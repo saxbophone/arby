@@ -2,14 +2,14 @@
 # minimum CMake version required for C++20 support, among other things
 cmake_minimum_required(VERSION 3.15)
 
-# detect if MyHovercraftIsFullOfEels is being used as a sub-project of another CMake project
+# detect if Arby is being used as a sub-project of another CMake project
 if(NOT DEFINED PROJECT_NAME)
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_SUBPROJECT OFF)
+    set(ARBY_SUBPROJECT OFF)
 else()
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_SUBPROJECT ON)
+    set(ARBY_SUBPROJECT ON)
 endif()
 
-project(my-hovercraft-is-full-of-eels VERSION 0.4.1 LANGUAGES CXX)
+project(arby VERSION 0.4.1 LANGUAGES CXX)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -27,24 +27,24 @@ endif()
 
 # set some handy custom variables to detect Release-type builds from Debug-type ones
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_DEBUG ON)
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_RELEASE OFF)
+    set(ARBY_BUILD_DEBUG ON)
+    set(ARBY_BUILD_RELEASE OFF)
 else()
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_DEBUG OFF)
-    set(MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_RELEASE ON)
+    set(ARBY_BUILD_DEBUG OFF)
+    set(ARBY_BUILD_RELEASE ON)
 endif()
 
-message(STATUS "[my-hovercraft-is-full-of-eels] Build Mode: ${CMAKE_BUILD_TYPE}")
+message(STATUS "[arby] Build Mode: ${CMAKE_BUILD_TYPE}")
 
 # set the C++ standard to use to C++20 always
-set(MY_HOVERCRAFT_IS_FULL_OF_EELS_CXX_STANDARD "20")
-message(STATUS "[my-hovercraft-is-full-of-eels] C++ Standard set to C++${MY_HOVERCRAFT_IS_FULL_OF_EELS_CXX_STANDARD}")
-set(CMAKE_CXX_STANDARD ${MY_HOVERCRAFT_IS_FULL_OF_EELS_CXX_STANDARD})
+set(ARBY_CXX_STANDARD "20")
+message(STATUS "[arby] C++ Standard set to C++${ARBY_CXX_STANDARD}")
+set(CMAKE_CXX_STANDARD ${ARBY_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(CMakeDependentOption)
 # if building in Release mode, provide an option to explicitly enable tests if desired (always ON for other builds, OFF by default for Release builds)
-cmake_dependent_option(ENABLE_TESTS "Build the unit tests in release mode?" OFF MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_RELEASE ON)
+cmake_dependent_option(ENABLE_TESTS "Build the unit tests in release mode?" OFF ARBY_BUILD_RELEASE ON)
 
 # Premature Optimisation causes problems. Commented out code below allows detection and enabling of LTO.
 # It's not being used currently because it seems to cause linker errors with Clang++ on Ubuntu if the library
@@ -54,37 +54,37 @@ cmake_dependent_option(ENABLE_TESTS "Build the unit tests in release mode?" OFF 
 
 # include(CheckIPOSupported)
 # check_ipo_supported(RESULT IPO_SUPPORTED)
-# # If we're in Release mode, set MY_HOVERCRAFT_IS_FULL_OF_EELS_USE_IPO to ON by default if it's detected as supported (user can always explicitly enable it in Release mode)
-# cmake_dependent_option(MY_HOVERCRAFT_IS_FULL_OF_EELS_USE_IPO "Use Link-Time/Inter-Procedural Optimisation?" ${IPO_SUPPORTED} MY_HOVERCRAFT_IS_FULL_OF_EELS_BUILD_RELEASE OFF)
-# if(MY_HOVERCRAFT_IS_FULL_OF_EELS_USE_IPO)
-#     message(STATUS "[my-hovercraft-is-full-of-eels] Link-Time-Optimisation Enabled")
+# # If we're in Release mode, set ARBY_USE_IPO to ON by default if it's detected as supported (user can always explicitly enable it in Release mode)
+# cmake_dependent_option(ARBY_USE_IPO "Use Link-Time/Inter-Procedural Optimisation?" ${IPO_SUPPORTED} ARBY_BUILD_RELEASE OFF)
+# if(ARBY_USE_IPO)
+#     message(STATUS "[arby] Link-Time-Optimisation Enabled")
 # endif()
 
 set(
-    MY_HOVERCRAFT_IS_FULL_OF_EELS_VERSION_STRING
+    ARBY_VERSION_STRING
     "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
 )
-set(MY_HOVERCRAFT_IS_FULL_OF_EELS_ESCAPED_VERSION_STRING "\"${MY_HOVERCRAFT_IS_FULL_OF_EELS_VERSION_STRING}\"")
+set(ARBY_ESCAPED_VERSION_STRING "\"${ARBY_VERSION_STRING}\"")
 # end basic metadata
 
 # This is a special target which only exists to capture compilation options
-# used for my-hovercraft-is-full-of-eels and its tests. This is to avoid setting global compiler
+# used for arby and its tests. This is to avoid setting global compiler
 # options which would be inherited by dependencies as well, which is bad
-# because my-hovercraft-is-full-of-eels uses strict compiler warning options which not all other
+# because arby uses strict compiler warning options which not all other
 # projects can build successfully with.
 # Any target linked with this one will inherit the compiler options used for
-# my-hovercraft-is-full-of-eels.
-add_library(my-hovercraft-is-full-of-eels-compiler-options INTERFACE)
+# arby.
+add_library(arby-compiler-options INTERFACE)
 
 # used for enabling additional compiler options if supported
 include(CheckCXXCompilerFlag)
 
 function(enable_cxx_compiler_flag_if_supported flag)
-    message(STATUS "[my-hovercraft-is-full-of-eels] Checking if compiler supports warning flag '${flag}'")
+    message(STATUS "[arby] Checking if compiler supports warning flag '${flag}'")
     check_cxx_compiler_flag("${flag}" flag_supported)
     if(flag_supported)
-        message(STATUS "[my-hovercraft-is-full-of-eels] Enabling warning flag '${flag}'")
-        target_compile_options(my-hovercraft-is-full-of-eels-compiler-options INTERFACE "${flag}")
+        message(STATUS "[arby] Enabling warning flag '${flag}'")
+        target_compile_options(arby-compiler-options INTERFACE "${flag}")
     endif()
     unset(flag_supported CACHE)
 endfunction()
@@ -136,10 +136,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 include(CPM)
 
 # library
-add_subdirectory(my-hovercraft-is-full-of-eels)
+add_subdirectory(arby)
 # unit tests --only enable if requested AND we're not building as a sub-project
-if(ENABLE_TESTS AND NOT MY_HOVERCRAFT_IS_FULL_OF_EELS_SUBPROJECT)
-    message(STATUS "[my-hovercraft-is-full-of-eels] Unit Tests Enabled")
+if(ENABLE_TESTS AND NOT ARBY_SUBPROJECT)
+    message(STATUS "[arby] Unit Tests Enabled")
     add_subdirectory(tests)
     enable_testing()
 endif()

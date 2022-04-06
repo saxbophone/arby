@@ -6,7 +6,7 @@
 
 #include "Private.hpp"
 
-namespace com::saxbophone::my_hovercraft_is_full_of_eels::PRIVATE {
+namespace com::saxbophone::arby::PRIVATE {
     bool library_works() {
         return true;
     }

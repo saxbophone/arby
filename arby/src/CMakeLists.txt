@@ -1,6 +1,6 @@
 # top-level namespace source files
 target_sources(
-    my-hovercraft-is-full-of-eels
+    arby
         PRIVATE
             Private.cpp
             Public.cpp
