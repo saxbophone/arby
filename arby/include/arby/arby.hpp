@@ -14,16 +14,11 @@
  *
  */
 
-#ifndef COM_SAXBOPHONE_ARBY_PUBLIC_HPP
-#define COM_SAXBOPHONE_ARBY_PUBLIC_HPP
+#ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
+#define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
 namespace com::saxbophone::arby {
-    /**
-     * @brief Stub test function for sample project
-     * @returns Whether the test library "works" or not, which is a vague
-     * question in of itself
-     */
-    bool library_works();
+    class Uint {};
 }
 
 #endif // include guard

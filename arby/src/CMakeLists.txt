@@ -2,8 +2,7 @@
 target_sources(
     arby
         PRIVATE
-            Private.cpp
-            Public.cpp
+            arby.cpp
 )
 # sub-namespace source directories
 # NOTE: none yet!
