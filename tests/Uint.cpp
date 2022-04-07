@@ -42,3 +42,42 @@ TEST_CASE("std::numeric_limits<arby::Uint>") {
     CHECK(std::numeric_limits<arby::Uint>::signaling_NaN() == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::denorm_min() == 0); // N/A
 }
+
+TEST_CASE("arby::Uint(uintmax_t random) and (uintmax_t)arby::Uint") {
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+
+    arby::Uint output(input);
+
+    CHECK((uintmax_t)output == input);
+}
+
+TEST_CASE("arby::Uint(0) and (uintmax_t)arby::Uint") {
+    arby::Uint output(0);
+
+    CHECK((uintmax_t)output == 0);
+}
+
+TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint") {
+    arby::Uint output(std::numeric_limits<uintmax_t>::max());
+
+    CHECK((uintmax_t)output == std::numeric_limits<uintmax_t>::max());
+}
+
+// only inlude these tests if we have library support for constexpr vector
+#ifdef __cpp_lib_constexpr_vector
+constexpr uintmax_t use_uint() {
+    return (uintmax_t)arby::Uint();
+}
+
+constexpr uintmax_t use_uint(std::size_t) {
+    return (uintmax_t)arby::Uint(0);
+}
+
+TEST_CASE("constexpr arby::Uint()") {
+    CHECK(use_uint() == 0);
+}
+
+TEST_CASE("constexpr arby::Uint(0)") {
+    CHECK(use_uint(0) == 0);
+}
+#endif
