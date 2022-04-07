@@ -36,11 +36,13 @@ namespace com::saxbophone::arby {
     Uint::Uint() : Uint::Uint(0) {}
 
     Uint::Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
-        uintmax_t power = exp(Uint::BASE, _digits.size());
-        for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
-            *digit = value / power;
-            value %= power;
-            power /= Uint::BASE;
+        if (_digits.size() > 0) {
+            uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
+            for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
+                *digit = value / power;
+                value %= power;
+                power /= Uint::BASE;
+            }
         }
     }
 
