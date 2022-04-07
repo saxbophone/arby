@@ -28,11 +28,9 @@ namespace com::saxbophone::arby {
     };
 }
 
-using namespace com::saxbophone;
-
 // adding template specialisation to std::numeric_limits<> for arby::Uint
 template <>
-class std::numeric_limits<arby::Uint> {
+class std::numeric_limits<com::saxbophone::arby::Uint> {
 public:
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = false;
@@ -58,15 +56,15 @@ public:
     static constexpr bool traps = true;
     static constexpr bool tinyness_before = false; // N/A
     // These methods can always be converted from constexpr to const if constexpr vector gives too much grief!
-    static constexpr arby::Uint min() { return 0; };
-    static constexpr arby::Uint lowest() { return 0; };
-    static constexpr arby::Uint max() { return 0; }; // N/A
-    static constexpr arby::Uint epsilon() { return 0; } // N/A
-    static constexpr arby::Uint round_error() { return 0; } // N/A
-    static constexpr arby::Uint infinity() { return 0; } // N/A
-    static constexpr arby::Uint quiet_NaN() { return 0; } // N/A
-    static constexpr arby::Uint signaling_NaN() { return 0; } // N/A
-    static constexpr arby::Uint denorm_min() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint min() { return 0; };
+    static constexpr com::saxbophone::arby::Uint lowest() { return 0; };
+    static constexpr com::saxbophone::arby::Uint max() { return 0; }; // N/A
+    static constexpr com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint round_error() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint infinity() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard
