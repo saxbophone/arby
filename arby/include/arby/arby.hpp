@@ -31,6 +31,7 @@ namespace com::saxbophone::arby {
          * make up the digits of our arbitrary-size integers
          */
         using StorageType = unsigned int;
+        // XXX: remove this, it won't work on platforms where both uintmax_t and uint are same width!
         static constexpr uintmax_t BASE = (uintmax_t)std::numeric_limits<StorageType>::max() + 1u;
         std::vector<StorageType> _digits;
     public:
