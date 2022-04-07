@@ -9,24 +9,38 @@
 
 #include <arby/arby.hpp>
 
+
+namespace {
+    // returns ceil(logₐ(n))
+    constexpr uintmax_t fit(uintmax_t n, uintmax_t a) {
+        uintmax_t remainder;
+        uintmax_t exponent = 0;
+        do {
+            remainder = n / a;
+            n = remainder;
+            exponent++;
+        } while (n > 0);
+        return exponent;
+    }
+    // returns xⁿ
+    constexpr uintmax_t exp(uintmax_t x, uintmax_t n) {
+        if (n == 0) {
+            return 1;
+        } else {
+            return x * exp(x, n - 1);
+        }
+    }
+}
+
 namespace com::saxbophone::arby {
     Uint::Uint() : Uint::Uint(0) {}
 
-    Uint::Uint(uintmax_t value) {
-        // cmath can probably do this quicker, but we'd have to use floating point! :S
-        uintmax_t current_radix = 1;
-        uintmax_t current_value = value;
-        while (current_value > Uint::BASE) {
-            current_radix *= Uint::BASE;
-            current_value /= Uint::BASE;
-            this->_digits.push_back(0);
-        }
-        // iterate backwards over digits
-        for (auto it = this->_digits.rbegin(); it != this->_digits.rend(); ++it) {
-            Uint::StorageType digit = current_radix / value;
-            value -= digit * current_radix;
-            *it = digit;
-            current_radix /= Uint::BASE;
+    Uint::Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
+        uintmax_t power = exp(Uint::BASE, _digits.size());
+        for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
+            *digit = value / power;
+            value %= power;
+            power /= Uint::BASE;
         }
     }
 
@@ -35,7 +49,7 @@ namespace com::saxbophone::arby {
     Uint::operator uintmax_t() const {
         uintmax_t accumulator = 0;
         uintmax_t current_radix = 1;
-        for (auto digit : this->_digits) {
+        for (auto digit : _digits) {
             accumulator += digit * current_radix;
             current_radix *= Uint::BASE;
         }
