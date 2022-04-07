@@ -13,6 +13,10 @@
 namespace {
     // returns ceil(logₐ(n))
     constexpr uintmax_t fit(uintmax_t n, uintmax_t a) {
+        // n = 0 is the exception --we don't use any digits at all for 0
+        if (n == 0) {
+            return 0;
+        }
         uintmax_t remainder;
         uintmax_t exponent = 0;
         do {
