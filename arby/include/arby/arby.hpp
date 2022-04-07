@@ -96,7 +96,7 @@ namespace com::saxbophone::arby {
             if (_digits.size() > 0) {
                 uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
                 for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
-                    *digit = value / power;
+                    *digit = (StorageType)(value / power);
                     value %= power;
                     power /= Uint::BASE;
                 }
