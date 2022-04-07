@@ -17,14 +17,56 @@
 #ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
 #define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
+#include <cstdint>
 #include <limits>
+#include <string>
+#include <vector>
+
+
+namespace {
+    /*
+     * these template specialisations are used for selecting the unsigned type
+     * to use for storing the digits of our arbitrary-size numbers
+     *
+     * the template specialisations pick the next-smallest unsigned type for
+     * the given signed type, this is to ensure that the number base is not out
+     * of range of int on any given system, and means we can report it from the
+     * radix() method in numeric_limits<> (which returns int).
+     */
+    template <typename T>
+    struct GetStorageType {
+        using type = void;
+    };
+
+    template <>
+    struct GetStorageType<std::int64_t> {
+        using type = std::uint32_t;
+    };
+
+    template <>
+    struct GetStorageType<std::int32_t> {
+        using type = std::uint16_t;
+    };
+
+    template <>
+    struct GetStorageType<std::int16_t> {
+        using type = std::uint8_t;
+    };
+}
 
 namespace com::saxbophone::arby {
     class Uint {
     public:
-        constexpr Uint() {}
-        constexpr Uint(int) {}
-        constexpr bool operator==(const Uint& rhs) const = default;
+        using StorageType = GetStorageType<int>::type;
+        static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
+        Uint();
+        Uint(uintmax_t value);
+        Uint(std::string digits);
+        bool operator==(const Uint& rhs) const = default;
+        explicit operator uintmax_t() const;
+        explicit operator std::string() const;
+    private:
+        std::vector<StorageType> _digits;
     };
 }
 
@@ -48,7 +90,7 @@ public:
     static constexpr int digits = 0; // N/A
     static constexpr int digits10 = 0; // N/A
     static constexpr int max_digits10 = 0; // N/A
-    static constexpr int radix = 2; // should be UINT_MAX+1 but won't fit in an int!
+    static constexpr int radix = com::saxbophone::arby::Uint::BASE;
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A
@@ -56,15 +98,15 @@ public:
     static constexpr bool traps = true;
     static constexpr bool tinyness_before = false; // N/A
     // These methods can always be converted from constexpr to const if constexpr vector gives too much grief!
-    static constexpr com::saxbophone::arby::Uint min() { return 0; };
-    static constexpr com::saxbophone::arby::Uint lowest() { return 0; };
-    static constexpr com::saxbophone::arby::Uint max() { return 0; }; // N/A
-    static constexpr com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint round_error() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint infinity() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
+    static com::saxbophone::arby::Uint min() { return 0; };
+    static com::saxbophone::arby::Uint lowest() { return 0; };
+    static com::saxbophone::arby::Uint max() { return 0; }; // N/A
+    static com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
+    static com::saxbophone::arby::Uint round_error() { return 0; } // N/A
+    static com::saxbophone::arby::Uint infinity() { return 0; } // N/A
+    static com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
+    static com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
+    static com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard

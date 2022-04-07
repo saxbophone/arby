@@ -23,7 +23,8 @@ TEST_CASE("std::numeric_limits<arby::Uint>") {
     CHECK(std::numeric_limits<arby::Uint>::digits == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::digits10 == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::max_digits10 == 0); // N/A
-    CHECK(std::numeric_limits<arby::Uint>::radix == 2); // should be UINT_MAX+1 but won't fit in an int!
+    // calculate the bit width of the next-lowest type, its place value is the radix
+    CHECK(std::numeric_limits<arby::Uint>::radix == 1u << ((std::numeric_limits<int>::digits + 1) / 2));
     CHECK(std::numeric_limits<arby::Uint>::min_exponent == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::min_exponent10 == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::max_exponent == 0); // N/A
