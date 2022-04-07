@@ -4,15 +4,23 @@
  * <Copyright information goes here>
  */
 
-#include <iostream>
+#include <cstdint>
+#include <string>
 
 #include <arby/arby.hpp>
 
 namespace com::saxbophone::arby {
-    Uint::Uint() {}
-    Uint::Uint(uintmax_t value) {
-        std::cout << Uint::BASE << std::endl;
-    }
+    Uint::Uint() : Uint::Uint(0) {}
+
+    Uint::Uint(uintmax_t value) {}
+
     Uint::Uint(std::string digits) {}
-    // bool Uint::operator==(const Uint& rhs) const = default;
+
+    Uint::operator uintmax_t() const {
+        return {};
+    }
+
+    Uint::operator std::string() const {
+        return {};
+    }
 }

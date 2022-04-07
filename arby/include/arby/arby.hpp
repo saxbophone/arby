@@ -38,6 +38,8 @@ namespace com::saxbophone::arby {
         Uint(uintmax_t value);
         Uint(std::string digits);
         bool operator==(const Uint& rhs) const = default;
+        explicit operator uintmax_t() const;
+        explicit operator std::string() const;
     };
 }
 
