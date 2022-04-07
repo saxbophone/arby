@@ -4,12 +4,7 @@
  * <Copyright information goes here>
  */
 
-#include <arby/Public.hpp>
-
-#include "Private.hpp"
+#include <arby/arby.hpp>
 
 namespace com::saxbophone::arby {
-    bool library_works() {
-        return PRIVATE::library_works();
-    }
 }
