@@ -22,25 +22,51 @@
 #include <string>
 #include <vector>
 
+
+namespace {
+    /*
+     * these template specialisations are used for selecting the unsigned type
+     * to use for storing the digits of our arbitrary-size numbers
+     *
+     * the template specialisations pick the next-smallest unsigned type for
+     * the given signed type, this is to ensure that the number base is not out
+     * of range of int on any given system, and means we can report it from the
+     * radix() method in numeric_limits<> (which returns int).
+     */
+    template <typename T>
+    struct GetStorageType {
+        using type = void;
+    };
+
+    template <>
+    struct GetStorageType<std::int64_t> {
+        using type = std::uint32_t;
+    };
+
+    template <>
+    struct GetStorageType<std::int32_t> {
+        using type = std::uint16_t;
+    };
+
+    template <>
+    struct GetStorageType<std::int16_t> {
+        using type = std::uint8_t;
+    };
+}
+
 namespace com::saxbophone::arby {
     class Uint {
-    private:
-        /*
-         * unsigned int is meant to be the "natural" unsigned type for the
-         * system, so it seems like a good idea to use it as a base word to
-         * make up the digits of our arbitrary-size integers
-         */
-        using StorageType = unsigned int;
-        // XXX: remove this, it won't work on platforms where both uintmax_t and uint are same width!
-        static constexpr uintmax_t BASE = (uintmax_t)std::numeric_limits<StorageType>::max() + 1u;
-        std::vector<StorageType> _digits;
     public:
+        using StorageType = GetStorageType<int>::type;
+        static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
         Uint();
         Uint(uintmax_t value);
         Uint(std::string digits);
         bool operator==(const Uint& rhs) const = default;
         explicit operator uintmax_t() const;
         explicit operator std::string() const;
+    private:
+        std::vector<StorageType> _digits;
     };
 }
 
@@ -64,7 +90,7 @@ public:
     static constexpr int digits = 0; // N/A
     static constexpr int digits10 = 0; // N/A
     static constexpr int max_digits10 = 0; // N/A
-    static constexpr int radix = 2; // should be UINT_MAX+1 but won't fit in an int!
+    static constexpr int radix = com::saxbophone::arby::Uint::BASE;
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A
