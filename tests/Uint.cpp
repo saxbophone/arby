@@ -42,3 +42,11 @@ TEST_CASE("std::numeric_limits<arby::Uint>") {
     CHECK(std::numeric_limits<arby::Uint>::signaling_NaN() == 0); // N/A
     CHECK(std::numeric_limits<arby::Uint>::denorm_min() == 0); // N/A
 }
+
+TEST_CASE("arby::Uint(uintmax_t) and (uintmax_t)arby::Uint") {
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+
+    arby::Uint output(input);
+
+    CHECK((uintmax_t)output == input);
+}
