@@ -85,22 +85,22 @@ public:
     static constexpr bool has_denorm_loss = false; // N/A
     static constexpr std::float_round_style round_style = std::round_toward_zero;
     static constexpr bool is_iec559 = false;
-    static constexpr bool is_bounded = false;
-    static constexpr bool is_modulo = false;
-    static constexpr int digits = 0; // N/A
-    static constexpr int digits10 = 0; // N/A
-    static constexpr int max_digits10 = 0; // N/A
-    static constexpr int radix = com::saxbophone::arby::Uint::BASE;
+    static constexpr bool is_bounded = false; // an unbounded type!
+    static constexpr bool is_modulo = false; // Uint increases number of digits on overflow. Underflow is undefined.
+    static constexpr int digits = 0; // N/A --no hard limit
+    static constexpr int digits10 = 0; // N/A --no hard limit
+    static constexpr int max_digits10 = 0; // N/A --no hard limit
+    static constexpr int radix = com::saxbophone::arby::Uint::BASE; // NOTE: this is the radix used for each digit, all of which are binary
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A
     static constexpr int max_exponent10 = 0; // N/A
-    static constexpr bool traps = true;
+    static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
     static constexpr bool tinyness_before = false; // N/A
-    // These methods can always be converted from constexpr to const if constexpr vector gives too much grief!
+    // these methods should be made constexpr when constexpr std::vector is widely supported
     static com::saxbophone::arby::Uint min() { return 0; };
     static com::saxbophone::arby::Uint lowest() { return 0; };
-    static com::saxbophone::arby::Uint max() { return 0; }; // N/A
+    static com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
     static com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
     static com::saxbophone::arby::Uint round_error() { return 0; } // N/A
     static com::saxbophone::arby::Uint infinity() { return 0; } // N/A
