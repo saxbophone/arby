@@ -17,6 +17,7 @@
 #ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
 #define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -52,18 +53,66 @@ namespace {
     struct GetStorageType<std::int16_t> {
         using type = std::uint8_t;
     };
+
+    // returns ceil(logₐ(n))
+    constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
+        // n = 0 is the exception --we don't use any digits at all for 0
+        if (n == 0) {
+            return 0;
+        }
+        std::size_t remainder;
+        std::size_t exponent = 0;
+        do {
+            remainder = n / a;
+            n = remainder;
+            exponent++;
+        } while (n > 0);
+        return exponent;
+    }
+    // returns xⁿ
+    constexpr uintmax_t exp(uintmax_t x, uintmax_t n) {
+        if (n == 0) {
+            return 1;
+        } else {
+            return x * exp(x, n - 1);
+        }
+    }
 }
+
+// only define Uint as a constexpr class if there is library support for constexpr std::vector
+#ifdef __cpp_lib_constexpr_vector
+#define constexprvector constexpr
+#else
+#define constexprvector
+#endif
 
 namespace com::saxbophone::arby {
     class Uint {
     public:
         using StorageType = GetStorageType<int>::type;
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
-        Uint();
-        Uint(uintmax_t value);
+        constexprvector Uint() : Uint(0) {}
+        constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
+            if (_digits.size() > 0) {
+                uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
+                for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
+                    *digit = value / power;
+                    value %= power;
+                    power /= Uint::BASE;
+                }
+            }
+        }
         Uint(std::string digits);
-        bool operator==(const Uint& rhs) const = default;
-        explicit operator uintmax_t() const;
+        constexprvector bool operator==(const Uint& rhs) const = default;
+        explicit constexprvector operator uintmax_t() const {
+            uintmax_t accumulator = 0;
+            uintmax_t current_radix = 1;
+            for (auto digit : _digits) {
+                accumulator += digit * current_radix;
+                current_radix *= Uint::BASE;
+            }
+            return accumulator;
+        }
         explicit operator std::string() const;
     private:
         std::vector<StorageType> _digits;
@@ -98,15 +147,18 @@ public:
     static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
     static constexpr bool tinyness_before = false; // N/A
     // these methods should be made constexpr when constexpr std::vector is widely supported
-    static com::saxbophone::arby::Uint min() { return 0; };
-    static com::saxbophone::arby::Uint lowest() { return 0; };
-    static com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
-    static com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
-    static com::saxbophone::arby::Uint round_error() { return 0; } // N/A
-    static com::saxbophone::arby::Uint infinity() { return 0; } // N/A
-    static com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
-    static com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
-    static com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint min() { return 0; };
+    static constexprvector com::saxbophone::arby::Uint lowest() { return 0; };
+    static constexprvector com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
+    static constexprvector com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint round_error() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint infinity() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
+
+// avoid polluting global macro namespace by tidying up our macros after us
+#undef constexprvector
 
 #endif // include guard
