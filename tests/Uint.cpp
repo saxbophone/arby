@@ -62,3 +62,22 @@ TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint") {
 
     CHECK((uintmax_t)output == std::numeric_limits<uintmax_t>::max());
 }
+
+// only inlude these tests if we have library support for constexpr vector
+#ifdef __cpp_lib_constexpr_vector
+TEST_CASE("constexpr arby::Uint()") {
+    constexpr arby::Uint input;
+
+    constexpr uintmax_t output = (uintmax_t)input;
+
+    CHECK(output == 0);
+}
+
+TEST_CASE("constexpr arby::Uint(0)") {
+    constexpr arby::Uint input(0);
+
+    constexpr uintmax_t output = (uintmax_t)input;
+
+    CHECK(output == 0);
+}
+#endif
