@@ -31,13 +31,13 @@ TEST_CASE("std::numeric_limits<arby::Uint>") {
     CHECK(std::numeric_limits<arby::Uint>::traps);
     CHECK_FALSE(std::numeric_limits<arby::Uint>::tinyness_before); // N/A
     // can't uncomment these tests until Uint has an equality operator and can be ctor() from int
-    // CHECK(std::numeric_limits<arby::Uint>::min() == 0);
-    // CHECK(std::numeric_limits<arby::Uint>::lowest() == 0);
-    // CHECK(std::numeric_limits<arby::Uint>::max() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::epsilon() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::round_error() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::infinity() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::quiet_NaN() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::signaling_NaN() == 0); // N/A
-    // CHECK(std::numeric_limits<arby::Uint>::denorm_min() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::min() == 0);
+    CHECK(std::numeric_limits<arby::Uint>::lowest() == 0);
+    CHECK(std::numeric_limits<arby::Uint>::max() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::epsilon() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::round_error() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::infinity() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::quiet_NaN() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::signaling_NaN() == 0); // N/A
+    CHECK(std::numeric_limits<arby::Uint>::denorm_min() == 0); // N/A
 }
