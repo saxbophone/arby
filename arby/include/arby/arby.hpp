@@ -17,14 +17,27 @@
 #ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
 #define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
+#include <cstdint>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace com::saxbophone::arby {
     class Uint {
+    private:
+        /*
+         * unsigned int is meant to be the "natural" unsigned type for the
+         * system, so it seems like a good idea to use it as a base word to
+         * make up the digits of our arbitrary-size integers
+         */
+        using StorageType = unsigned int;
+        static constexpr uintmax_t BASE = (uintmax_t)std::numeric_limits<StorageType>::max() + 1u;
+        std::vector<StorageType> _digits;
     public:
-        constexpr Uint() {}
-        constexpr Uint(int) {}
-        constexpr bool operator==(const Uint& rhs) const = default;
+        Uint();
+        Uint(uintmax_t value);
+        Uint(std::string digits);
+        bool operator==(const Uint& rhs) const = default;
     };
 }
 
@@ -56,15 +69,15 @@ public:
     static constexpr bool traps = true;
     static constexpr bool tinyness_before = false; // N/A
     // These methods can always be converted from constexpr to const if constexpr vector gives too much grief!
-    static constexpr com::saxbophone::arby::Uint min() { return 0; };
-    static constexpr com::saxbophone::arby::Uint lowest() { return 0; };
-    static constexpr com::saxbophone::arby::Uint max() { return 0; }; // N/A
-    static constexpr com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint round_error() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint infinity() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
+    static com::saxbophone::arby::Uint min() { return 0; };
+    static com::saxbophone::arby::Uint lowest() { return 0; };
+    static com::saxbophone::arby::Uint max() { return 0; }; // N/A
+    static com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
+    static com::saxbophone::arby::Uint round_error() { return 0; } // N/A
+    static com::saxbophone::arby::Uint infinity() { return 0; } // N/A
+    static com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
+    static com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
+    static com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard
