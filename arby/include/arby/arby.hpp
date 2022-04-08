@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <compare>
 #include <limits>
 #include <string>
 #include <vector>
