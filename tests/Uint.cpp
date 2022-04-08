@@ -1,4 +1,5 @@
 #include <limits>
+#include <stdexcept>
 
 #include <catch2/catch.hpp>
 
@@ -125,11 +126,11 @@ TEST_CASE("arby::Uint postfix decrement") {
 TEST_CASE("arby::Uint prefix decrement underflow") {
     arby::Uint input = 0;
     // underflow should throw an exception
-    CHECK_THROWS(--input);
+    CHECK_THROWS_AS(--input, std::underflow_error);
 }
 
 TEST_CASE("arby::Uint postfix decrement underflow") {
     arby::Uint input = 0;
     // underflow should throw an exception
-    CHECK_THROWS(input--);
+    CHECK_THROWS_AS(input--, std::underflow_error);
 }

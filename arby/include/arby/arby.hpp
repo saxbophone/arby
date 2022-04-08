@@ -22,6 +22,7 @@
 #include <compare>
 #include <limits>
 #include <string>
+#include <stdexcept>
 #include <vector>
 
 
@@ -153,7 +154,7 @@ namespace com::saxbophone::arby {
         Uint& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
-                throw "error: arithmetic underflow";
+                throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit
                 auto it = _digits.begin();
