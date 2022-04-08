@@ -101,3 +101,35 @@ TEST_CASE("arby::Uint++") {
     CHECK((uintmax_t)original == input + 1);
     CHECK((uintmax_t)previous == input);
 }
+
+TEST_CASE("--arby::Uint") {
+    uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
+
+    arby::Uint original = input;
+    arby::Uint changed = --original;
+
+    CHECK((uintmax_t)original == input - 1);
+    CHECK((uintmax_t)changed == input - 1);
+}
+
+TEST_CASE("arby::Uint--") {
+    uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
+
+    arby::Uint original = input;
+    arby::Uint previous = original--;
+
+    CHECK((uintmax_t)original == input - 1);
+    CHECK((uintmax_t)previous == input);
+}
+
+TEST_CASE("--arby::Uint underflow") {
+    arby::Uint input = 0;
+    // underflow should throw an exception
+    CHECK_THROWS(--input);
+}
+
+TEST_CASE("arby::Uint-- underflow") {
+    arby::Uint input = 0;
+    // underflow should throw an exception
+    CHECK_THROWS(input--);
+}
