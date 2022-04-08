@@ -124,7 +124,23 @@ namespace com::saxbophone::arby {
         explicit operator std::string() const;
         // prefix increment
         Uint& operator++() {
-            // TODO: implement
+            // empty digits vector (means value is zero) is a special case
+            if (_digits.size() == 0) {
+                _digits.push_back(1);
+            } else {
+                // increment least significant digit
+                auto it = _digits.begin();
+                (*it)++;
+                // increment remaining digits (rollover) as needed
+                while (it < _digits.end() - 1 and *it == 0) { // last digit overflowed to zero
+                    it++; // increment index
+                    (*it)++; // increment digit
+                }
+                // if last digit is zero, we need another one
+                if (_digits.back() == 0) {
+                    _digits.push_back(1);
+                }
+            }
             return *this; // return new value by reference
         }
         // postfix increment
