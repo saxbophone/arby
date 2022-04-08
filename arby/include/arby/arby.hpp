@@ -151,7 +151,23 @@ namespace com::saxbophone::arby {
         }
         // prefix decrement
         Uint& operator--() {
-            // TODO: implement
+            // empty digits vector (means value is zero) is a special case
+            if (_digits.size() == 0) {
+                throw "error: arithmetic underflow";
+            } else {
+                // decrement least significant digit
+                auto it = _digits.begin();
+                (*it)--;
+                // decrement remaining digits (borrow) as needed
+                while (it < _digits.end() - 1 and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
+                    it++; // increment index
+                    (*it)--; // decrement digit
+                }
+                // if last digit is zero, remove it
+                if (_digits.back() == 0) {
+                    _digits.pop_back();
+                }
+            }
             return *this; // return new value by reference
         }
         // postfix decrement

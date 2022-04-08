@@ -82,7 +82,7 @@ TEST_CASE("constexpr arby::Uint(0)") {
 }
 #endif
 
-TEST_CASE("++arby::Uint") {
+TEST_CASE("arby::Uint prefix increment") {
     uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
 
     arby::Uint original = input;
@@ -92,7 +92,7 @@ TEST_CASE("++arby::Uint") {
     CHECK((uintmax_t)changed == input + 1);
 }
 
-TEST_CASE("arby::Uint++") {
+TEST_CASE("arby::Uint postfix increment") {
     uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
 
     arby::Uint original = input;
@@ -102,7 +102,7 @@ TEST_CASE("arby::Uint++") {
     CHECK((uintmax_t)previous == input);
 }
 
-TEST_CASE("--arby::Uint") {
+TEST_CASE("arby::Uint prefix decrement") {
     uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
 
     arby::Uint original = input;
@@ -112,7 +112,7 @@ TEST_CASE("--arby::Uint") {
     CHECK((uintmax_t)changed == input - 1);
 }
 
-TEST_CASE("arby::Uint--") {
+TEST_CASE("arby::Uint postfix decrement") {
     uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
 
     arby::Uint original = input;
@@ -122,13 +122,13 @@ TEST_CASE("arby::Uint--") {
     CHECK((uintmax_t)previous == input);
 }
 
-TEST_CASE("--arby::Uint underflow") {
+TEST_CASE("arby::Uint prefix decrement underflow") {
     arby::Uint input = 0;
     // underflow should throw an exception
     CHECK_THROWS(--input);
 }
 
-TEST_CASE("arby::Uint-- underflow") {
+TEST_CASE("arby::Uint postfix decrement underflow") {
     arby::Uint input = 0;
     // underflow should throw an exception
     CHECK_THROWS(input--);
