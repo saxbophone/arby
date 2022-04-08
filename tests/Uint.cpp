@@ -81,3 +81,23 @@ TEST_CASE("constexpr arby::Uint(0)") {
     CHECK(use_uint(0) == 0);
 }
 #endif
+
+TEST_CASE("++arby::Uint") {
+    uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
+
+    arby::Uint original = input;
+    arby::Uint changed = ++original;
+
+    CHECK((uintmax_t)original == input + 1);
+    CHECK((uintmax_t)changed == input + 1);
+}
+
+TEST_CASE("arby::Uint++") {
+    uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
+
+    arby::Uint original = input;
+    arby::Uint previous = original++;
+
+    CHECK((uintmax_t)original == input + 1);
+    CHECK((uintmax_t)previous == input);
+}
