@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <compare>
 #include <limits>
 #include <string>
 #include <vector>
@@ -90,8 +91,11 @@ namespace com::saxbophone::arby {
     class Uint {
     public:
         using StorageType = GetStorageType<int>::type;
+
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
+
         constexprvector Uint() : Uint(0) {}
+
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
                 uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
@@ -102,8 +106,11 @@ namespace com::saxbophone::arby {
                 }
             }
         }
+
         Uint(std::string digits);
+
         constexprvector bool operator==(const Uint& rhs) const = default;
+
         explicit constexprvector operator uintmax_t() const {
             uintmax_t accumulator = 0;
             uintmax_t current_radix = 1;
@@ -113,7 +120,120 @@ namespace com::saxbophone::arby {
             }
             return accumulator;
         }
+
         explicit operator std::string() const;
+        // prefix increment
+        Uint& operator++() {
+            // TODO: implement
+            return *this; // return new value by reference
+        }
+        // postfix increment
+        Uint operator++(int) {
+            Uint old = *this; // copy old value
+            operator++();  // prefix increment
+            return old;    // return old value
+        }
+        // prefix decrement
+        Uint& operator--() {
+            // TODO: implement
+            return *this; // return new value by reference
+        }
+        // postfix decrement
+        Uint operator--(int) {
+            Uint old = *this; // copy old value
+            operator--();  // prefix decrement
+            return old;    // return old value
+        }
+        // addition-assignment
+        constexprvector Uint& operator+=(const Uint& rhs) {
+            // TODO: implement
+            return *this; // return the result by reference
+        }
+        // addition
+        friend constexprvector Uint operator+(Uint lhs, const Uint& rhs) {
+            lhs += rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // subtraction-assignment
+        constexprvector Uint& operator-=(const Uint& rhs) {
+            // TODO: implement
+            return *this; // return the result by reference
+        }
+        // subtraction
+        friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
+            lhs -= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // multiplication-assignment
+        constexprvector Uint& operator*=(const Uint& rhs) {
+            // TODO: implement
+            return *this; // return the result by reference
+        }
+        // multiplication
+        friend constexprvector Uint operator*(Uint lhs, const Uint& rhs) {
+            lhs *= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // division-assignment
+        constexprvector Uint& operator/=(const Uint& rhs) {
+            // TODO: implement
+            return *this; // return the result by reference
+        }
+        // division
+        friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
+            lhs /= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // modulo-assignment
+        constexprvector Uint& operator%=(const Uint& rhs) {
+            // TODO: implement
+            return *this; // return the result by reference
+        }
+        // modulo
+        friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
+            lhs %= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // three-way-comparison operator defines all relational operators
+        constexprvector auto operator<=>(const Uint& rhs) const {
+            // XXX: stub, function needs proper implementation
+            // XXX: we can't use defaulted comparisons only because our vector
+            // is little-endian... or we could reverse the order and cause more
+            // work for ourselves when enlargening Uint instances but to the
+            // benefit of being able to take advantage of the defaulted
+            // comparison operator...
+            return std::strong_ordering::equal;
+        }
+        // left-shift-assignment
+        constexprvector Uint& operator<<=(const Uint& n) {
+            // TODO: implement
+            return *this;
+        }
+        // left-shift
+        friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
+            lhs <<= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // right-shift-assignment
+        constexprvector Uint& operator>>=(const Uint& n) {
+            // TODO: implement
+            return *this;
+        }
+        // right-shift
+        friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
+            lhs <<= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // contextual conversion to bool (behaves same way as int)
+        explicit constexprvector operator bool() const {
+            // TODO: implement
+            return false;
+        }
+        // unary minus
+        constexprvector Uint operator-() const {
+            // TODO: implement
+            return *this;
+        }
     private:
         std::vector<StorageType> _digits;
     };
