@@ -35,6 +35,11 @@ namespace {
      * the given signed type, this is to ensure that the number base is not out
      * of range of int on any given system, and means we can report it from the
      * radix() method in numeric_limits<> (which returns int).
+     * TODO: maybe we should remove this and just use int as StorageType instead
+     * as the benefit of being able to report the base as radix() seems small
+     * compared to the potential cost of maybe using a non-efficient smaller data
+     * type to store the digits.
+     * Then again, premature optimisation is bad...
      */
     template <typename T>
     struct GetStorageType {
