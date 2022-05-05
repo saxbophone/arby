@@ -152,6 +152,10 @@ TEST_CASE("arby::Uint three-way-comparison with arby::Uint using known values") 
                 {3, 5, std::strong_ordering::less},
                 {5, 3, std::strong_ordering::greater},
                 {261, 261, std::strong_ordering::equal},
+                // now for some other much larger values guaranteed to pass a digit-boundary
+                {arby::Uint::BASE + 1, arby::Uint::BASE + 1, std::strong_ordering::equal},
+                {arby::Uint::BASE + 20, arby::Uint::BASE + 19, std::strong_ordering::greater},
+                {arby::Uint::BASE + 33, arby::Uint::BASE + 62, std::strong_ordering::less},
             }
         )
     );
