@@ -75,11 +75,11 @@ constexpr uintmax_t use_uint(std::size_t) {
 }
 
 TEST_CASE("constexpr arby::Uint()") {
-    CHECK(use_uint() == 0);
+    STATIC_CHECK(use_uint() == 0);
 }
 
 TEST_CASE("constexpr arby::Uint(0)") {
-    CHECK(use_uint(0) == 0);
+    STATIC_CHECK(use_uint(0) == 0);
 }
 #endif
 
