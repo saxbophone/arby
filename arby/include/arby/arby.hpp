@@ -99,9 +99,10 @@ namespace com::saxbophone::arby {
 
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
+                // fill out digits in big-endian order
                 uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
-                for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
-                    *digit = (StorageType)(value / power);
+                for (auto& digit : _digits) {
+                    digit = (StorageType)(value / power);
                     value %= power;
                     power /= Uint::BASE;
                 }
@@ -115,8 +116,10 @@ namespace com::saxbophone::arby {
         explicit constexprvector operator uintmax_t() const {
             uintmax_t accumulator = 0;
             uintmax_t current_radix = 1;
-            for (auto digit : _digits) {
-                accumulator += digit * current_radix;
+            // digits are stored in big-endian order, but we read them out in little-endian
+            // TODO: loops like this make my head hurt. Let's read it out in big-endian order instead
+            for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
+                accumulator += *digit * current_radix;
                 current_radix *= Uint::BASE;
             }
             return accumulator;
@@ -130,16 +133,16 @@ namespace com::saxbophone::arby {
                 _digits.push_back(1);
             } else {
                 // increment least significant digit
-                auto it = _digits.begin();
+                auto it = _digits.rbegin();
                 (*it)++;
                 // increment remaining digits (rollover) as needed
-                while (it < _digits.end() - 1 and *it == 0) { // last digit overflowed to zero
-                    it++; // increment index
+                while (it != _digits.rend() and *it == 0) { // last digit overflowed to zero
+                    ++it; // increment index
                     (*it)++; // increment digit
                 }
                 // if last digit is zero, we need another one
-                if (_digits.back() == 0) {
-                    _digits.push_back(1);
+                if (_digits.front() == 0) {
+                    _digits.insert(_digits.begin(), 1);
                 }
             }
             return *this; // return new value by reference
@@ -157,16 +160,16 @@ namespace com::saxbophone::arby {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit
-                auto it = _digits.begin();
+                auto it = _digits.rbegin();
                 (*it)--;
                 // decrement remaining digits (borrow) as needed
-                while (it < _digits.end() - 1 and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
-                    it++; // increment index
+                while (it != _digits.rend() and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
+                    ++it; // increment index
                     (*it)--; // decrement digit
                 }
                 // if last digit is zero, remove it
-                if (_digits.back() == 0) {
-                    _digits.pop_back();
+                if (_digits.front() == 0) {
+                    _digits.erase(_digits.begin());
                 }
             }
             return *this; // return new value by reference
@@ -263,6 +266,9 @@ namespace com::saxbophone::arby {
             return false;
         }
         // unary minus
+        // D'oh! This type is unsigned. It's tricky to know exactly what unary
+        // minus means when applied to unsigned, but this SO answer explains:
+        // https://stackoverflow.com/a/14065392/6177253
         constexprvector Uint operator-() const {
             // TODO: implement
             return *this;
