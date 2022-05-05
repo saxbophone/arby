@@ -127,7 +127,7 @@ namespace com::saxbophone::arby {
 
         explicit operator std::string() const;
         // prefix increment
-        Uint& operator++() {
+        constexprvector Uint& operator++() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 _digits.push_back(1);
@@ -148,13 +148,13 @@ namespace com::saxbophone::arby {
             return *this; // return new value by reference
         }
         // postfix increment
-        Uint operator++(int) {
+        constexprvector Uint operator++(int) {
             Uint old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
         }
         // prefix decrement
-        Uint& operator--() {
+        constexprvector Uint& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
@@ -175,7 +175,7 @@ namespace com::saxbophone::arby {
             return *this; // return new value by reference
         }
         // postfix decrement
-        Uint operator--(int) {
+        constexprvector Uint operator--(int) {
             Uint old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
