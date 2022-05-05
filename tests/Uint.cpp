@@ -1,3 +1,4 @@
+#include <compare>
 #include <limits>
 #include <stdexcept>
 
@@ -137,4 +138,15 @@ TEST_CASE("arby::Uint postfix decrement underflow") {
     arby::Uint input = 0;
     // underflow should throw an exception
     CHECK_THROWS_AS(input--, std::underflow_error);
+}
+
+TEST_CASE("arby::Uint three-way-comparison with arby::Uint") {
+    auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max()))));
+    arby::Uint lhs = values[0];
+    arby::Uint rhs = values[1];
+    // determine the ordering between the two raw values
+    std::strong_ordering comparison = values[0] <=> values[1];
+
+    // the two Uint instances should have the same three-way-comparison
+    CHECK((lhs <=> rhs) == comparison);
 }
