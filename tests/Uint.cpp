@@ -140,7 +140,29 @@ TEST_CASE("arby::Uint postfix decrement underflow") {
     CHECK_THROWS_AS(input--, std::underflow_error);
 }
 
-TEST_CASE("arby::Uint three-way-comparison with arby::Uint") {
+TEST_CASE("arby::Uint three-way-comparison with arby::Uint using known values") {
+    auto values = GENERATE(
+        table<uintmax_t, uintmax_t, std::strong_ordering>(
+            {
+                {0, 0, std::strong_ordering::equal},
+                {1, 0, std::strong_ordering::greater},
+                {0, 1, std::strong_ordering::less},
+                {27, 19, std::strong_ordering::greater},
+                {2, 87, std::strong_ordering::less},
+                {3, 5, std::strong_ordering::less},
+                {5, 3, std::strong_ordering::greater},
+                {261, 261, std::strong_ordering::equal},
+            }
+        )
+    );
+    arby::Uint lhs = std::get<0>(values);
+    arby::Uint rhs = std::get<1>(values);
+
+    // the two Uint instances should have the same three-way-comparison
+    CHECK((lhs <=> rhs) == std::get<2>(values));
+}
+
+TEST_CASE("arby::Uint three-way-comparison with arby::Uint using random values") {
     auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max()))));
     arby::Uint lhs = values[0];
     arby::Uint rhs = values[1];
