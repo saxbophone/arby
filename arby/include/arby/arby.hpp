@@ -236,6 +236,9 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // three-way-comparison operator defines all relational operators
+        // defaulted comparison does just a lexicographic comparison on digits,
+        // which works for Uint because the digits are a vector and are stored
+        // big-endian.
         constexprvector auto operator<=>(const Uint& rhs) const = default;
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
