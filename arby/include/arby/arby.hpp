@@ -231,15 +231,7 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // three-way-comparison operator defines all relational operators
-        constexprvector auto operator<=>(const Uint& rhs) const {
-            // XXX: stub, function needs proper implementation
-            // XXX: we can't use defaulted comparisons only because our vector
-            // is little-endian... or we could reverse the order and cause more
-            // work for ourselves when enlargening Uint instances but to the
-            // benefit of being able to take advantage of the defaulted
-            // comparison operator...
-            return std::strong_ordering::equal;
-        }
+        constexprvector auto operator<=>(const Uint& rhs) const = default;
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
