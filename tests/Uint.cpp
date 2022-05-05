@@ -84,7 +84,7 @@ TEST_CASE("constexpr arby::Uint(0)") {
 #endif
 
 TEST_CASE("arby::Uint prefix increment") {
-    uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 
     arby::Uint original = input;
     arby::Uint changed = ++original;
@@ -94,7 +94,7 @@ TEST_CASE("arby::Uint prefix increment") {
 }
 
 TEST_CASE("arby::Uint postfix increment") {
-    uintmax_t input = GENERATE(as<uintmax_t>{}, 0, arby::Uint::BASE - 1);
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 
     arby::Uint original = input;
     arby::Uint previous = original++;
@@ -104,7 +104,7 @@ TEST_CASE("arby::Uint postfix increment") {
 }
 
 TEST_CASE("arby::Uint prefix decrement") {
-    uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
     arby::Uint original = input;
     arby::Uint changed = --original;
@@ -114,7 +114,7 @@ TEST_CASE("arby::Uint prefix decrement") {
 }
 
 TEST_CASE("arby::Uint postfix decrement") {
-    uintmax_t input = GENERATE(as<uintmax_t>{}, 1, arby::Uint::BASE);
+    uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
     arby::Uint original = input;
     arby::Uint previous = original--;
@@ -122,6 +122,10 @@ TEST_CASE("arby::Uint postfix decrement") {
     CHECK((uintmax_t)original == input - 1);
     CHECK((uintmax_t)previous == input);
 }
+
+// NOTE: no need for increment overflow tests as Uint doesn't overflow --it expands as necessary
+// TODO: consider writing a test case that applies very large size-increasing operations (maybe exponents)
+// on Uint to force a failure condition when memory runs out an an exception is thrown.
 
 TEST_CASE("arby::Uint prefix decrement underflow") {
     arby::Uint input = 0;
