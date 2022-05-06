@@ -198,32 +198,29 @@ namespace com::saxbophone::arby {
             return old;    // return old value
         }
         // addition-assignment
-        constexprvector Uint& operator+=(const Uint& rhs) {
+        constexprvector Uint& operator+=(Uint rhs) {
             using OverflowType = GetStorageType<int>::OverflowType;
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
-                // if rhs is bigger than us, add empty leading digits to us
+                // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
+                } else if (_digits.size() > rhs._digits.size()) {
+                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
-                auto rhs_it = rhs._digits.rbegin();
-                auto lhs_it = _digits.rbegin();
-                for (; rhs_it != rhs._digits.rend(); ++lhs_it, ++rhs_it) {
-                    OverflowType addition = (OverflowType)*lhs_it + *rhs_it + carry;
+                for (std::size_t i = _digits.size(); i --> 0; ) {
+                    OverflowType addition = (OverflowType)_digits[i] + rhs._digits[i] + carry;
                     // downcast to chop off any more significant bits
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
-                    *lhs_it = (StorageType)addition;
+                    _digits[i] = (StorageType)addition;
                     // update the carry with the value in the top significant bits
                     carry = (StorageType)(addition >> GetStorageType<int>::BITS_BETWEEN);
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
-                    if (rhs._digits.size() + 1 > _digits.size()) {
-                        _digits.insert(_digits.begin(), 0);
-                    }
-                    _digits.front() = carry;
+                    _digits.insert(_digits.begin(), carry);
                 }
             }
             return *this; // return the result by reference
