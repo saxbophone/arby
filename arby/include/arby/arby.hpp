@@ -19,6 +19,8 @@
 
 #include <cstddef>
 #include <cstdint>
+
+#include <algorithm>
 #include <compare>
 #include <limits>
 #include <string>
@@ -299,7 +301,16 @@ namespace com::saxbophone::arby {
         // defaulted comparison does just a lexicographic comparison on digits,
         // which works for Uint because the digits are a vector and are stored
         // big-endian.
+        #ifdef __cpp_lib_three_way_comparison
         constexprvector auto operator<=>(const Uint& rhs) const = default;
+        #else
+        constexprvector auto operator<=>(const Uint& rhs) const {
+            return std::lexicographical_compare_three_way(
+                _digits.begin(), _digits.end(),
+                rhs._digits.begin(), rhs._digits.end()
+            );
+        }
+        #endif
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
