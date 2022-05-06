@@ -176,3 +176,33 @@ TEST_CASE("arby::Uint three-way-comparison with arby::Uint using random values")
     // the two Uint instances should have the same three-way-comparison
     CHECK((lhs <=> rhs) == comparison);
 }
+
+TEST_CASE("Assignment-addition of arby::Uint to arby::Uint") {
+    // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
+    auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2))));
+    arby::Uint lhs = values[0];
+    const arby::Uint rhs = values[1];
+    // determine what the result of addition between the raw values should be
+    values[0] += values[1];
+
+    // do the assignment-addition
+    lhs += rhs;
+
+    // check the result
+    CHECK((uintmax_t)lhs == values[0]);
+}
+
+TEST_CASE("Addition of arby::Uint and arby::Uint") {
+    // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
+    auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2))));
+    arby::Uint lhs = values[0];
+    arby::Uint rhs = values[1];
+    // determine what the result of addition between the raw values should be
+    uintmax_t addition = values[0] + values[1];
+
+    // do the addition
+    arby::Uint result = lhs + rhs;
+
+    // check the result
+    CHECK((uintmax_t)result == addition);
+}
