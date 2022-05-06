@@ -6,7 +6,7 @@ CPMFindPackage(
 )
 
 add_executable(tests)
-target_sources(tests PRIVATE main.cpp basic_arithmetic.cpp multiplication.cpp)
+target_sources(tests PRIVATE main.cpp basic_arithmetic.cpp divmod.cpp multiplication.cpp)
 target_link_libraries(
     tests
     PRIVATE
