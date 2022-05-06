@@ -25,6 +25,7 @@
 #include <limits>
 #include <string>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 
@@ -299,6 +300,11 @@ namespace com::saxbophone::arby {
         friend constexprvector Uint operator*(Uint lhs, const Uint& rhs) {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
+        }
+        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
+        // returns tuple of {quotient, remainder}
+        static constexprvector std::tuple<Uint, Uint> divmod(Uint lhs, Uint rhs) {
+            return {};
         }
         // division-assignment
         constexprvector Uint& operator/=(const Uint& rhs) {
