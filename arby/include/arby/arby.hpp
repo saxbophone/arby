@@ -304,6 +304,10 @@ namespace com::saxbophone::arby {
         // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
         // returns tuple of {quotient, remainder}
         static constexprvector std::tuple<Uint, Uint> divmod(Uint lhs, Uint rhs) {
+            // division by zero is undefined
+            if (rhs._digits.size() == 0) {
+                throw std::domain_error("division by zero");
+            }
             return {};
         }
         // division-assignment
