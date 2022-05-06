@@ -29,7 +29,7 @@ jobs:
         cxx: [g++-10, clang++]
         include:
           - os: macos-10.15
-            cxx: clang++
+            cxx: g++-10
           - os: windows-2019
             cxx: msvc
 
