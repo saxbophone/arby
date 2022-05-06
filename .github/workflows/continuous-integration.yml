@@ -21,7 +21,7 @@ jobs:
     env:
       BUILD_TYPE: Debug
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [macos-10.15, ubuntu-20.04]
         cxx: [g++-10, clang++]
