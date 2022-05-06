@@ -269,7 +269,10 @@ namespace com::saxbophone::arby {
         }
         // multiplication-assignment
         constexprvector Uint& operator*=(const Uint& rhs) {
-            // TODO: implement
+            // either operand being zero always results in zero
+            if (_digits.size() == 0 or rhs._digits.size() == 0) {
+                _digits.clear();
+            }
             return *this; // return the result by reference
         }
         // multiplication
