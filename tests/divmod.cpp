@@ -32,7 +32,7 @@ TEST_CASE("Modulo of arby::Uint by zero raises domain_error", "[modulo]") {
     CHECK_THROWS_AS(numerator % arby::Uint(0), std::domain_error);
 }
 
-TEST_CASE("divmod of arby::Uint by zero raises domain_error", "[division][modulo]") {
+TEST_CASE("divmod of arby::Uint by zero raises domain_error", "[divmod]") {
     arby::Uint numerator = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     CHECK_THROWS_AS(arby::Uint::divmod(numerator, arby::Uint(0)), std::domain_error);
@@ -68,7 +68,7 @@ TEST_CASE("Modulo of zero by any non-zero arby::Uint returns zero", "[modulo]") 
     CHECK((uintmax_t)(numerator % denominator) == 0);
 }
 
-TEST_CASE("divmod of zero by any non-zero arby::Uint returns zero quotient and remainder", "[division][modulo]") {
+TEST_CASE("divmod of zero by any non-zero arby::Uint returns zero quotient and remainder", "[divmod]") {
     arby::Uint numerator = arby::Uint(0);
     uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
@@ -120,7 +120,7 @@ TEST_CASE("Modulo of non-zero arby::Uint by non-zero arby::Uint", "[modulo]") {
     CHECK((uintmax_t)(lhs % rhs) == (numerator % denominator));
 }
 
-TEST_CASE("divmod of non-zero arby::Uint by non-zero arby::Uint", "[modulo]") {
+TEST_CASE("divmod of non-zero arby::Uint by non-zero arby::Uint", "[divmod]") {
     uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
     arby::Uint lhs = numerator;
