@@ -206,3 +206,35 @@ TEST_CASE("Addition of arby::Uint and arby::Uint") {
     // check the result
     CHECK((uintmax_t)result == addition);
 }
+
+TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint") {
+    // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
+    auto bigger = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
+    auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = bigger;
+    const arby::Uint rhs = smaller;
+    // determine what the result of addition between the raw values should be
+    bigger += smaller;
+
+    // do the assignment-addition
+    lhs += rhs;
+
+    // check the result
+    CHECK((uintmax_t)lhs == bigger);
+}
+
+TEST_CASE("Addition of arby::Uint and much smaller arby::Uint") {
+    // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
+    auto bigger = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
+    auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = bigger;
+    arby::Uint rhs = smaller;
+    // determine what the result of addition between the raw values should be
+    uintmax_t addition = bigger + smaller;
+
+    // do the addition
+    arby::Uint result = lhs + rhs;
+
+    // check the result
+    CHECK((uintmax_t)result == addition);
+}
