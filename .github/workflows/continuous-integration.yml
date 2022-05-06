@@ -65,7 +65,9 @@ jobs:
       - name: Use Clang++13 on macOS
         shell: bash
         if: ${{ matrix.os == 'macos-10.15' && matrix.cxx == 'clang++' }}
-        run: alias clang++="$(brew --prefix llvm)/bin/clang"
+        run: |
+          shopt -s expand_aliases
+          alias clang++="$(brew --prefix llvm)/bin/clang"
 
       # when building on master branch and not a pull request, build and test in release mode (optimised build)
       - name: Set Build Mode to Release
