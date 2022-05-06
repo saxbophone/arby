@@ -64,8 +64,8 @@ TEST_CASE("arby::Uint multiplication by arby::Uint(0)", "[multiplication]") {
 TEST_CASE("arby::Uint assignment-multiplication by arby::Uint", "[multiplication]") {
     // maximum factor value, to ensure we don't overflow uintmax_t so we can measure the result
     const uintmax_t MAX = std::sqrt(std::numeric_limits<uintmax_t>::max());
-    uintmax_t multiplier = GENERATE(take(100, random((uintmax_t)0, MAX)));
-    uintmax_t multiplicand = GENERATE(take(100, random((uintmax_t)0, MAX)));
+    uintmax_t multiplier = GENERATE_COPY(take(100, random((uintmax_t)0, MAX)));
+    uintmax_t multiplicand = GENERATE_COPY(take(100, random((uintmax_t)0, MAX)));
     arby::Uint lhs = multiplier;
     arby::Uint rhs = multiplicand;
     // expected value
