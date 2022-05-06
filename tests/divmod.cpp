@@ -31,3 +31,9 @@ TEST_CASE("Modulo of arby::Uint by zero raises domain_error", "[modulo]") {
 
     CHECK_THROWS_AS(numerator % arby::Uint(0), std::domain_error);
 }
+
+TEST_CASE("divmod of arby::Uint by zero raises domain_error", "[modulo]") {
+    arby::Uint numerator = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+
+    CHECK_THROWS_AS(arby::Uint::divmod(numerator, arby::Uint(0)), std::domain_error);
+}
