@@ -31,34 +31,40 @@ namespace {
      * these template specialisations are used for selecting the unsigned type
      * to use for storing the digits of our arbitrary-size numbers
      *
-     * the template specialisations pick the next-smallest unsigned type for
-     * the given signed type, this is to ensure that the number base is not out
-     * of range of int on any given system, and means we can report it from the
-     * radix() method in numeric_limits<> (which returns int).
-     * TODO: maybe we should remove this and just use int as StorageType instead
-     * as the benefit of being able to report the base as radix() seems small
-     * compared to the potential cost of maybe using a non-efficient smaller data
-     * type to store the digits.
-     * Then again, premature optimisation is bad...
+     * the template specialisations pick the corresponding unsigned type and the
+     * next-smallest unsigned type for the given signed type, this is to ensure
+     * that the number base is not out of range of int on any given system, and
+     * means we can report it from the radix() method in numeric_limits<>
+     * (which returns int).
+     *
+     * - OverflowType denotes the unsigned equivalent of the given signed type,
+     * this can safely store MAX*MAX of the next-lowest unsigned type, so is
+     * useful to store the intermediate results for multiplication and addition.
+     * - StorageType denotes the next-lowest unsigned type. This is the type
+     * which is used to store the digits of the arbitrary-size number.
      */
     template <typename T>
     struct GetStorageType {
-        using type = void;
+        using OverflowType = void;
+        using StorageType = void;
     };
 
     template <>
     struct GetStorageType<std::int64_t> {
-        using type = std::uint32_t;
+        using OverflowType = std::uint64_t;
+        using StorageType = std::uint32_t;
     };
 
     template <>
     struct GetStorageType<std::int32_t> {
-        using type = std::uint16_t;
+        using OverflowType = std::uint32_t;
+        using StorageType = std::uint16_t;
     };
 
     template <>
     struct GetStorageType<std::int16_t> {
-        using type = std::uint8_t;
+        using OverflowType = std::uint16_t;
+        using StorageType = std::uint8_t;
     };
 
     // returns ceil(logₐ(n))
@@ -96,7 +102,7 @@ namespace {
 namespace com::saxbophone::arby {
     class Uint {
     public:
-        using StorageType = GetStorageType<int>::type;
+        using StorageType = GetStorageType<int>::StorageType;
 
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
 
