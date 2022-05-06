@@ -303,3 +303,37 @@ TEST_CASE("Subtraction of arby::Uint from much smaller arby::Uint") {
     // check the result
     CHECK((uintmax_t)result == subtraction);
 }
+
+TEST_CASE("Attempt at non-zero assignment-subtraction from arby::Uint(0) raises underflow_error") {
+    arby::Uint zero;
+    auto subtrahend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    arby::Uint rhs = subtrahend;
+
+    CHECK_THROWS_AS(zero -= rhs, std::underflow_error);
+}
+
+TEST_CASE("Attempt at non-zero subtraction from arby::Uint(0) raises underflow_error") {
+    arby::Uint zero;
+    auto subtrahend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    arby::Uint rhs = subtrahend;
+
+    CHECK_THROWS_AS(zero - rhs, std::underflow_error);
+}
+
+TEST_CASE("Assignment-subtraction of arby::Uint(0) from arby::Uint(0)") {
+    arby::Uint lhs, rhs;
+    REQUIRE((uintmax_t)lhs == 0);
+    REQUIRE((uintmax_t)rhs == 0);
+
+    lhs -= rhs;
+
+    CHECK((uintmax_t)lhs == 0);
+}
+
+TEST_CASE("Subtraction of arby::Uint(0) from arby::Uint(0)") {
+    arby::Uint lhs, rhs;
+    REQUIRE((uintmax_t)lhs == 0);
+    REQUIRE((uintmax_t)rhs == 0);
+
+    CHECK((uintmax_t)(lhs - rhs) == 0);
+}
