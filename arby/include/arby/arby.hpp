@@ -42,29 +42,35 @@ namespace {
      * useful to store the intermediate results for multiplication and addition.
      * - StorageType denotes the next-lowest unsigned type. This is the type
      * which is used to store the digits of the arbitrary-size number.
+     * - BITS_BETWEEN denotes the number of bits needed to shift StorageType
+     * up to OverflowType
      */
     template <typename T>
     struct GetStorageType {
         using OverflowType = void;
         using StorageType = void;
+        static constexpr std::size_t BITS_BETWEEN = 0;
     };
 
     template <>
     struct GetStorageType<std::int64_t> {
         using OverflowType = std::uint64_t;
         using StorageType = std::uint32_t;
+        static constexpr std::size_t BITS_BETWEEN = 32;
     };
 
     template <>
     struct GetStorageType<std::int32_t> {
         using OverflowType = std::uint32_t;
         using StorageType = std::uint16_t;
+        static constexpr std::size_t BITS_BETWEEN = 16;
     };
 
     template <>
     struct GetStorageType<std::int16_t> {
         using OverflowType = std::uint16_t;
         using StorageType = std::uint8_t;
+        static constexpr std::size_t BITS_BETWEEN = 8;
     };
 
     // returns ceil(logₐ(n))
@@ -193,7 +199,23 @@ namespace com::saxbophone::arby {
         }
         // addition-assignment
         constexprvector Uint& operator+=(const Uint& rhs) {
-            // TODO: implement
+            using OverflowType = GetStorageType<int>::OverflowType;
+            // either arg being a zero is a no-op, guard against this
+            if (_digits.size() != 0 or rhs._digits.size() != 0) {
+                // work backwards up the digits vector of the rhs
+                StorageType carry = 0; // carries are stored here on overflow
+                // XXX: this isn't correct! We can't use i to index both objects because we're decrementing the index and the size may differ
+                // TODO: replace with two reverse iterators
+                for (std::size_t i = rhs._digits.size(); i --> 0; ) {
+                    OverflowType addition = (OverflowType)_digits[i] + rhs._digits[i] + carry;
+                    // downcast to chop off any more significant bits
+                    // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
+                    _digits[i] = (StorageType)addition;
+                    // update the carry with the value in the top significant bits
+                    carry = (StorageType)(addition >> GetStorageType<int>::BITS_BETWEEN);
+                }
+                // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
+            }
             return *this; // return the result by reference
         }
         // addition
