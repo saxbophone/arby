@@ -308,23 +308,29 @@ namespace com::saxbophone::arby {
         }
         // division-assignment
         constexprvector Uint& operator/=(const Uint& rhs) {
-            // TODO: implement
+            Uint quotient = *this / rhs; // uses friend /operator
+            // assign quotient's digits back to our digits
+            _digits = quotient._digits;
             return *this; // return the result by reference
         }
         // division
         friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
-            lhs /= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
+            Uint quotient;
+            std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
+            return quotient;
         }
         // modulo-assignment
         constexprvector Uint& operator%=(const Uint& rhs) {
-            // TODO: implement
+            Uint remainder = *this % rhs; // uses friend %operator
+            // assign remainder's digits back to our digits
+            _digits = remainder._digits;
             return *this; // return the result by reference
         }
         // modulo
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
-            lhs %= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
+            Uint remainder;
+            std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
+            return remainder;
         }
         // three-way-comparison operator defines all relational operators
         // defaulted comparison does just a lexicographic comparison on digits,
