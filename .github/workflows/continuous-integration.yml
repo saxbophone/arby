@@ -23,9 +23,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-10.15, ubuntu-20.04]
+        # NOTE: disabling clang++ on macOS until a convenient way to override it to clang++13 can be found
+        # '$(brew --prefix llvm)/bin/clang' gives us access to clang++13
+        os: [ubuntu-20.04]
         cxx: [g++-10, clang++]
         include:
+          - os: macos-10.15
+            cxx: clang++
           - os: windows-2019
             cxx: msvc
 
@@ -61,13 +65,6 @@ jobs:
       #     # as long as the OS and Compiler match exactly
       #     restore-keys: |
       #       ${{ env.cache-name }}-${{ matrix.os }}-${{ matrix.cxx }}-
-
-      - name: Use Clang++13 on macOS
-        shell: bash
-        if: ${{ matrix.os == 'macos-10.15' && matrix.cxx == 'clang++' }}
-        run: |
-          shopt -s expand_aliases
-          alias clang++="$(brew --prefix llvm)/bin/clang"
 
       # when building on master branch and not a pull request, build and test in release mode (optimised build)
       - name: Set Build Mode to Release

@@ -301,26 +301,7 @@ namespace com::saxbophone::arby {
         // defaulted comparison does just a lexicographic comparison on digits,
         // which works for Uint because the digits are a vector and are stored
         // big-endian.
-        #ifdef __cpp_lib_three_way_comparison
         constexprvector auto operator<=>(const Uint& rhs) const = default;
-        #else
-        constexprvector auto operator<=>(const Uint& rhs) const {
-            // having more digits is a dead give-away that one side is bigger
-            if (_digits.size() > rhs._digits.size()) {
-                return std::strong_ordering::greater;
-            } else if (rhs._digits.size() > _digits.size()) {
-                return std::strong_ordering::less;
-            } else { // they're both the same size and we need to check the digits
-                for (std::size_t i = 0; i < _digits.size(); i++) {
-                    auto compare = _digits[i] <=> rhs._digits[i];
-                    if (compare != std::strong_ordering::equal) {
-                        return compare;
-                    }
-                }
-                return std::strong_ordering::equal;
-            }
-        }
-        #endif
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
