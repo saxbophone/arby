@@ -255,7 +255,7 @@ namespace com::saxbophone::arby {
                 }
                 // if borrow is non-zero, then an arithmetic underflow occurred
                 if (borrow) {
-                    // TODO: raise std::underflow_error
+                    throw std::underflow_error("arithmetic underflow: subtrahend bigger than minuend");
                 }
             }
             return *this; // return the result by reference
