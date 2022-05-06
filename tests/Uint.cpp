@@ -239,3 +239,67 @@ TEST_CASE("Addition of arby::Uint and much smaller arby::Uint") {
     // check the result
     CHECK((uintmax_t)result == addition);
 }
+
+TEST_CASE("Assignment-subtraction of arby::Uint from arby::Uint") {
+    auto minuend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    // ensure subtrahend is never bigger than minuend so we don't underflow
+    auto subtrahend = GENERATE_COPY(take(100, random((uintmax_t)1, minuend)));
+    arby::Uint lhs = minuend;
+    const arby::Uint rhs = subtrahend;
+    // determine what the result of subtraction between the raw values should be
+    minuend -= subtrahend;
+
+    // do the assignment-subtraction
+    lhs -= rhs;
+
+    // check the result
+    CHECK((uintmax_t)lhs == minuend);
+}
+
+TEST_CASE("Subtraction of arby::Uint from arby::Uint") {
+    auto minuend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    // ensure subtrahend is never bigger than minuend so we don't underflow
+    auto subtrahend = GENERATE_COPY(take(100, random((uintmax_t)1, minuend)));
+    arby::Uint lhs = minuend;
+    arby::Uint rhs = subtrahend;
+    // determine what the result of subtraction between the raw values should be
+    uintmax_t subtraction = minuend - subtrahend;
+
+    // do the subtraction
+    arby::Uint result = lhs - rhs;
+
+    // check the result
+    CHECK((uintmax_t)result == subtraction);
+}
+
+TEST_CASE("Assignment-subtraction of much smaller arby::Uint from arby::Uint") {
+    auto minuend = GENERATE(take(100, random((uintmax_t)arby::Uint::BASE, std::numeric_limits<uintmax_t>::max())));
+    // ensure subtrahend is never bigger than minuend so we don't underflow
+    auto subtrahend = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = minuend;
+    const arby::Uint rhs = subtrahend;
+    // determine what the result of subtraction between the raw values should be
+   minuend -= subtrahend;
+
+    // do the assignment-subtraction
+    lhs -= rhs;
+
+    // check the result
+    CHECK((uintmax_t)lhs == minuend);
+}
+
+TEST_CASE("Subtraction of arby::Uint from much smaller arby::Uint") {
+    auto minuend = GENERATE(take(100, random((uintmax_t)arby::Uint::BASE, std::numeric_limits<uintmax_t>::max())));
+    // ensure subtrahend is never bigger than minuend so we don't underflow
+    auto subtrahend = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = minuend;
+    arby::Uint rhs = subtrahend;
+    // determine what the result of subtraction between the raw values should be
+    uintmax_t subtraction = minuend - subtrahend;
+
+    // do the subtraction
+    arby::Uint result = lhs - rhs;
+
+    // check the result
+    CHECK((uintmax_t)result == subtraction);
+}
