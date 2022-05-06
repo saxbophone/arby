@@ -8,7 +8,7 @@
 
 using namespace com::saxbophone;
 
-TEST_CASE("std::numeric_limits<arby::Uint>") {
+TEST_CASE("std::numeric_limits<arby::Uint>", "[numeric-limits]") {
     CHECK(std::numeric_limits<arby::Uint>::is_specialized);
     CHECK_FALSE(std::numeric_limits<arby::Uint>::is_signed);
     CHECK(std::numeric_limits<arby::Uint>::is_integer);
@@ -45,7 +45,7 @@ TEST_CASE("std::numeric_limits<arby::Uint>") {
     CHECK(std::numeric_limits<arby::Uint>::denorm_min() == 0); // N/A
 }
 
-TEST_CASE("arby::Uint(uintmax_t random) and (uintmax_t)arby::Uint") {
+TEST_CASE("arby::Uint(uintmax_t random) and (uintmax_t)arby::Uint", "[ctor]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     arby::Uint output(input);
@@ -53,13 +53,13 @@ TEST_CASE("arby::Uint(uintmax_t random) and (uintmax_t)arby::Uint") {
     CHECK((uintmax_t)output == input);
 }
 
-TEST_CASE("arby::Uint(0) and (uintmax_t)arby::Uint") {
+TEST_CASE("arby::Uint(0) and (uintmax_t)arby::Uint", "[ctor]") {
     arby::Uint output(0);
 
     CHECK((uintmax_t)output == 0);
 }
 
-TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint") {
+TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint", "[ctor]") {
     arby::Uint output(std::numeric_limits<uintmax_t>::max());
 
     CHECK((uintmax_t)output == std::numeric_limits<uintmax_t>::max());
@@ -67,12 +67,12 @@ TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint") {
 
 // only inlude these tests if we have library support for constexpr vector
 #ifdef __cpp_lib_constexpr_vector
-TEST_CASE("constexpr arby::Uint") {
+TEST_CASE("constexpr arby::Uint", "[constexpr]") {
     WARN("No constexpr tests written yet");
 }
 #endif
 
-TEST_CASE("arby::Uint prefix increment") {
+TEST_CASE("arby::Uint prefix increment", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 
     arby::Uint original = input;
@@ -82,7 +82,7 @@ TEST_CASE("arby::Uint prefix increment") {
     CHECK((uintmax_t)changed == input + 1);
 }
 
-TEST_CASE("arby::Uint postfix increment") {
+TEST_CASE("arby::Uint postfix increment", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 
     arby::Uint original = input;
@@ -92,7 +92,7 @@ TEST_CASE("arby::Uint postfix increment") {
     CHECK((uintmax_t)previous == input);
 }
 
-TEST_CASE("arby::Uint prefix decrement") {
+TEST_CASE("arby::Uint prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
     arby::Uint original = input;
@@ -102,7 +102,7 @@ TEST_CASE("arby::Uint prefix decrement") {
     CHECK((uintmax_t)changed == input - 1);
 }
 
-TEST_CASE("arby::Uint postfix decrement") {
+TEST_CASE("arby::Uint postfix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
     arby::Uint original = input;
@@ -116,19 +116,19 @@ TEST_CASE("arby::Uint postfix decrement") {
 // TODO: consider writing a test case that applies very large size-increasing operations (maybe exponents)
 // on Uint to force a failure condition when memory runs out an an exception is thrown.
 
-TEST_CASE("arby::Uint prefix decrement underflow") {
+TEST_CASE("arby::Uint prefix decrement underflow", "[basic-arithmetic]") {
     arby::Uint input = 0;
     // underflow should throw an exception
     CHECK_THROWS_AS(--input, std::underflow_error);
 }
 
-TEST_CASE("arby::Uint postfix decrement underflow") {
+TEST_CASE("arby::Uint postfix decrement underflow", "[basic-arithmetic]") {
     arby::Uint input = 0;
     // underflow should throw an exception
     CHECK_THROWS_AS(input--, std::underflow_error);
 }
 
-TEST_CASE("arby::Uint three-way-comparison with arby::Uint using known values") {
+TEST_CASE("arby::Uint three-way-comparison with arby::Uint using known values", "[basic-arithmetic]") {
     auto values = GENERATE(
         table<uintmax_t, uintmax_t, std::strong_ordering>(
             {
@@ -154,7 +154,7 @@ TEST_CASE("arby::Uint three-way-comparison with arby::Uint using known values") 
     CHECK((lhs <=> rhs) == std::get<2>(values));
 }
 
-TEST_CASE("arby::Uint three-way-comparison with arby::Uint using random values") {
+TEST_CASE("arby::Uint three-way-comparison with arby::Uint using random values", "[basic-arithmetic]") {
     auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max()))));
     arby::Uint lhs = values[0];
     arby::Uint rhs = values[1];
@@ -165,7 +165,7 @@ TEST_CASE("arby::Uint three-way-comparison with arby::Uint using random values")
     CHECK((lhs <=> rhs) == comparison);
 }
 
-TEST_CASE("Assignment-addition of arby::Uint to arby::Uint") {
+TEST_CASE("Assignment-addition of arby::Uint to arby::Uint", "[basic-arithmetic]") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
     auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2))));
     arby::Uint lhs = values[0];
@@ -180,7 +180,7 @@ TEST_CASE("Assignment-addition of arby::Uint to arby::Uint") {
     CHECK((uintmax_t)lhs == values[0]);
 }
 
-TEST_CASE("Addition of arby::Uint and arby::Uint") {
+TEST_CASE("Addition of arby::Uint and arby::Uint", "[basic-arithmetic]") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
     auto values = GENERATE(take(1000, chunk(2, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2))));
     arby::Uint lhs = values[0];
@@ -195,7 +195,7 @@ TEST_CASE("Addition of arby::Uint and arby::Uint") {
     CHECK((uintmax_t)result == addition);
 }
 
-TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint") {
+TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint", "[basic-arithmetic]") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
     auto bigger = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)std::numeric_limits<unsigned int>::max() / 2)));
     auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
@@ -211,7 +211,7 @@ TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint") {
     CHECK((uintmax_t)lhs == bigger);
 }
 
-TEST_CASE("Addition of arby::Uint and much smaller arby::Uint") {
+TEST_CASE("Addition of arby::Uint and much smaller arby::Uint", "[basic-arithmetic]") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
     auto bigger = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)std::numeric_limits<unsigned int>::max() / 2)));
     auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
@@ -228,7 +228,7 @@ TEST_CASE("Addition of arby::Uint and much smaller arby::Uint") {
     CHECK((uintmax_t)result == addition);
 }
 
-TEST_CASE("Assignment-subtraction of arby::Uint from arby::Uint") {
+TEST_CASE("Assignment-subtraction of arby::Uint from arby::Uint", "[basic-arithmetic]") {
     auto minuend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     // ensure subtrahend is never bigger than minuend so we don't underflow
     auto subtrahend = GENERATE_COPY(take(100, random((uintmax_t)1, minuend)));
@@ -244,7 +244,7 @@ TEST_CASE("Assignment-subtraction of arby::Uint from arby::Uint") {
     CHECK((uintmax_t)lhs == minuend);
 }
 
-TEST_CASE("Subtraction of arby::Uint from arby::Uint") {
+TEST_CASE("Subtraction of arby::Uint from arby::Uint", "[basic-arithmetic]") {
     auto minuend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     // ensure subtrahend is never bigger than minuend so we don't underflow
     auto subtrahend = GENERATE_COPY(take(100, random((uintmax_t)1, minuend)));
@@ -260,7 +260,7 @@ TEST_CASE("Subtraction of arby::Uint from arby::Uint") {
     CHECK((uintmax_t)result == subtraction);
 }
 
-TEST_CASE("Assignment-subtraction of much smaller arby::Uint from arby::Uint") {
+TEST_CASE("Assignment-subtraction of much smaller arby::Uint from arby::Uint", "[basic-arithmetic]") {
     auto minuend = GENERATE(take(100, random((uintmax_t)arby::Uint::BASE, std::numeric_limits<uintmax_t>::max())));
     // ensure subtrahend is never bigger than minuend so we don't underflow
     auto subtrahend = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
@@ -276,7 +276,7 @@ TEST_CASE("Assignment-subtraction of much smaller arby::Uint from arby::Uint") {
     CHECK((uintmax_t)lhs == minuend);
 }
 
-TEST_CASE("Subtraction of arby::Uint from much smaller arby::Uint") {
+TEST_CASE("Subtraction of arby::Uint from much smaller arby::Uint", "[basic-arithmetic]") {
     auto minuend = GENERATE(take(100, random((uintmax_t)arby::Uint::BASE, std::numeric_limits<uintmax_t>::max())));
     // ensure subtrahend is never bigger than minuend so we don't underflow
     auto subtrahend = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
@@ -292,7 +292,7 @@ TEST_CASE("Subtraction of arby::Uint from much smaller arby::Uint") {
     CHECK((uintmax_t)result == subtraction);
 }
 
-TEST_CASE("Attempt at non-zero assignment-subtraction from arby::Uint(0) raises underflow_error") {
+TEST_CASE("Attempt at non-zero assignment-subtraction from arby::Uint(0) raises underflow_error", "[basic-arithmetic]") {
     arby::Uint zero;
     auto subtrahend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     arby::Uint rhs = subtrahend;
@@ -300,7 +300,7 @@ TEST_CASE("Attempt at non-zero assignment-subtraction from arby::Uint(0) raises 
     CHECK_THROWS_AS(zero -= rhs, std::underflow_error);
 }
 
-TEST_CASE("Attempt at non-zero subtraction from arby::Uint(0) raises underflow_error") {
+TEST_CASE("Attempt at non-zero subtraction from arby::Uint(0) raises underflow_error", "[basic-arithmetic]") {
     arby::Uint zero;
     auto subtrahend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     arby::Uint rhs = subtrahend;
@@ -308,7 +308,7 @@ TEST_CASE("Attempt at non-zero subtraction from arby::Uint(0) raises underflow_e
     CHECK_THROWS_AS(zero - rhs, std::underflow_error);
 }
 
-TEST_CASE("Assignment-subtraction of arby::Uint(0) from arby::Uint(0)") {
+TEST_CASE("Assignment-subtraction of arby::Uint(0) from arby::Uint(0)", "[basic-arithmetic]") {
     arby::Uint lhs, rhs;
     REQUIRE((uintmax_t)lhs == 0);
     REQUIRE((uintmax_t)rhs == 0);
@@ -318,7 +318,7 @@ TEST_CASE("Assignment-subtraction of arby::Uint(0) from arby::Uint(0)") {
     CHECK((uintmax_t)lhs == 0);
 }
 
-TEST_CASE("Subtraction of arby::Uint(0) from arby::Uint(0)") {
+TEST_CASE("Subtraction of arby::Uint(0) from arby::Uint(0)", "[basic-arithmetic]") {
     arby::Uint lhs, rhs;
     REQUIRE((uintmax_t)lhs == 0);
     REQUIRE((uintmax_t)rhs == 0);
