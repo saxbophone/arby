@@ -40,7 +40,7 @@ TEST_CASE("divmod of arby::Uint by zero raises domain_error", "[division][modulo
 
 TEST_CASE("Assignment-division of zero by any non-zero arby::Uint returns zero", "[division]") {
     arby::Uint numerator = arby::Uint(0);
-    arby::Uint denominator = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
     numerator /= denominator;
     CHECK((uintmax_t)numerator == 0);
@@ -48,14 +48,14 @@ TEST_CASE("Assignment-division of zero by any non-zero arby::Uint returns zero",
 
 TEST_CASE("Division of zero by any non-zero arby::Uint returns zero", "[division]") {
     arby::Uint numerator = arby::Uint(0);
-    arby::Uint denominator = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
     CHECK((uintmax_t)(numerator / denominator) == 0);
 }
 
 TEST_CASE("Assignment-modulo of zero by any non-zero arby::Uint returns zero", "[modulo]") {
     arby::Uint numerator = arby::Uint(0);
-    arby::Uint denominator = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
     numerator %= denominator;
     CHECK((uintmax_t)numerator == 0);
@@ -63,17 +63,71 @@ TEST_CASE("Assignment-modulo of zero by any non-zero arby::Uint returns zero", "
 
 TEST_CASE("Modulo of zero by any non-zero arby::Uint returns zero", "[modulo]") {
     arby::Uint numerator = arby::Uint(0);
-    arby::Uint denominator = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
     CHECK((uintmax_t)(numerator % denominator) == 0);
 }
 
 TEST_CASE("divmod of zero by any non-zero arby::Uint returns zero quotient and remainder", "[division][modulo]") {
     arby::Uint numerator = arby::Uint(0);
-    arby::Uint denominator = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
 
     auto [quotient, remainder] = arby::Uint::divmod(numerator, denominator);
 
     CHECK((uintmax_t)quotient == 0);
     CHECK((uintmax_t)remainder == 0);
+}
+
+TEST_CASE("Assignment-division by non-zero arby::Uint to non-zero arby::Uint", "[division]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+    numerator /= denominator;
+
+    lhs /= rhs;
+
+    CHECK((uintmax_t)lhs == numerator);
+}
+
+TEST_CASE("Division of non-zero arby::Uint by non-zero arby::Uint", "[division]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+
+    CHECK((uintmax_t)(lhs / rhs) == (numerator / denominator));
+}
+
+TEST_CASE("Assignment-modulo by non-zero arby::Uint to non-zero arby::Uint", "[modulo]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+    numerator %= denominator;
+
+    lhs %= rhs;
+
+    CHECK((uintmax_t)lhs == numerator);
+}
+
+TEST_CASE("Modulo of non-zero arby::Uint by non-zero arby::Uint", "[modulo]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+
+    CHECK((uintmax_t)(lhs % rhs) == (numerator % denominator));
+}
+
+TEST_CASE("divmod of non-zero arby::Uint by non-zero arby::Uint", "[modulo]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t denominator = GENERATE(take(100, random((uintmax_t)1, (uintmax_t)arby::Uint::BASE)));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+
+    auto [quotient, remainder] = arby::Uint::divmod(lhs, rhs);
+
+    CHECK((uintmax_t)quotient == numerator / denominator);
+    CHECK((uintmax_t)remainder == numerator % denominator);
 }
