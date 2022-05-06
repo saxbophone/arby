@@ -28,6 +28,8 @@
 #include <tuple>
 #include <vector>
 
+#include <iostream>
+
 
 namespace {
     /*
@@ -304,11 +306,33 @@ namespace com::saxbophone::arby {
         // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
         // returns tuple of {quotient, remainder}
         static constexprvector std::tuple<Uint, Uint> divmod(Uint lhs, Uint rhs) {
+            using OverflowType = GetStorageType<int>::OverflowType;
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
                 throw std::domain_error("division by zero");
             }
-            return {};
+            // when denominator is longer than numerator, answer must be zero
+            if (rhs._digits.size() > lhs._digits.size()) {
+                return {arby::Uint(0), lhs};
+            }
+            // used as starting point for answer estimates
+            arby::Uint quotient = lhs._digits[0] / ((OverflowType)rhs._digits[0] + 1);
+            if (rhs._digits.size() < lhs._digits.size()) { // when denominator is shorter than numerator
+                // add additional trailing zeroes to the answer estimate
+                quotient._digits.insert(quotient._digits.end(), lhs._digits.size() - rhs._digits.size(), 0);
+            }
+            // subtract quotient many lots of rhs from lhs --representing the share of the lower-bound estimate
+            lhs -= rhs * quotient;
+            // XXX: this is still far too slow! we need to be smarter and use the remaining digits as an indicator how
+            // far to lerp between min and max estimates to get a good estimate of the result
+            // quotient is currently at a lower-bound estimate, now keep incrementing it until we find the answer
+            // while (lhs >= rhs) {
+            //     lhs -= rhs;
+            //     quotient++;
+            //     std::cout << (uintmax_t)lhs << " " << (uintmax_t)quotient << std::endl;
+            //     std::cin.get();
+            // }
+            return {quotient, lhs};
         }
         // division-assignment
         constexprvector Uint& operator/=(const Uint& rhs) {
