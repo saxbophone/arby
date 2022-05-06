@@ -231,8 +231,33 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // subtraction-assignment
-        constexprvector Uint& operator-=(const Uint& rhs) {
-            // TODO: implement
+        constexprvector Uint& operator-=(Uint rhs) {
+            using OverflowType = GetStorageType<int>::OverflowType;
+            // TODO: detect underflow early?
+            // rhs being a zero is a no-op, guard against this
+            if (rhs._digits.size() != 0) {
+                // make sure this and rhs are the same size, fill with leading zeroes if needed
+                if (rhs._digits.size() > _digits.size()) {
+                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
+                } else if (_digits.size() > rhs._digits.size()) {
+                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
+                }
+                // work backwards up the digits vector of the rhs
+                bool borrow = false; // transfers borrows up when triggered
+                for (std::size_t i = _digits.size(); i --> 0; ) {
+                    // this will underflow correctly in a way that means we can get the remainder off the bottom bits
+                    OverflowType subtraction = (OverflowType)_digits[i] - rhs._digits[i] - borrow;
+                    // downcast to chop off any more significant bits
+                    // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
+                    _digits[i] = (StorageType)subtraction;
+                    // detect any borrow that is needed
+                    borrow = subtraction > std::numeric_limits<StorageType>::max();
+                }
+                // if borrow is non-zero, then an arithmetic underflow occurred
+                if (borrow) {
+                    // TODO: raise std::underflow_error
+                }
+            }
             return *this; // return the result by reference
         }
         // subtraction
