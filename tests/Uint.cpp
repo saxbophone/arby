@@ -209,7 +209,7 @@ TEST_CASE("Addition of arby::Uint and arby::Uint") {
 
 TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
-    auto bigger = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
+    auto bigger = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)std::numeric_limits<unsigned int>::max() / 2)));
     auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
     arby::Uint lhs = bigger;
     const arby::Uint rhs = smaller;
@@ -225,8 +225,9 @@ TEST_CASE("Assignment-addition of much smaller arby::Uint to arby::Uint") {
 
 TEST_CASE("Addition of arby::Uint and much smaller arby::Uint") {
     // choose values in the range half of max uint so as to be sure the result is representable as uint for comparison purposes
-    auto bigger = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
+    auto bigger = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)std::numeric_limits<unsigned int>::max() / 2)));
     auto smaller = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
+    CAPTURE(bigger, smaller);
     arby::Uint lhs = bigger;
     arby::Uint rhs = smaller;
     // determine what the result of addition between the raw values should be

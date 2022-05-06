@@ -202,19 +202,29 @@ namespace com::saxbophone::arby {
             using OverflowType = GetStorageType<int>::OverflowType;
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
+                // if rhs is bigger than us, add empty leading digits to us
+                if (rhs._digits.size() > _digits.size()) {
+                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
+                }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
-                // XXX: this isn't correct! We can't use i to index both objects because we're decrementing the index and the size may differ
-                // TODO: replace with two reverse iterators
-                for (std::size_t i = rhs._digits.size(); i --> 0; ) {
-                    OverflowType addition = (OverflowType)_digits[i] + rhs._digits[i] + carry;
+                auto rhs_it = rhs._digits.rbegin();
+                auto lhs_it = _digits.rbegin();
+                for (; rhs_it != rhs._digits.rend(); ++lhs_it, ++rhs_it) {
+                    OverflowType addition = (OverflowType)*lhs_it + *rhs_it + carry;
                     // downcast to chop off any more significant bits
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
-                    _digits[i] = (StorageType)addition;
+                    *lhs_it = (StorageType)addition;
                     // update the carry with the value in the top significant bits
                     carry = (StorageType)(addition >> GetStorageType<int>::BITS_BETWEEN);
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
+                if (carry != 0) {
+                    if (rhs._digits.size() + 1 > _digits.size()) {
+                        _digits.insert(_digits.begin(), 0);
+                    }
+                    _digits.front() = carry;
+                }
             }
             return *this; // return the result by reference
         }
