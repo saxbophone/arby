@@ -305,7 +305,7 @@ namespace com::saxbophone::arby {
         }
         // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
         // returns tuple of {quotient, remainder}
-        static constexprvector std::tuple<Uint, Uint> divmod(Uint lhs, Uint rhs) {
+        static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             using OverflowType = GetStorageType<int>::OverflowType;
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
@@ -315,24 +315,37 @@ namespace com::saxbophone::arby {
             if (rhs._digits.size() > lhs._digits.size()) {
                 return {arby::Uint(0), lhs};
             }
-            // used as starting point for answer estimates
-            arby::Uint quotient = lhs._digits[0] / ((OverflowType)rhs._digits[0] + 1);
-            if (rhs._digits.size() < lhs._digits.size()) { // when denominator is shorter than numerator
-                // add additional trailing zeroes to the answer estimate
-                quotient._digits.insert(quotient._digits.end(), lhs._digits.size() - rhs._digits.size(), 0);
+            // this will gradually accumulate the calculated quotient
+            Uint quotient;
+            // this will gradually decrement with each subtraction
+            Uint remainder = lhs;
+            // how many places can we shift rhs left until it's the same width as lhs?
+            std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
+            // of those places, we can only shift leftwards up to the first place of lhs that rhs[0] is not greater than
+            std::size_t max_shift, i;
+            for (i = 0; i <= wiggle_room and rhs._digits[i] <= lhs._digits[i]; i++) {}
+            max_shift = wiggle_room - i;
+            // now, shift up rhs by this amount and see how many times it goes into lhs
+            for (std::size_t s = max_shift; s --> 0; ) {
+                // this is the digit of lhs that the front digit of rhs will line up with
+                std::size_t lhs_target = max_shift - 1 - s;
+                // this is like an exponent, denoting the magnitude of the number of places we've shifted
+                Uint shift = 1;
+                // shift it leftwards by inserting s many zero digits at the end
+                shift._digits.insert(shift._digits.end(), s, 0);
+                // a good initial estimate of the lower-bound for number of times it goes in is given thus
+                Uint estimate = remainder._digits[0] / ((OverflowType)rhs._digits[0] + 1);
+                // subtract this many of rhs from remainder and increment quotient accordingly
+                remainder -= rhs * estimate * shift;
+                quotient += estimate * shift;
+                // subtract any additional rounds that will fit
+                while (remainder >= rhs * shift) {
+                    remainder -= rhs * shift;
+                    quotient += shift;
+                }
+                std::cout << (uintmax_t)lhs << " " << (uintmax_t)quotient << std::endl;
             }
-            // subtract quotient many lots of rhs from lhs --representing the share of the lower-bound estimate
-            lhs -= rhs * quotient;
-            // XXX: this is still far too slow! we need to be smarter and use the remaining digits as an indicator how
-            // far to lerp between min and max estimates to get a good estimate of the result
-            // quotient is currently at a lower-bound estimate, now keep incrementing it until we find the answer
-            // while (lhs >= rhs) {
-            //     lhs -= rhs;
-            //     quotient++;
-            //     std::cout << (uintmax_t)lhs << " " << (uintmax_t)quotient << std::endl;
-            //     std::cin.get();
-            // }
-            return {quotient, lhs};
+            return {quotient, remainder};
         }
         // division-assignment
         constexprvector Uint& operator/=(const Uint& rhs) {
