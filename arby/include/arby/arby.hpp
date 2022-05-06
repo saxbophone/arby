@@ -269,9 +269,29 @@ namespace com::saxbophone::arby {
         }
         // multiplication-assignment
         constexprvector Uint& operator*=(const Uint& rhs) {
+            using OverflowType = GetStorageType<int>::OverflowType;
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
                 _digits.clear();
+            } else {
+                // store a copy of this for use as lhs
+                const Uint lhs = *this;
+                // reset this to zero
+                _digits.clear();
+                // multiply each digit from lhs with each digit from rhs
+                for (std::size_t l = 0; l < lhs._digits.size(); l++) {
+                    for (std::size_t r = 0; r < rhs._digits.size(); r++) {
+                        OverflowType multiplication = lhs._digits[l] * rhs._digits[r];
+                        // create a new Uint with this intermediate result and add trailing places as needed
+                        Uint intermediate = multiplication;
+                        // we need to remap the indices as the digits are stored big-endian
+                        std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
+                        // add that many trailing zeroes to intermediate's digits
+                        intermediate._digits.insert(intermediate._digits.end(), shift_amount, 0);
+                        // finally, add it to this as an accumulator
+                        *this += intermediate;
+                    }
+                }
             }
             return *this; // return the result by reference
         }
