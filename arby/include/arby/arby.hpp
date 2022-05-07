@@ -366,6 +366,10 @@ namespace com::saxbophone::arby {
             Uint quotient;
             // this will gradually decrement with each subtraction
             Uint remainder = lhs;
+            // dividing zero by anything is a special case
+            if (lhs._digits.size() == 0) {
+                return {}; // 0, remainder 0
+            }
             // a sneaky shortcut that prevents hang-ups when rhs == BASE
             if (rhs == Uint::BASE) {
                 quotient = remainder;
