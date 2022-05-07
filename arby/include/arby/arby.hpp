@@ -115,6 +115,7 @@ namespace com::saxbophone::arby {
     class Uint {
     public:
         using StorageType = GetStorageType<int>::StorageType;
+        using OverflowType = GetStorageType<int>::OverflowType;
 
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
 
@@ -215,7 +216,6 @@ namespace com::saxbophone::arby {
         }
         // addition-assignment
         constexprvector Uint& operator+=(Uint rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
@@ -248,7 +248,6 @@ namespace com::saxbophone::arby {
         }
         // subtraction-assignment
         constexprvector Uint& operator-=(Uint rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (rhs._digits.size() != 0) {
@@ -274,6 +273,10 @@ namespace com::saxbophone::arby {
                     throw std::underflow_error("arithmetic underflow: subtrahend bigger than minuend");
                 }
             }
+            // remove any leading zeroes
+            while (_digits.size() > 0 and _digits.front() == 0) {
+                _digits.erase(_digits.begin());
+            }
             return *this; // return the result by reference
         }
         // subtraction
@@ -283,7 +286,6 @@ namespace com::saxbophone::arby {
         }
         // multiplication-assignment
         constexprvector Uint& operator*=(const Uint& rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
                 _digits.clear();
@@ -314,33 +316,65 @@ namespace com::saxbophone::arby {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
-        // returns tuple of {quotient, remainder}
-        static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
-            // using OverflowType = GetStorageType<int>::OverflowType;
-            // division by zero is undefined
-            if (rhs._digits.size() == 0) {
-                throw std::domain_error("division by zero");
-            }
-            // when denominator is longer than numerator, answer must be zero
-            if (rhs._digits.size() > lhs._digits.size()) {
-                return {arby::Uint(0), lhs};
-            }
-            // this will gradually accumulate the calculated quotient
-            Uint quotient;
-            // this will gradually decrement with each subtraction
-            Uint remainder = lhs;
+    private:
+        // function that shifts up rhs to be just big enough to be smaller than lhs
+        static Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
             if (wiggle_room > 0 and lhs._digits[0] < rhs._digits[0]) {
                 wiggle_room--;
             }
-            std::cout << std::hex << std::setw(16) << (uintmax_t)lhs << " " << wiggle_room << std::endl;
-            Uint shift = rhs;
+            Uint shift = 1;
             shift._digits.insert(shift._digits.end(), wiggle_room, 0);
-            std::cout << std::hex << std::setw(16) << (uintmax_t)shift << std::endl;
-            std::cin.get();
+            return shift;
+        }
+        // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
+        static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+            // std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
+            OverflowType denominator = (OverflowType)rhs._digits[0] + 1;
+            // std::cout << "denominator = " << std::hex << denominator << std::endl;
+            // std::cout << std::hex << lhs._digits[0] << " >= " << std::hex << denominator << "?" << std::endl;
+            if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
+                // std::cout << "lhs[0] / (rhs[0]+1)" << std::endl;
+                // std::cout << "numerator = " << std::hex << lhs._digits[0] << std::endl;
+                // std::cout << "numerator / denominator = " << std::hex << ((OverflowType)lhs._digits[0] / denominator) << std::endl;
+                return (OverflowType)lhs._digits[0] / denominator;
+            } else { // use lhs[0..1] / rhs[0]
+                // std::cout << "lhs[0..1] / (rhs[0]+1)" << std::endl;
+                Uint leading_digits = lhs;
+                leading_digits._digits.resize(2);
+                uintmax_t numerator = (uintmax_t)leading_digits;
+                // std::cout << "numerator = " << std::hex << numerator << std::endl;
+                // std::cout << "numerator / denominator = " << std::hex << (numerator / denominator) << std::endl;
+                return numerator / denominator;
+            }
+        }
+    public:
+        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
+        // returns tuple of {quotient, remainder}
+        static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
+            // division by zero is undefined
+            if (rhs._digits.size() == 0) {
+                throw std::domain_error("division by zero");
+            }
+            // this will gradually accumulate the calculated quotient
+            Uint quotient;
+            // this will gradually decrement with each subtraction
+            Uint remainder = lhs;
+            // while we have any chance in subtracting further from it
+            while (remainder >= rhs) {
+                // exponent denotes a raw value describing how many places we can shift rhs up by
+                Uint exponent = Uint::get_max_shift(remainder, rhs);
+                // estimate how many times it goes in and subtract this many of rhs
+                Uint estimate = Uint::estimate_division(remainder, rhs);
+                // std::cout << (uintmax_t)exponent << " " << (uintmax_t)estimate << std::endl;
+                remainder -= estimate * rhs * exponent;
+                quotient += estimate * exponent;
+                // std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
+                // std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
+                // std::cin.get();
+            }
             // use long division
             // basically, we need to use the leading digits of both operands to
             // help guess at each level how many times the shifted version of rhs
