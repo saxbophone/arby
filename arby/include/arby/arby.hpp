@@ -328,11 +328,6 @@ namespace com::saxbophone::arby {
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
         static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
-            // lhs[0] == rhs gets special treatment, otherwise it doesn't work properly
-            // this is probably because we are conservative and add 1 to denominator to under-estimate the partial quotient...
-            if (lhs._digits[0] == rhs) {
-                return 1;
-            }
             // TODO: potential improvement opportunity:
             // don't always add 1 to the denominator.
             // instead, only add 1 to it if rhs has any remaining digits after the first and any of them are non-zero
@@ -340,7 +335,10 @@ namespace com::saxbophone::arby {
             // this might allow us to divide by BASE and by rhs==lhs[0] without needing to special-case either...
             // it might also allow us to divide 0 by n without needing to special-case it, but that one probably
             // needs special-casing anyway due to the unique behaviour of the remainder...
-            OverflowType denominator = (OverflowType)rhs._digits[0] + 1;
+            OverflowType denominator = (OverflowType)rhs._digits[0];
+            if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
+                denominator++;
+            }
             if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
                 return (OverflowType)lhs._digits[0] / denominator;
             } else { // use lhs[0..1] / rhs[0]
@@ -363,16 +361,16 @@ namespace com::saxbophone::arby {
             // this will gradually decrement with each subtraction
             Uint remainder = lhs;
             // dividing zero by anything is a special case
-            if (lhs._digits.size() == 0) {
-                return {}; // 0, remainder 0
-            }
+            // if (lhs._digits.size() == 0) {
+            //     return {}; // 0, remainder 0
+            // }
             // a sneaky shortcut that prevents hang-ups when rhs == BASE
-            if (rhs == Uint::BASE) {
-                quotient = remainder;
-                quotient._digits.pop_back();
-                remainder._digits = {remainder._digits.back()};
-                return {quotient, remainder};
-            }
+            // if (rhs == Uint::BASE) {
+            //     quotient = remainder;
+            //     quotient._digits.pop_back();
+            //     remainder._digits = {remainder._digits.back()};
+            //     return {quotient, remainder};
+            // }
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
                 // exponent denotes a raw value describing how many places we can shift rhs up by
