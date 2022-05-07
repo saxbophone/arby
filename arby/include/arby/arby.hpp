@@ -333,6 +333,13 @@ namespace com::saxbophone::arby {
             if (lhs._digits[0] == rhs) {
                 return 1;
             }
+            // TODO: potential improvement opportunity:
+            // don't always add 1 to the denominator.
+            // instead, only add 1 to it if there are remaining digits and any of them are non-zero
+            // otherwise, leave it as it is.
+            // this might allow us to divide by BASE and by rhs==lhs[0] without needing to special-case either...
+            // it might also allow us to divide 0 by n without needing to special-case it, but that one probably
+            // needs special-casing anyway due to the unique behaviour of the remainder...
             OverflowType denominator = (OverflowType)rhs._digits[0] + 1;
             if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
                 return (OverflowType)lhs._digits[0] / denominator;
