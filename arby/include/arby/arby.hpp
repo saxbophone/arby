@@ -117,6 +117,18 @@ namespace com::saxbophone::arby {
 
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
 
+        constexprvector bool operator==(const Uint& rhs) const = default;
+
+        // three-way-comparison operator defines all relational operators
+        constexprvector auto operator<=>(const Uint& rhs) const {
+            // use size to indicate ordering if they differ
+            if (_digits.size() != rhs._digits.size()) {
+                return _digits.size() <=> rhs._digits.size();
+            } else { // otherwise compare the elements until a mismatch is found
+                return _digits <=> rhs._digits;
+            }
+        }
+
         constexprvector Uint() : Uint(0) {}
 
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
@@ -132,8 +144,6 @@ namespace com::saxbophone::arby {
         }
 
         Uint(std::string digits);
-
-        constexprvector bool operator==(const Uint& rhs) const = default;
 
         explicit constexprvector operator uintmax_t() const {
             uintmax_t accumulator = 0;
@@ -394,11 +404,6 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
         }
-        // three-way-comparison operator defines all relational operators
-        // defaulted comparison does just a lexicographic comparison on digits,
-        // which works for Uint because the digits are a vector and are stored
-        // big-endian.
-        constexprvector auto operator<=>(const Uint& rhs) const = default;
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
