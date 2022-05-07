@@ -341,6 +341,17 @@ namespace com::saxbophone::arby {
             shift._digits.insert(shift._digits.end(), wiggle_room, 0);
             std::cout << std::hex << std::setw(16) << (uintmax_t)shift << std::endl;
             std::cin.get();
+            // use long division
+            // basically, we need to use the leading digits of both operands to
+            // help guess at each level how many times the shifted version of rhs
+            // will fit into remainder.
+            // we basically do this by dividing leading digit of remainder by that of rhs
+            // if at any point, remainder's lead is less than rhs, then we need to skip that level
+            // BUT we need to then divide the LEADING TWO DIGITS by the leading digit of rhs
+            // something like ((OverflowType)lead * BASE + second_lead) / rhs_lead...
+            // don't forget how much you shifted by each time when summing successful "take-aways" from quotient.
+            // anything left over when we run out of bits to shift out of the shifted rhs becomes the remainder that is
+            // returned from the function.
             return {quotient, remainder};
         }
         // division-assignment
