@@ -28,9 +28,6 @@
 #include <tuple>
 #include <vector>
 
-#include <iostream>
-#include <iomanip>
-
 
 namespace {
     /*
@@ -335,22 +332,13 @@ namespace com::saxbophone::arby {
             if (lhs._digits[0] == rhs) {
                 return 1;
             }
-            // std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
             OverflowType denominator = (OverflowType)rhs._digits[0] + 1;
-            // std::cout << "denominator = " << std::hex << denominator << std::endl;
-            // std::cout << std::hex << lhs._digits[0] << " >= " << std::hex << denominator << "?" << std::endl;
             if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
-                // std::cout << "lhs[0] / (rhs[0]+1)" << std::endl;
-                // std::cout << "numerator = " << std::hex << lhs._digits[0] << std::endl;
-                // std::cout << "numerator / denominator = " << std::hex << ((OverflowType)lhs._digits[0] / denominator) << std::endl;
                 return (OverflowType)lhs._digits[0] / denominator;
             } else { // use lhs[0..1] / rhs[0]
-                // std::cout << "lhs[0..1] / (rhs[0]+1)" << std::endl;
                 Uint leading_digits = lhs;
                 leading_digits._digits.resize(2);
                 uintmax_t numerator = (uintmax_t)leading_digits;
-                // std::cout << "numerator = " << std::hex << numerator << std::endl;
-                // std::cout << "numerator / denominator = " << std::hex << (numerator / denominator) << std::endl;
                 return numerator / denominator;
             }
         }
@@ -377,34 +365,7 @@ namespace com::saxbophone::arby {
                 remainder._digits = {remainder._digits.back()};
                 return {quotient, remainder};
             }
-            // while we have any chance in subtracting further from it
-            while (remainder >= rhs) {
-                // exponent denotes a raw value describing how many places we can shift rhs up by
-                Uint exponent = Uint::get_max_shift(remainder, rhs);
-                // estimate how many times it goes in and subtract this many of rhs
-                Uint estimate = Uint::estimate_division(remainder, rhs);
-                // std::cout << (uintmax_t)exponent << " " << (uintmax_t)estimate << std::endl;
-                // if (remainder < (estimate * rhs * exponent)) {
-                //     std::cout << std::hex << (uintmax_t)remainder << " -= " << std::hex << (uintmax_t)(estimate * rhs * exponent) << std::endl;
-                //     std::cout << "With context:" << std::endl;
-                //     std::cout << "\testimate = " << std::hex << (uintmax_t)estimate << std::endl;
-                //     std::cout << "\trhs =\t" << std::hex << (uintmax_t)rhs << std::endl;
-                //     std::cout << "\texponent = " << std::hex << (uintmax_t)exponent << std::endl;
-                // }
-                if (remainder >= (estimate * rhs * exponent)) {
-                    remainder -= estimate * rhs * exponent;
-                    quotient += estimate * exponent;
-                }
-                if (remainder >= rhs) {
-                    remainder -= rhs;
-                    quotient++;
-                }
-                // std::cin.get();
-                // std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
-                // std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
-                // std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
-            }
-            // std::cin.get();
+
             // use long division
             // basically, we need to use the leading digits of both operands to
             // help guess at each level how many times the shifted version of rhs
@@ -416,7 +377,22 @@ namespace com::saxbophone::arby {
             // don't forget how much you shifted by each time when summing successful "take-aways" from quotient.
             // anything left over when we run out of bits to shift out of the shifted rhs becomes the remainder that is
             // returned from the function.
-            // std::cin.get();
+
+            // while we have any chance in subtracting further from it
+            while (remainder >= rhs) {
+                // exponent denotes a raw value describing how many places we can shift rhs up by
+                Uint exponent = Uint::get_max_shift(remainder, rhs);
+                // estimate how many times it goes in and subtract this many of rhs
+                Uint estimate = Uint::estimate_division(remainder, rhs);
+                if (remainder >= (estimate * rhs * exponent)) {
+                    remainder -= estimate * rhs * exponent;
+                    quotient += estimate * exponent;
+                }
+                if (remainder >= rhs) {
+                    remainder -= rhs;
+                    quotient++;
+                }
+            }
             return {quotient, remainder};
         }
         // division-assignment
