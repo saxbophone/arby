@@ -338,8 +338,8 @@ namespace com::saxbophone::arby {
             } else { // use lhs[0..1] / rhs[0]
                 Uint leading_digits = lhs;
                 leading_digits._digits.resize(2);
-                uintmax_t numerator = (uintmax_t)leading_digits;
-                return numerator / denominator;
+                OverflowType numerator = (OverflowType)(uintmax_t)leading_digits;
+                return (numerator / denominator);
             }
         }
     public:
