@@ -366,6 +366,13 @@ namespace com::saxbophone::arby {
             Uint quotient;
             // this will gradually decrement with each subtraction
             Uint remainder = lhs;
+            // a sneaky shortcut that prevents hang-ups when rhs == BASE
+            if (rhs == Uint::BASE) {
+                quotient = remainder;
+                quotient._digits.pop_back();
+                remainder._digits = {remainder._digits.back()};
+                return {quotient, remainder};
+            }
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
                 // exponent denotes a raw value describing how many places we can shift rhs up by
@@ -389,9 +396,9 @@ namespace com::saxbophone::arby {
                     quotient++;
                 }
                 // std::cin.get();
-                std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
-                std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
-                std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
+                // std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
+                // std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
+                // std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
             }
             // std::cin.get();
             // use long division
