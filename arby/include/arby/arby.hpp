@@ -331,6 +331,10 @@ namespace com::saxbophone::arby {
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
         static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+            // lhs[0] == rhs gets special treatment, otherwise it doesn't work properly
+            if (lhs._digits[0] == rhs) {
+                return 1;
+            }
             // std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
             OverflowType denominator = (OverflowType)rhs._digits[0] + 1;
             // std::cout << "denominator = " << std::hex << denominator << std::endl;
@@ -369,12 +373,27 @@ namespace com::saxbophone::arby {
                 // estimate how many times it goes in and subtract this many of rhs
                 Uint estimate = Uint::estimate_division(remainder, rhs);
                 // std::cout << (uintmax_t)exponent << " " << (uintmax_t)estimate << std::endl;
-                remainder -= estimate * rhs * exponent;
-                quotient += estimate * exponent;
-                // std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
-                // std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
+                // if (remainder < (estimate * rhs * exponent)) {
+                //     std::cout << std::hex << (uintmax_t)remainder << " -= " << std::hex << (uintmax_t)(estimate * rhs * exponent) << std::endl;
+                //     std::cout << "With context:" << std::endl;
+                //     std::cout << "\testimate = " << std::hex << (uintmax_t)estimate << std::endl;
+                //     std::cout << "\trhs =\t" << std::hex << (uintmax_t)rhs << std::endl;
+                //     std::cout << "\texponent = " << std::hex << (uintmax_t)exponent << std::endl;
+                // }
+                if (remainder >= (estimate * rhs * exponent)) {
+                    remainder -= estimate * rhs * exponent;
+                    quotient += estimate * exponent;
+                }
+                if (remainder >= rhs) {
+                    remainder -= rhs;
+                    quotient++;
+                }
                 // std::cin.get();
+                std::cout << std::hex << (uintmax_t)lhs << " / " << std::hex << (uintmax_t)rhs << std::endl;
+                std::cout << "remainder = " << std::hex << (uintmax_t)remainder;
+                std::cout << " quotient = " << std::hex << (uintmax_t)quotient << std::endl;
             }
+            // std::cin.get();
             // use long division
             // basically, we need to use the leading digits of both operands to
             // help guess at each level how many times the shifted version of rhs
@@ -386,6 +405,7 @@ namespace com::saxbophone::arby {
             // don't forget how much you shifted by each time when summing successful "take-aways" from quotient.
             // anything left over when we run out of bits to shift out of the shifted rhs becomes the remainder that is
             // returned from the function.
+            // std::cin.get();
             return {quotient, remainder};
         }
         // division-assignment
