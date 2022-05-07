@@ -321,10 +321,32 @@ namespace com::saxbophone::arby {
             Uint remainder = lhs;
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
+            // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
+            if (wiggle_room > 0 and lhs._digits[0] < rhs._digits[0]) {
+                wiggle_room--;
+            }
             // now, shift up rhs by this amount and see how many times it goes into lhs
-            Uint shift = rhs;
+            Uint shift = 1;
             shift._digits.insert(shift._digits.end(), wiggle_room, 0);
-            return {lhs, shift};
+            // while we haven't shifted out any of rhs' original digits
+            while (shift._digits.size() >= rhs._digits.size()) {
+                std::cout << "while (" << shift._digits.size() << " >= " << rhs._digits.size() << ") {" << std::endl;
+                Uint chunk = rhs * shift;
+                std::cout << (uintmax_t)chunk << " = " << (uintmax_t)rhs << " * " << (uintmax_t)shift << ";" << std::endl;
+                std::cout << "while (" << (uintmax_t)remainder << " >= " << (uintmax_t)chunk << ") ?" << std::endl;
+                while (remainder >= chunk) {
+                    std::cout << "while (" << (uintmax_t)remainder << " >= " << (uintmax_t)chunk << ") {" << std::endl;
+                    std::cout << (uintmax_t)remainder << " -= " << (uintmax_t)chunk << ";" << std::endl;
+                    std::cout << (uintmax_t)quotient << " += " << (uintmax_t)shift << ";" << std::endl;
+                    remainder -= chunk;
+                    quotient += shift;
+                    std::cout << "}" << std::endl;
+                }
+                // shift out one of shift's digits
+                shift._digits.pop_back();
+                std::cout << "}" << std::endl;
+            }
+            return {quotient, remainder};
             // for (std::size_t s = max_shift; s --> 0; ) {
             //     // this is the digit of lhs that the front digit of rhs will line up with
             //     std::size_t lhs_target = max_shift - 1 - s;
