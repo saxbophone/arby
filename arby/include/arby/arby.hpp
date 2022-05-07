@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <iostream>
+#include <iomanip>
 
 
 namespace {
@@ -335,6 +336,11 @@ namespace com::saxbophone::arby {
             if (wiggle_room > 0 and lhs._digits[0] < rhs._digits[0]) {
                 wiggle_room--;
             }
+            std::cout << std::hex << std::setw(16) << (uintmax_t)lhs << " " << wiggle_room << std::endl;
+            Uint shift = rhs;
+            shift._digits.insert(shift._digits.end(), wiggle_room, 0);
+            std::cout << std::hex << std::setw(16) << (uintmax_t)shift << std::endl;
+            std::cin.get();
             return {quotient, remainder};
         }
         // division-assignment
