@@ -329,6 +329,7 @@ namespace com::saxbophone::arby {
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
         static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
             // lhs[0] == rhs gets special treatment, otherwise it doesn't work properly
+            // this is probably because we are conservative and add 1 to denominator to under-estimate the partial quotient...
             if (lhs._digits[0] == rhs) {
                 return 1;
             }
@@ -365,19 +366,6 @@ namespace com::saxbophone::arby {
                 remainder._digits = {remainder._digits.back()};
                 return {quotient, remainder};
             }
-
-            // use long division
-            // basically, we need to use the leading digits of both operands to
-            // help guess at each level how many times the shifted version of rhs
-            // will fit into remainder.
-            // we basically do this by dividing leading digit of remainder by that of rhs
-            // if at any point, remainder's lead is less than rhs, then we need to skip that level
-            // BUT we need to then divide the LEADING TWO DIGITS by the leading digit of rhs
-            // something like ((OverflowType)lead * BASE + second_lead) / rhs_lead...
-            // don't forget how much you shifted by each time when summing successful "take-aways" from quotient.
-            // anything left over when we run out of bits to shift out of the shifted rhs becomes the remainder that is
-            // returned from the function.
-
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
                 // exponent denotes a raw value describing how many places we can shift rhs up by
@@ -388,6 +376,8 @@ namespace com::saxbophone::arby {
                     remainder -= estimate * rhs * exponent;
                     quotient += estimate * exponent;
                 }
+                // this is a bit awkward, and needed when estimate_division was too conservative and gave an estimate of
+                // zero, even when remainder >= rhs... This can happen if leading digits of remainder == rhs...
                 if (remainder >= rhs) {
                     remainder -= rhs;
                     quotient++;
