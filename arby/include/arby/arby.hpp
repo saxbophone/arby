@@ -335,7 +335,7 @@ namespace com::saxbophone::arby {
             }
             // TODO: potential improvement opportunity:
             // don't always add 1 to the denominator.
-            // instead, only add 1 to it if there are remaining digits and any of them are non-zero
+            // instead, only add 1 to it if rhs has any remaining digits after the first and any of them are non-zero
             // otherwise, leave it as it is.
             // this might allow us to divide by BASE and by rhs==lhs[0] without needing to special-case either...
             // it might also allow us to divide 0 by n without needing to special-case it, but that one probably
