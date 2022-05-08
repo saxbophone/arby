@@ -156,6 +156,9 @@ namespace com::saxbophone::arby {
             return accumulator;
         }
 
+        // custom ostream operator that allows this class to be printed with std::cout and friends
+        friend std::ostream& operator<<(std::ostream& os, const Uint& object);
+
         explicit operator std::string() const;
         // prefix increment
         constexprvector Uint& operator++() {
