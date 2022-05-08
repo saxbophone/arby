@@ -313,7 +313,7 @@ namespace com::saxbophone::arby {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-    private:
+    private: // private helper methods for Uint::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
         static constexprvector Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
