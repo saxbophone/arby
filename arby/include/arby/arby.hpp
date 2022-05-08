@@ -338,7 +338,11 @@ namespace com::saxbophone::arby {
             if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
                 return (OverflowType)lhs._digits[0] / denominator;
             } else { // use lhs[0..1] / rhs[0]
+                // chop off all but the leading two digits of lhs to get the numerator
                 Uint leading_digits = lhs;
+                // NOTE: we can guarantee that lhs will not be shorter than 2 digits here ONLY because the caller will
+                // not call this method if lhs < rhs AND to get to this branch, the first digit of lhs is less than that
+                // of rhs. These facts taken together prove that lhs is at least 2 digits long at this point.
                 leading_digits._digits.resize(2);
                 OverflowType numerator = (OverflowType)(uintmax_t)leading_digits;
                 return (numerator / denominator);
@@ -374,6 +378,9 @@ namespace com::saxbophone::arby {
                     remainder -= (shifted_rhs);
                     quotient += exponent;
                 }
+                // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
+                // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
+                // terminate.
             }
             return {quotient, remainder};
         }
