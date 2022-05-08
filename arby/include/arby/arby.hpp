@@ -285,7 +285,9 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // multiplication-assignment
-        constexprvector Uint& operator*=(const Uint& rhs) {
+        // NOTE: even though rhs is not modified, we take a copy in case rhs IS
+        // this, in which case it would get cleared when we clear this' digits.
+        constexprvector Uint& operator*=(Uint rhs) {
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
                 _digits.clear();
