@@ -328,15 +328,11 @@ namespace com::saxbophone::arby {
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
         static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
-            // TODO: potential improvement opportunity:
-            // don't always add 1 to the denominator.
-            // instead, only add 1 to it if rhs has any remaining digits after the first and any of them are non-zero
-            // otherwise, leave it as it is.
-            // this might allow us to divide by BASE and by rhs==lhs[0] without needing to special-case either...
-            // it might also allow us to divide 0 by n without needing to special-case it, but that one probably
-            // needs special-casing anyway due to the unique behaviour of the remainder...
             OverflowType denominator = (OverflowType)rhs._digits[0];
+            // if any of the other digits of rhs are non-zero...
             if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
+                // increment denominator, we don't know what those other digits are so we have to assume denominator
+                // is closer in value to denominator+1 and estimate accordingly, by deliberately underestimating...
                 denominator++;
             }
             if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
