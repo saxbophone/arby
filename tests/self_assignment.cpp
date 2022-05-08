@@ -9,6 +9,11 @@
 
 using namespace com::saxbophone;
 
+// Clang warns about self-assignments that result in constants (as with sub, div and mod)
+// but we really do want to do those things, so silence those warnings for this unit
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+
 TEST_CASE("Addition self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
     arby::Uint arb = value;
@@ -55,3 +60,5 @@ TEST_CASE("Modulo self-assignment", "[self-assignment]") {
 
     CHECK((uintmax_t)arb == 0);
 }
+
+#pragma clang diagnostic pop
