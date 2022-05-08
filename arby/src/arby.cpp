@@ -16,4 +16,8 @@ namespace com::saxbophone::arby {
     Uint::operator std::string() const {
         return {};
     }
+
+    std::ostream& operator<<(std::ostream& os, const Uint& object) {
+        return os;
+    }
 }
