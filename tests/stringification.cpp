@@ -28,3 +28,14 @@ TEST_CASE("Using std::ostream << arby::Uint generates decimal string of value", 
 
     CHECK(os.str() == std::get<1>(values));
 }
+
+TEST_CASE("Using std::ostream << with random arby::Uint generates decimal string of value", "[stringification]") {
+    auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    arby::Uint arb = value;
+    std::string expected_str = std::to_string(value);
+    std::ostringstream os;
+
+    os << arb;
+
+    CHECK(os.str() == expected_str);
+}
