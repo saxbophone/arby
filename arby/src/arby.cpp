@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include <iostream>
+#include <sstream>
 #include <string>
 
 #include <arby/arby.hpp>
@@ -16,7 +16,9 @@ namespace com::saxbophone::arby {
     Uint::Uint(std::string digits) {}
 
     Uint::operator std::string() const {
-        return {};
+        std::ostringstream os;
+        os << std::dec << *this;
+        return os.str();
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
