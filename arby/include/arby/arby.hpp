@@ -315,7 +315,7 @@ namespace com::saxbophone::arby {
         }
     private:
         // function that shifts up rhs to be just big enough to be smaller than lhs
-        static Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
+        static constexprvector Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
@@ -327,7 +327,7 @@ namespace com::saxbophone::arby {
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
-        static OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+        static constexprvector OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits[0];
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
