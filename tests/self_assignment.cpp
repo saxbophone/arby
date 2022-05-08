@@ -11,6 +11,7 @@ using namespace com::saxbophone;
 
 // Clang warns about self-assignments that result in constants (as with sub, div and mod)
 // but we really do want to do those things, so silence those warnings for this unit
+#pragma warning (disable : 4068 ) /* disable unknown pragma warnings for this file when on MSVC */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
 
