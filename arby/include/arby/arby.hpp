@@ -360,17 +360,6 @@ namespace com::saxbophone::arby {
             Uint quotient;
             // this will gradually decrement with each subtraction
             Uint remainder = lhs;
-            // dividing zero by anything is a special case
-            // if (lhs._digits.size() == 0) {
-            //     return {}; // 0, remainder 0
-            // }
-            // a sneaky shortcut that prevents hang-ups when rhs == BASE
-            // if (rhs == Uint::BASE) {
-            //     quotient = remainder;
-            //     quotient._digits.pop_back();
-            //     remainder._digits = {remainder._digits.back()};
-            //     return {quotient, remainder};
-            // }
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
                 // exponent denotes a raw value describing how many places we can shift rhs up by
@@ -381,11 +370,11 @@ namespace com::saxbophone::arby {
                     remainder -= estimate * rhs * exponent;
                     quotient += estimate * exponent;
                 }
-                // this is a bit awkward, and needed when estimate_division was too conservative and gave an estimate of
-                // zero, even when remainder >= rhs... This can happen if leading digits of remainder == rhs...
-                if (remainder >= rhs) {
-                    remainder -= rhs;
-                    quotient++;
+                // our estimate deliberately underestimates how many times shifted rhs can go into remainder
+                // here we subtract further rounds of rhs * exponent if possible
+                if (remainder >= (rhs * exponent)) {
+                    remainder -= (rhs * exponent);
+                    quotient += exponent;
                 }
             }
             return {quotient, remainder};
