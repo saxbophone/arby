@@ -25,6 +25,7 @@
 #include <limits>
 #include <string>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 
@@ -111,8 +112,21 @@ namespace com::saxbophone::arby {
     class Uint {
     public:
         using StorageType = GetStorageType<int>::StorageType;
+        using OverflowType = GetStorageType<int>::OverflowType;
 
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
+
+        constexprvector bool operator==(const Uint& rhs) const = default;
+
+        // three-way-comparison operator defines all relational operators
+        constexprvector auto operator<=>(const Uint& rhs) const {
+            // use size to indicate ordering if they differ
+            if (_digits.size() != rhs._digits.size()) {
+                return _digits.size() <=> rhs._digits.size();
+            } else { // otherwise compare the elements until a mismatch is found
+                return _digits <=> rhs._digits;
+            }
+        }
 
         constexprvector Uint() : Uint(0) {}
 
@@ -129,8 +143,6 @@ namespace com::saxbophone::arby {
         }
 
         Uint(std::string digits);
-
-        constexprvector bool operator==(const Uint& rhs) const = default;
 
         explicit constexprvector operator uintmax_t() const {
             uintmax_t accumulator = 0;
@@ -201,7 +213,6 @@ namespace com::saxbophone::arby {
         }
         // addition-assignment
         constexprvector Uint& operator+=(Uint rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
@@ -234,7 +245,6 @@ namespace com::saxbophone::arby {
         }
         // subtraction-assignment
         constexprvector Uint& operator-=(Uint rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (rhs._digits.size() != 0) {
@@ -260,6 +270,10 @@ namespace com::saxbophone::arby {
                     throw std::underflow_error("arithmetic underflow: subtrahend bigger than minuend");
                 }
             }
+            // remove any leading zeroes
+            while (_digits.size() > 0 and _digits.front() == 0) {
+                _digits.erase(_digits.begin());
+            }
             return *this; // return the result by reference
         }
         // subtraction
@@ -269,7 +283,6 @@ namespace com::saxbophone::arby {
         }
         // multiplication-assignment
         constexprvector Uint& operator*=(const Uint& rhs) {
-            using OverflowType = GetStorageType<int>::OverflowType;
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
                 _digits.clear();
@@ -300,31 +313,103 @@ namespace com::saxbophone::arby {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
+    private: // private helper methods for Uint::divmod()
+        // function that shifts up rhs to be just big enough to be smaller than lhs
+        static constexprvector Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
+            // how many places can we shift rhs left until it's the same width as lhs?
+            std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
+            // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
+            if (wiggle_room > 0 and lhs._digits[0] < rhs._digits[0]) {
+                wiggle_room--;
+            }
+            Uint shift = 1;
+            shift._digits.insert(shift._digits.end(), wiggle_room, 0);
+            return shift;
+        }
+        // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
+        static constexprvector OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+            OverflowType denominator = (OverflowType)rhs._digits[0];
+            // if any of the other digits of rhs are non-zero...
+            if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
+                // increment denominator, we don't know what those other digits are so we have to assume denominator
+                // is closer in value to denominator+1 and estimate accordingly, by deliberately underestimating...
+                denominator++;
+            }
+            if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
+                return (OverflowType)lhs._digits[0] / denominator;
+            } else { // use lhs[0..1] / rhs[0]
+                // chop off all but the leading two digits of lhs to get the numerator
+                Uint leading_digits = lhs;
+                // NOTE: we can guarantee that lhs will not be shorter than 2 digits here ONLY because the caller will
+                // not call this method if lhs < rhs AND to get to this branch, the first digit of lhs is less than that
+                // of rhs. These facts taken together prove that lhs is at least 2 digits long at this point.
+                leading_digits._digits.resize(2);
+                OverflowType numerator = (OverflowType)(uintmax_t)leading_digits;
+                return (numerator / denominator);
+            }
+        }
+    public:
+        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
+        // returns tuple of {quotient, remainder}
+        static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
+            // division by zero is undefined
+            if (rhs._digits.size() == 0) {
+                throw std::domain_error("division by zero");
+            }
+            // this will gradually accumulate the calculated quotient
+            Uint quotient;
+            // this will gradually decrement with each subtraction
+            Uint remainder = lhs;
+            // while we have any chance in subtracting further from it
+            while (remainder >= rhs) {
+                // exponent denotes a raw value describing how many places we can shift rhs up by
+                Uint exponent = Uint::get_max_shift(remainder, rhs);
+                // estimate how many times it goes in and subtract this many of rhs
+                Uint estimate = Uint::estimate_division(remainder, rhs);
+                // we'll actually be subtracting rhs shifted by exponent
+                Uint shifted_rhs = rhs * exponent;
+                if (remainder >= (estimate * shifted_rhs)) {
+                    remainder -= estimate * shifted_rhs;
+                    quotient += estimate * exponent;
+                }
+                // our estimate deliberately underestimates how many times shifted rhs can go into remainder
+                // here we subtract further rounds of shifted_rhs if possible
+                if (remainder >= (shifted_rhs)) {
+                    remainder -= (shifted_rhs);
+                    quotient += exponent;
+                }
+                // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
+                // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
+                // terminate.
+            }
+            return {quotient, remainder};
+        }
         // division-assignment
         constexprvector Uint& operator/=(const Uint& rhs) {
-            // TODO: implement
+            Uint quotient = *this / rhs; // uses friend /operator
+            // assign quotient's digits back to our digits
+            _digits = quotient._digits;
             return *this; // return the result by reference
         }
         // division
         friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
-            lhs /= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
+            Uint quotient;
+            std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
+            return quotient;
         }
         // modulo-assignment
         constexprvector Uint& operator%=(const Uint& rhs) {
-            // TODO: implement
+            Uint remainder = *this % rhs; // uses friend %operator
+            // assign remainder's digits back to our digits
+            _digits = remainder._digits;
             return *this; // return the result by reference
         }
         // modulo
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
-            lhs %= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
+            Uint remainder;
+            std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
+            return remainder;
         }
-        // three-way-comparison operator defines all relational operators
-        // defaulted comparison does just a lexicographic comparison on digits,
-        // which works for Uint because the digits are a vector and are stored
-        // big-endian.
-        constexprvector auto operator<=>(const Uint& rhs) const = default;
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
