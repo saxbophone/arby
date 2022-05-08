@@ -12,6 +12,7 @@ target_sources(
         basic_arithmetic.cpp
         divmod.cpp
         multiplication.cpp
+        self_assignment.cpp
         stringification.cpp
 )
 target_link_libraries(
