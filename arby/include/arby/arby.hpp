@@ -366,14 +366,16 @@ namespace com::saxbophone::arby {
                 Uint exponent = Uint::get_max_shift(remainder, rhs);
                 // estimate how many times it goes in and subtract this many of rhs
                 Uint estimate = Uint::estimate_division(remainder, rhs);
-                if (remainder >= (estimate * rhs * exponent)) {
-                    remainder -= estimate * rhs * exponent;
+                // we'll actually be subtracting rhs shifted by exponent
+                Uint shifted_rhs = rhs * exponent;
+                if (remainder >= (estimate * shifted_rhs)) {
+                    remainder -= estimate * shifted_rhs;
                     quotient += estimate * exponent;
                 }
                 // our estimate deliberately underestimates how many times shifted rhs can go into remainder
-                // here we subtract further rounds of rhs * exponent if possible
-                if (remainder >= (rhs * exponent)) {
-                    remainder -= (rhs * exponent);
+                // here we subtract further rounds of shifted_rhs if possible
+                if (remainder >= (shifted_rhs)) {
+                    remainder -= (shifted_rhs);
                     quotient += exponent;
                 }
             }
