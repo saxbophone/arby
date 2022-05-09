@@ -185,3 +185,16 @@ TEST_CASE("divmod of non-zero arby::Uint by non-zero arby::Uint", "[divmod]") {
     CHECK((uintmax_t)quotient == numerator / denominator);
     CHECK((uintmax_t)remainder == numerator % denominator);
 }
+
+// extra
+
+TEST_CASE("Division of much smaller arby::Uint by much larger arby::Uint", "[division]") {
+    uintmax_t numerator = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)arby::Uint::BASE)));
+    // ensure denominator is greater than numerator
+    uintmax_t denominator = GENERATE_COPY(take(100, random(numerator + 1, std::numeric_limits<uintmax_t>::max())));
+    arby::Uint lhs = numerator;
+    arby::Uint rhs = denominator;
+
+    // answer should always be zero
+    CHECK((uintmax_t)(lhs / rhs) == 0);
+}
