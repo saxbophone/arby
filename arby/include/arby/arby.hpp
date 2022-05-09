@@ -417,12 +417,17 @@ namespace com::saxbophone::arby {
         }
         // raises base to power of exponent
         static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
-            // 1 to the power of anything is always 1
-            if (base == 1) {
+            // use divide-and-conquer recursion to break up huge powers into products of smaller powers
+            // exponent = 0 is our base case to terminate the recursion
+            if (exponent == 0) {
                 return 1;
             }
-            Uint power = 1;
-            for (Uint i = 0; i < exponent; i++) {
+            auto [quotient, remainder] = Uint::divmod(exponent, 2);
+            // instead of calculating x^n, do x^(n/2)
+            Uint power = Uint::pow(base, quotient);
+            power *= power;
+            // and multiply by base again if n was odd
+            if (remainder == 1) {
                 power *= base;
             }
             return power;

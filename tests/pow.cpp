@@ -36,7 +36,7 @@ static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
 
 TEST_CASE("Non-zero arby::Uint raised to the power of non-zero arby::Uint", "[pow]") {
     // base needs to be severely constrained if we are to have any reasonable prospect of getting some large exponents
-    auto base = GENERATE(take(1000, random((uintmax_t)1, (uintmax_t)256)));
+    auto base = GENERATE(take(10000, random((uintmax_t)1, (uintmax_t)256)));
     // use log-n to find out the maximmum number exponent we can raise base to to fit in uintmax_t range
     uintmax_t MAX = (uintmax_t)(std::log(std::numeric_limits<uintmax_t>::max()) / std::log(base));
     auto exponent = GENERATE_COPY(take(1, random((uintmax_t)1, MAX)));
