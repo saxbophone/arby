@@ -491,8 +491,8 @@ namespace com::saxbophone::arby {
         // go through character by character, adding them to the final value
         Uint power = Uint::pow(10, length - 1);
         for (std::size_t i = 0; i < length; i++) {
-            std::uint8_t digit = literal[i] - '0';
-            value += digit * power;
+            auto digit = literal[i] - '0';
+            value += (uintmax_t)digit * power;
             power /= 10;
         }
         return value;
