@@ -415,6 +415,10 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
         }
+        // raises base to power of exponent
+        static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
+            return {};
+        }
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement
