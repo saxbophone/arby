@@ -21,6 +21,19 @@ TEST_CASE("Zero raised to the power of any non-zero arby::Uint returns 0", "[pow
     CHECK(arby::Uint::pow(0, value) == 0);
 }
 
+// std::pow() is not accurate for large powers and we need exactness
+static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
+    // 1 to the power of anything is always 1
+    if (base == 1) {
+        return 1;
+    }
+    uintmax_t power = 1;
+    for (uintmax_t i = 0; i < exponent; i++) {
+        power *= base;
+    }
+    return power;
+}
+
 TEST_CASE("Non-zero arby::Uint raised to the power of non-zero arby::Uint", "[pow]") {
     // base needs to be severely constrained if we are to have any reasonable prospect of getting some large exponents
     auto base = GENERATE(take(1000, random((uintmax_t)1, (uintmax_t)256)));
@@ -30,5 +43,5 @@ TEST_CASE("Non-zero arby::Uint raised to the power of non-zero arby::Uint", "[po
 
     CAPTURE(base, exponent);
 
-    CHECK((uintmax_t)arby::Uint::pow(base, exponent) == (uintmax_t)std::pow(base, exponent));
+    CHECK((uintmax_t)arby::Uint::pow(base, exponent) == integer_pow(base, exponent));
 }

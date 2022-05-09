@@ -417,7 +417,15 @@ namespace com::saxbophone::arby {
         }
         // raises base to power of exponent
         static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
-            return {};
+            // 1 to the power of anything is always 1
+            if (base == 1) {
+                return 1;
+            }
+            Uint power = 1;
+            for (Uint i = 0; i < exponent; i++) {
+                power *= base;
+            }
+            return power;
         }
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
