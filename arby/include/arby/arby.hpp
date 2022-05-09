@@ -482,7 +482,20 @@ namespace com::saxbophone::arby {
     // we want to support a potentially infinite number of digits, or certainly
     // more than can be stored in unsigned long long...
     constexprvector Uint operator "" _uarb(const char* literal) {
-        return {};
+        // we can't use strlen or std::string to get the length becuase neither are constexpr
+        std::size_t length = 0;
+        while (literal[length] != 0) { // search for the null-terminator
+            length++;
+        }
+        Uint value;
+        // go through character by character, adding them to the final value
+        Uint power = Uint::pow(10, length - 1);
+        for (std::size_t i = 0; i < length; i++) {
+            std::uint8_t digit = literal[i] - '0';
+            value += digit * power;
+            power /= 10;
+        }
+        return value;
     }
 }
 
