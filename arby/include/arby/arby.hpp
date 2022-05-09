@@ -415,6 +415,29 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
         }
+        // raises base to power of exponent
+        static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
+            // use divide-and-conquer recursion to break up huge powers into products of smaller powers
+            // exponent = 0 is our base case to terminate the recursion
+            if (exponent == 0) {
+                return 1;
+            } else if (exponent == 1) {
+                // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
+                return base;
+            } else if (exponent == 2) {
+                // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
+                return base * base;
+            }
+            auto [quotient, remainder] = Uint::divmod(exponent, 2);
+            // instead of calculating x^n, do x^(n/2)
+            Uint power = Uint::pow(base, quotient);
+            power *= power;
+            // and multiply by base again if n was odd
+            if (remainder == 1) {
+                power *= base;
+            }
+            return power;
+        }
         // left-shift-assignment
         constexprvector Uint& operator<<=(const Uint& n) {
             // TODO: implement

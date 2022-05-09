@@ -12,6 +12,7 @@ target_sources(
         basic_arithmetic.cpp
         divmod.cpp
         multiplication.cpp
+        pow.cpp
         self_assignment.cpp
         stringification.cpp
 )
