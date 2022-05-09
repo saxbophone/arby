@@ -105,7 +105,9 @@ namespace {
 #ifdef __cpp_lib_constexpr_vector
 #define constexprvector constexpr
 #else
-#define constexprvector
+// otherwise define the special macro as inline to keep the inline semantics of all things that use it
+// this is needed because it can cause linkage issues with duplicated symbols otherwise
+#define constexprvector inline
 #endif
 
 namespace com::saxbophone::arby {
@@ -474,6 +476,27 @@ namespace com::saxbophone::arby {
     private:
         std::vector<StorageType> _digits;
     };
+
+    // raw user-defined-literal for Uint class
+    // we use a raw literal in this case because as the Uint type is unbounded,
+    // we want to support a potentially infinite number of digits, or certainly
+    // more than can be stored in unsigned long long...
+    constexprvector Uint operator "" _uarb(const char* literal) {
+        // we can't use strlen or std::string to get the length becuase neither are constexpr
+        std::size_t length = 0;
+        while (literal[length] != 0) { // search for the null-terminator
+            length++;
+        }
+        Uint value;
+        // go through character by character, adding them to the final value
+        Uint power = Uint::pow(10, length - 1);
+        for (std::size_t i = 0; i < length; i++) {
+            auto digit = literal[i] - '0';
+            value += (uintmax_t)digit * power;
+            power /= 10;
+        }
+        return value;
+    }
 }
 
 // adding template specialisation to std::numeric_limits<> for arby::Uint

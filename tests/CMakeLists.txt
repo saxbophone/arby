@@ -15,6 +15,7 @@ target_sources(
         pow.cpp
         self_assignment.cpp
         stringification.cpp
+        user_defined_literals.cpp
 )
 target_link_libraries(
     tests
