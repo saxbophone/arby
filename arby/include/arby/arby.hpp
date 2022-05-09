@@ -101,13 +101,13 @@ namespace {
     }
 }
 
-// only define Uint as a constexpr class if there is library support for constexpr std::vector
 #ifdef __cpp_lib_constexpr_vector
+// only define Uint as a constexpr class if there is library support for constexpr std::vector
 #define constexprvector constexpr
 #else
 // otherwise define the special macro as inline to keep the inline semantics of all things that use it
 // this is needed because it can cause linkage issues with duplicated symbols otherwise
-#define constexprvector inline
+#define constexprvector inline /**< Specifies `constexpr` if std::vector is `constexpr`, otherwise `inline` */
 #endif
 
 namespace com::saxbophone::arby {
@@ -473,10 +473,14 @@ namespace com::saxbophone::arby {
         std::vector<StorageType> _digits;
     };
 
-    // raw user-defined-literal for Uint class
-    // we use a raw literal in this case because as the Uint type is unbounded,
-    // we want to support a potentially infinite number of digits, or certainly
-    // more than can be stored in unsigned long long...
+    /**
+     * @brief raw user-defined-literal for Uint class
+     * @param literal the literal
+     * @returns Corresponding arby::Uint value
+     * @note we use a raw literal in this case because as the Uint type is
+     * unbounded, we want to support a potentially infinite number of digits,
+     * or certainly more than can be stored in unsigned long long...
+     */
     constexprvector Uint operator "" _uarb(const char* literal) {
         // we can't use strlen or std::string to get the length becuase neither are constexpr
         std::size_t length = 0;
