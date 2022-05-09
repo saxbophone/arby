@@ -105,7 +105,9 @@ namespace {
 #ifdef __cpp_lib_constexpr_vector
 #define constexprvector constexpr
 #else
-#define constexprvector
+// otherwise define the special macro as inline to keep the inline semantics of all things that use it
+// this is needed because it can cause linkage issues with duplicated symbols otherwise
+#define constexprvector inline
 #endif
 
 namespace com::saxbophone::arby {
@@ -474,6 +476,14 @@ namespace com::saxbophone::arby {
     private:
         std::vector<StorageType> _digits;
     };
+
+    // raw user-defined-literal for Uint class
+    // we use a raw literal in this case because as the Uint type is unbounded,
+    // we want to support a potentially infinite number of digits, or certainly
+    // more than can be stored in unsigned long long...
+    constexprvector Uint operator "" _uarb(const char* literal) {
+        return {};
+    }
 }
 
 // adding template specialisation to std::numeric_limits<> for arby::Uint
