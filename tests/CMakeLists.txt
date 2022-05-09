@@ -11,6 +11,7 @@ target_sources(
         main.cpp
         basic_arithmetic.cpp
         divmod.cpp
+        misc.cpp
         multiplication.cpp
         pow.cpp
         self_assignment.cpp

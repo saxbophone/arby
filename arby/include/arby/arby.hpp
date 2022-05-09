@@ -462,8 +462,8 @@ namespace com::saxbophone::arby {
         }
         // contextual conversion to bool (behaves same way as int)
         explicit constexprvector operator bool() const {
-            // TODO: implement
-            return false;
+            // zero is false --all other values are true
+            return _digits.size() > 0; // zero is encoded as empty digits array
         }
         // unary minus
         // D'oh! This type is unsigned. It's tricky to know exactly what unary
