@@ -38,7 +38,8 @@ TEST_CASE("Non-zero arby::Uint raised to the power of non-zero arby::Uint", "[po
     // base needs to be severely constrained if we are to have any reasonable prospect of getting some large exponents
     auto base = GENERATE(take(10000, random((uintmax_t)1, (uintmax_t)256)));
     // use log-n to find out the maximmum number exponent we can raise base to to fit in uintmax_t range
-    uintmax_t MAX = (uintmax_t)(std::log(std::numeric_limits<uintmax_t>::max()) / std::log(base));
+    // XXX: we're actually using max/2 range to make sure that we don't overflow uintmax_t due to log() inaccuracies
+    uintmax_t MAX = (uintmax_t)(std::log(std::numeric_limits<uintmax_t>::max() / 2) / std::log(base));
     auto exponent = GENERATE_COPY(take(1, random((uintmax_t)1, MAX)));
 
     CAPTURE(base, exponent);
