@@ -147,6 +147,10 @@ namespace com::saxbophone::arby {
         Uint(std::string digits);
 
         explicit constexprvector operator uintmax_t() const {
+            // prevent overflow of uintmax_t
+            if (*this > std::numeric_limits<uintmax_t>::max()) {
+                throw std::overflow_error("value too large for uintmax_t");
+            }
             uintmax_t accumulator = 0;
             uintmax_t current_radix = 1;
             // digits are stored in big-endian order, but we read them out in little-endian
