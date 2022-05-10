@@ -10,6 +10,7 @@ target_sources(
     tests PRIVATE
         main.cpp
         basic_arithmetic.cpp
+        casting.cpp
         divmod.cpp
         misc.cpp
         multiplication.cpp
