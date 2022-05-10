@@ -13,7 +13,10 @@
 
 
 namespace com::saxbophone::arby {
-    Uint::Uint(std::string digits) {}
+    Uint::Uint(std::string digits)
+        // use user-defined-literal to convert the digits in the string
+      : _digits(operator "" _uarb(digits.c_str())._digits)
+      {}
 
     Uint::operator std::string() const {
         std::ostringstream os;
