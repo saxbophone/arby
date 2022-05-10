@@ -15,12 +15,6 @@
 namespace com::saxbophone::arby {
     Uint::Uint(std::string digits) {}
 
-    Uint::operator std::string() const {
-        std::ostringstream os;
-        os << std::dec << *this;
-        return os.str();
-    }
-
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
         // this will store the leftover bits
         Uint value = object;
@@ -43,5 +37,11 @@ namespace com::saxbophone::arby {
             power /= 10;
         }
         return os;
+    }
+
+    Uint::operator std::string() const {
+        std::ostringstream os;
+        os << std::dec << *this;
+        return os.str();
     }
 }

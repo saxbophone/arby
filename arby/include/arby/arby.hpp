@@ -469,14 +469,6 @@ namespace com::saxbophone::arby {
             // zero is false --all other values are true
             return _digits.size() > 0; // zero is encoded as empty digits array
         }
-        // unary minus
-        // D'oh! This type is unsigned. It's tricky to know exactly what unary
-        // minus means when applied to unsigned, but this SO answer explains:
-        // https://stackoverflow.com/a/14065392/6177253
-        constexprvector Uint operator-() const {
-            // TODO: implement
-            return *this;
-        }
     private:
         std::vector<StorageType> _digits;
     };
