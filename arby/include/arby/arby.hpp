@@ -127,11 +127,13 @@ namespace com::saxbophone::arby {
         /**
          * @brief Defaulted equality operator for Uint objects
          * @param rhs other Uint object to compare against
+         * @returns `true` if objects are equal, otherwise `false`
          */
         constexprvector bool operator==(const Uint& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
          * @param rhs other Uint object to compare against
+         * @returns std::strong_ordering object for comparison
          */
         constexprvector auto operator<=>(const Uint& rhs) const {
             // use size to indicate ordering if they differ
@@ -164,7 +166,7 @@ namespace com::saxbophone::arby {
          * @brief String-constructor, initialises from string decimal value
          * @param digits string containing the digits of the value to initialise
          * with, written in decimal
-         * @warn Unimplemented
+         * @warning Unimplemented
          */
         Uint(std::string digits);
         /**
@@ -198,7 +200,10 @@ namespace com::saxbophone::arby {
          * @returns string representing the value of this Uint, in decimal
          */
         explicit operator std::string() const;
-        // prefix increment
+        /**
+         * @brief prefix increment
+         * @returns new value of Uint object after incrementing
+         */
         constexprvector Uint& operator++() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
@@ -219,13 +224,20 @@ namespace com::saxbophone::arby {
             }
             return *this; // return new value by reference
         }
-        // postfix increment
+        /**
+         * @brief postfix increment
+         * @returns old value of Uint object before incrementing
+         */
         constexprvector Uint operator++(int) {
             Uint old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
         }
-        // prefix decrement
+        /**
+         * @brief prefix decrement
+         * @returns new value of Uint object after decrementing
+         * @throws std::underflow_error when value of Uint is `0`
+         */
         constexprvector Uint& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
@@ -246,13 +258,22 @@ namespace com::saxbophone::arby {
             }
             return *this; // return new value by reference
         }
-        // postfix decrement
+        /**
+         * @brief postfix decrement
+         * @returns old value of Uint object before decrementing
+         * @throws std::underflow_error when value of Uint is `0`
+         */
         constexprvector Uint operator--(int) {
             Uint old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
         }
-        // addition-assignment
+        /**
+         * @brief addition-assignment
+         * @details Adds other value to this Uint and assigns the result to self
+         * @param rhs value to add to this Uint
+         * @returns resulting object after addition-assignment
+         */
         constexprvector Uint& operator+=(Uint rhs) {
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
@@ -279,12 +300,21 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // addition
+        /**
+         * @brief Addition operator for Uint
+         * @param lhs,rhs operands for the addition
+         * @returns sum of lhs + rhs
+         */
         friend constexprvector Uint operator+(Uint lhs, const Uint& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // subtraction-assignment
+        /**
+         * @brief subtraction-assignment
+         * @details Subtracts other value from this Uint and assigns the result to self
+         * @param rhs value to subtract from this Uint
+         * @returns resulting object after subtraction-assignment
+         */
         constexprvector Uint& operator-=(Uint rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
@@ -317,14 +347,21 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // subtraction
+        /**
+         * @brief Subtraction operator for Uint
+         * @param lhs,rhs operands for the subtraction
+         * @returns result of lhs - rhs
+         */
         friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // multiplication-assignment
-        // NOTE: even though rhs is not modified, we take a copy in case rhs IS
-        // this, in which case it would get cleared when we clear this' digits.
+        /**
+         * @brief multiplication-assignment
+         * @details Multiplies this Uint by other value and assigns the result to self
+         * @param rhs value to multiply this Uint by
+         * @returns resulting object after multiplication-assignment
+         */
         constexprvector Uint& operator*=(Uint rhs) {
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
@@ -351,7 +388,11 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // multiplication
+        /**
+         * @brief Multiplication operator for Uint
+         * @param lhs,rhs operands for the multiplication
+         * @returns product of lhs * rhs
+         */
         friend constexprvector Uint operator*(Uint lhs, const Uint& rhs) {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
@@ -392,8 +433,11 @@ namespace com::saxbophone::arby {
             }
         }
     public:
-        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
-        // returns tuple of {quotient, remainder}
+        /**
+         * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
+         * @param lhs,rhs operands for the division/modulo operation
+         * @returns tuple of {quotient, remainder}
+         */
         static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
@@ -427,33 +471,58 @@ namespace com::saxbophone::arby {
             }
             return {quotient, remainder};
         }
-        // division-assignment
+        /**
+         * @brief division-assignment
+         * @details Divides this Uint by other value and stores result to this
+         * @note This implements floor-division, returning the quotient only
+         * @param rhs value to divide this Uint by
+         * @returns resulting object after division-assignment
+         */
         constexprvector Uint& operator/=(const Uint& rhs) {
             Uint quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
             return *this; // return the result by reference
         }
-        // division
+        /**
+         * @brief Division operator for Uint
+         * @note This implements floor-division, returning the quotient only
+         * @param lhs,rhs operands for the division
+         * @returns quotient of lhs / rhs
+         */
         friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
             Uint quotient;
             std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
             return quotient;
         }
-        // modulo-assignment
+        /**
+         * @brief modulo-assignment
+         * @details Modulo-divides this Uint by other value and stores result to this
+         * @note This returns the modulo/remainder of the division operation
+         * @param rhs value to modulo-divide this Uint by
+         * @returns resulting object after modulo-assignment
+         */
         constexprvector Uint& operator%=(const Uint& rhs) {
             Uint remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
             return *this; // return the result by reference
         }
-        // modulo
+        /**
+         * @brief Modulo operator for Uint
+         * @note This implements modulo-division, returning the remainder only
+         * @param lhs,rhs operands for the division
+         * @returns remainder of lhs / rhs
+         */
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
             Uint remainder;
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
         }
-        // raises base to power of exponent
+        /**
+         * @returns base raised to the power of exponent
+         * @param base,exponent parameters for the base and exponent
+         */
         static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
             // exponent = 0 is our base case to terminate the recursion
@@ -476,27 +545,31 @@ namespace com::saxbophone::arby {
             }
             return power;
         }
-        // left-shift-assignment
-        constexprvector Uint& operator<<=(const Uint& n) {
-            // TODO: implement
-            return *this;
-        }
-        // left-shift
-        friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
-            lhs <<= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
-        }
-        // right-shift-assignment
-        constexprvector Uint& operator>>=(const Uint& n) {
-            // TODO: implement
-            return *this;
-        }
-        // right-shift
-        friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
-            lhs <<= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
-        }
-        // contextual conversion to bool (behaves same way as int)
+        // XXX: unimplemented shift operators commented out until implemented
+        // // left-shift-assignment
+        // constexprvector Uint& operator<<=(const Uint& n) {
+        //     // TODO: implement
+        //     return *this;
+        // }
+        // // left-shift
+        // friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
+        //     lhs <<= rhs; // reuse compound assignment
+        //     return lhs; // return the result by value (uses move constructor)
+        // }
+        // // right-shift-assignment
+        // constexprvector Uint& operator>>=(const Uint& n) {
+        //     // TODO: implement
+        //     return *this;
+        // }
+        // // right-shift
+        // friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
+        //     lhs <<= rhs; // reuse compound assignment
+        //     return lhs; // return the result by value (uses move constructor)
+        // }
+        /**
+         * @brief contextual conversion to bool (behaves same way as int)
+         * @returns `false` when value is `0`, otherwise `true`
+         */
         explicit constexprvector operator bool() const {
             // zero is false --all other values are true
             return _digits.size() > 0; // zero is encoded as empty digits array
