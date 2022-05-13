@@ -113,6 +113,10 @@ namespace {
 namespace com::saxbophone::arby {
     /**
      * @brief Arbitrary-precision unsigned integer type
+     * @note `std::numeric_limits<Uint>` is specialised such that most of the
+     * members of that type are implemented to describe the traits of this type.
+     * @note Exceptions include any members which describe a finite number of digits
+     * or a maximmum value, neither of which apply to this type as it is unbounded.
      */
     class Uint {
     private:
