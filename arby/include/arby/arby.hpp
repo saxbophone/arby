@@ -111,16 +111,28 @@ namespace {
 #endif
 
 namespace com::saxbophone::arby {
+    /**
+     * @brief Arbitrary-precision unsigned integer type
+     */
     class Uint {
-    public:
+    private:
         using StorageType = GetStorageType<int>::StorageType;
         using OverflowType = GetStorageType<int>::OverflowType;
-
+    public:
+        /**
+         * @brief The number base used internally to store the value
+         * @details This is the radix that the digits are encoded in
+         */
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
-
+        /**
+         * @brief Defaulted equality operator for Uint objects
+         * @param rhs other Uint object to compare against
+         */
         constexprvector bool operator==(const Uint& rhs) const = default;
-
-        // three-way-comparison operator defines all relational operators
+        /**
+         * @brief three-way-comparison operator defines all relational operators
+         * @param rhs other Uint object to compare against
+         */
         constexprvector auto operator<=>(const Uint& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
@@ -129,9 +141,14 @@ namespace com::saxbophone::arby {
                 return _digits <=> rhs._digits;
             }
         }
-
+        /**
+         * @brief Default constructor, initialises to numeric value `0`
+         */
         constexprvector Uint() : Uint(0) {}
-
+        /**
+         * @brief Value-constructor, initialises with the given value
+         * @param value value to initialise with
+         */
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
@@ -143,9 +160,18 @@ namespace com::saxbophone::arby {
                 }
             }
         }
-
+        /**
+         * @brief String-constructor, initialises from string decimal value
+         * @param digits string containing the digits of the value to initialise
+         * with, written in decimal
+         * @warn Unimplemented
+         */
         Uint(std::string digits);
-
+        /**
+         * @returns Value of this Uint object cast to uintmax_t
+         * @throws std::overflow_error when Uint value is out of range for
+         * uintmax_t
+         */
         explicit constexprvector operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
@@ -161,10 +187,16 @@ namespace com::saxbophone::arby {
             }
             return accumulator;
         }
-
-        // custom ostream operator that allows this class to be printed with std::cout and friends
+        /**
+         * @brief custom ostream operator that allows this class to be printed
+         * with std::cout and friends
+         * @param os stream to output to
+         * @param object Uint to print
+         */
         friend std::ostream& operator<<(std::ostream& os, const Uint& object);
-
+        /**
+         * @returns string representing the value of this Uint, in decimal
+         */
         explicit operator std::string() const;
         // prefix increment
         constexprvector Uint& operator++() {
