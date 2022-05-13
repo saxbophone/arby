@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
+        os: [ubuntu-20.04, macos-12]
         cxx: [g++-10, clang++]
         include:
           - os: windows-2019
@@ -68,21 +68,9 @@ jobs:
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
         run: echo "BUILD_TYPE=Release" >> $GITHUB_ENV
 
-      # specify C++ compiler to use
-      - name: Set C++ Compiler
-        shell: bash
-        # when not macOS and clang together
-        if: ${{ matrix.os != 'macos-10.15' || matrix.cxx != 'clang++' }}
-        run: echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
-
-      # manually override the C++ compiler when building with clang on macOS
-      - name: Set C++ Compiler for clang on macOS
-        shell: bash
-        # when macOS and clang together
-        if: ${{ matrix.os == 'macos-10.15' && matrix.cxx == 'clang++' }}
-        run: echo "CXX=$(brew --prefix llvm)/bin/clang" >> $GITHUB_ENV
-
       - name: Configure CMake
+        env:
+          CXX: ${{ matrix.cxx }}
         # Use a bash shell so we can use the same syntax for environment variable
         # access regardless of the host operating system
         shell: bash
