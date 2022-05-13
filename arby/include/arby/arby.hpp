@@ -101,26 +101,44 @@ namespace {
     }
 }
 
-// only define Uint as a constexpr class if there is library support for constexpr std::vector
 #ifdef __cpp_lib_constexpr_vector
+// only define Uint as a constexpr class if there is library support for constexpr std::vector
 #define constexprvector constexpr
 #else
 // otherwise define the special macro as inline to keep the inline semantics of all things that use it
 // this is needed because it can cause linkage issues with duplicated symbols otherwise
-#define constexprvector inline
+#define constexprvector inline /**< Specifies `constexpr` if std::vector is `constexpr`, otherwise `inline` */
 #endif
 
 namespace com::saxbophone::arby {
+    /**
+     * @brief Arbitrary-precision unsigned integer type
+     * @note `std::numeric_limits<Uint>` is specialised such that most of the
+     * members of that type are implemented to describe the traits of this type.
+     * @note Exceptions include any members which describe a finite number of digits
+     * or a maximmum value, neither of which apply to this type as it is unbounded.
+     */
     class Uint {
-    public:
+    private:
         using StorageType = GetStorageType<int>::StorageType;
         using OverflowType = GetStorageType<int>::OverflowType;
-
+    public:
+        /**
+         * @brief The number base used internally to store the value
+         * @details This is the radix that the digits are encoded in
+         */
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
-
+        /**
+         * @brief Defaulted equality operator for Uint objects
+         * @param rhs other Uint object to compare against
+         * @returns `true` if objects are equal, otherwise `false`
+         */
         constexprvector bool operator==(const Uint& rhs) const = default;
-
-        // three-way-comparison operator defines all relational operators
+        /**
+         * @brief three-way-comparison operator defines all relational operators
+         * @param rhs other Uint object to compare against
+         * @returns std::strong_ordering object for comparison
+         */
         constexprvector auto operator<=>(const Uint& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
@@ -129,9 +147,14 @@ namespace com::saxbophone::arby {
                 return _digits <=> rhs._digits;
             }
         }
-
+        /**
+         * @brief Default constructor, initialises to numeric value `0`
+         */
         constexprvector Uint() : Uint(0) {}
-
+        /**
+         * @brief Value-constructor, initialises with the given value
+         * @param value value to initialise with
+         */
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
@@ -143,9 +166,18 @@ namespace com::saxbophone::arby {
                 }
             }
         }
-
+        /**
+         * @brief String-constructor, initialises from string decimal value
+         * @param digits string containing the digits of the value to initialise
+         * with, written in decimal
+         * @warning Unimplemented
+         */
         Uint(std::string digits);
-
+        /**
+         * @returns Value of this Uint object cast to uintmax_t
+         * @throws std::overflow_error when Uint value is out of range for
+         * uintmax_t
+         */
         explicit constexprvector operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
@@ -161,12 +193,21 @@ namespace com::saxbophone::arby {
             }
             return accumulator;
         }
-
-        // custom ostream operator that allows this class to be printed with std::cout and friends
+        /**
+         * @brief custom ostream operator that allows this class to be printed
+         * with std::cout and friends
+         * @param os stream to output to
+         * @param object Uint to print
+         */
         friend std::ostream& operator<<(std::ostream& os, const Uint& object);
-
+        /**
+         * @returns string representing the value of this Uint, in decimal
+         */
         explicit operator std::string() const;
-        // prefix increment
+        /**
+         * @brief prefix increment
+         * @returns new value of Uint object after incrementing
+         */
         constexprvector Uint& operator++() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
@@ -187,13 +228,20 @@ namespace com::saxbophone::arby {
             }
             return *this; // return new value by reference
         }
-        // postfix increment
+        /**
+         * @brief postfix increment
+         * @returns old value of Uint object before incrementing
+         */
         constexprvector Uint operator++(int) {
             Uint old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
         }
-        // prefix decrement
+        /**
+         * @brief prefix decrement
+         * @returns new value of Uint object after decrementing
+         * @throws std::underflow_error when value of Uint is `0`
+         */
         constexprvector Uint& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
@@ -214,13 +262,22 @@ namespace com::saxbophone::arby {
             }
             return *this; // return new value by reference
         }
-        // postfix decrement
+        /**
+         * @brief postfix decrement
+         * @returns old value of Uint object before decrementing
+         * @throws std::underflow_error when value of Uint is `0`
+         */
         constexprvector Uint operator--(int) {
             Uint old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
         }
-        // addition-assignment
+        /**
+         * @brief addition-assignment
+         * @details Adds other value to this Uint and assigns the result to self
+         * @param rhs value to add to this Uint
+         * @returns resulting object after addition-assignment
+         */
         constexprvector Uint& operator+=(Uint rhs) {
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
@@ -247,12 +304,21 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // addition
+        /**
+         * @brief Addition operator for Uint
+         * @param lhs,rhs operands for the addition
+         * @returns sum of lhs + rhs
+         */
         friend constexprvector Uint operator+(Uint lhs, const Uint& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // subtraction-assignment
+        /**
+         * @brief subtraction-assignment
+         * @details Subtracts other value from this Uint and assigns the result to self
+         * @param rhs value to subtract from this Uint
+         * @returns resulting object after subtraction-assignment
+         */
         constexprvector Uint& operator-=(Uint rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
@@ -285,14 +351,21 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // subtraction
+        /**
+         * @brief Subtraction operator for Uint
+         * @param lhs,rhs operands for the subtraction
+         * @returns result of lhs - rhs
+         */
         friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // multiplication-assignment
-        // NOTE: even though rhs is not modified, we take a copy in case rhs IS
-        // this, in which case it would get cleared when we clear this' digits.
+        /**
+         * @brief multiplication-assignment
+         * @details Multiplies this Uint by other value and assigns the result to self
+         * @param rhs value to multiply this Uint by
+         * @returns resulting object after multiplication-assignment
+         */
         constexprvector Uint& operator*=(Uint rhs) {
             // either operand being zero always results in zero
             if (_digits.size() == 0 or rhs._digits.size() == 0) {
@@ -319,7 +392,11 @@ namespace com::saxbophone::arby {
             }
             return *this; // return the result by reference
         }
-        // multiplication
+        /**
+         * @brief Multiplication operator for Uint
+         * @param lhs,rhs operands for the multiplication
+         * @returns product of lhs * rhs
+         */
         friend constexprvector Uint operator*(Uint lhs, const Uint& rhs) {
             lhs *= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
@@ -360,8 +437,11 @@ namespace com::saxbophone::arby {
             }
         }
     public:
-        // division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
-        // returns tuple of {quotient, remainder}
+        /**
+         * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
+         * @param lhs,rhs operands for the division/modulo operation
+         * @returns tuple of {quotient, remainder}
+         */
         static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
@@ -395,33 +475,58 @@ namespace com::saxbophone::arby {
             }
             return {quotient, remainder};
         }
-        // division-assignment
+        /**
+         * @brief division-assignment
+         * @details Divides this Uint by other value and stores result to this
+         * @note This implements floor-division, returning the quotient only
+         * @param rhs value to divide this Uint by
+         * @returns resulting object after division-assignment
+         */
         constexprvector Uint& operator/=(const Uint& rhs) {
             Uint quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
             return *this; // return the result by reference
         }
-        // division
+        /**
+         * @brief Division operator for Uint
+         * @note This implements floor-division, returning the quotient only
+         * @param lhs,rhs operands for the division
+         * @returns quotient of lhs / rhs
+         */
         friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
             Uint quotient;
             std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
             return quotient;
         }
-        // modulo-assignment
+        /**
+         * @brief modulo-assignment
+         * @details Modulo-divides this Uint by other value and stores result to this
+         * @note This returns the modulo/remainder of the division operation
+         * @param rhs value to modulo-divide this Uint by
+         * @returns resulting object after modulo-assignment
+         */
         constexprvector Uint& operator%=(const Uint& rhs) {
             Uint remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
             return *this; // return the result by reference
         }
-        // modulo
+        /**
+         * @brief Modulo operator for Uint
+         * @note This implements modulo-division, returning the remainder only
+         * @param lhs,rhs operands for the division
+         * @returns remainder of lhs / rhs
+         */
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
             Uint remainder;
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
         }
-        // raises base to power of exponent
+        /**
+         * @returns base raised to the power of exponent
+         * @param base,exponent parameters for the base and exponent
+         */
         static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
             // exponent = 0 is our base case to terminate the recursion
@@ -444,27 +549,31 @@ namespace com::saxbophone::arby {
             }
             return power;
         }
-        // left-shift-assignment
-        constexprvector Uint& operator<<=(const Uint& n) {
-            // TODO: implement
-            return *this;
-        }
-        // left-shift
-        friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
-            lhs <<= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
-        }
-        // right-shift-assignment
-        constexprvector Uint& operator>>=(const Uint& n) {
-            // TODO: implement
-            return *this;
-        }
-        // right-shift
-        friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
-            lhs <<= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
-        }
-        // contextual conversion to bool (behaves same way as int)
+        // XXX: unimplemented shift operators commented out until implemented
+        // // left-shift-assignment
+        // constexprvector Uint& operator<<=(const Uint& n) {
+        //     // TODO: implement
+        //     return *this;
+        // }
+        // // left-shift
+        // friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
+        //     lhs <<= rhs; // reuse compound assignment
+        //     return lhs; // return the result by value (uses move constructor)
+        // }
+        // // right-shift-assignment
+        // constexprvector Uint& operator>>=(const Uint& n) {
+        //     // TODO: implement
+        //     return *this;
+        // }
+        // // right-shift
+        // friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
+        //     lhs <<= rhs; // reuse compound assignment
+        //     return lhs; // return the result by value (uses move constructor)
+        // }
+        /**
+         * @brief contextual conversion to bool (behaves same way as int)
+         * @returns `false` when value is `0`, otherwise `true`
+         */
         explicit constexprvector operator bool() const {
             // zero is false --all other values are true
             return _digits.size() > 0; // zero is encoded as empty digits array
@@ -473,10 +582,14 @@ namespace com::saxbophone::arby {
         std::vector<StorageType> _digits;
     };
 
-    // raw user-defined-literal for Uint class
-    // we use a raw literal in this case because as the Uint type is unbounded,
-    // we want to support a potentially infinite number of digits, or certainly
-    // more than can be stored in unsigned long long...
+    /**
+     * @brief raw user-defined-literal for Uint class
+     * @param literal the literal
+     * @returns Corresponding arby::Uint value
+     * @note we use a raw literal in this case because as the Uint type is
+     * unbounded, we want to support a potentially infinite number of digits,
+     * or certainly more than can be stored in unsigned long long...
+     */
     constexprvector Uint operator "" _uarb(const char* literal) {
         // we can't use strlen or std::string to get the length becuase neither are constexpr
         std::size_t length = 0;
