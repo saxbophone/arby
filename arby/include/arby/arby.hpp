@@ -579,6 +579,8 @@ namespace com::saxbophone::arby {
             return _digits.size() > 0; // zero is encoded as empty digits array
         }
     private:
+        std::string _stringify_for_base() const;
+
         std::vector<StorageType> _digits;
     };
 
