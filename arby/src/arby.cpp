@@ -15,33 +15,29 @@
 namespace com::saxbophone::arby {
     Uint::Uint(std::string digits) {}
 
-    std::ostream& operator<<(std::ostream& os, const Uint& object) {
-        // this will store the leftover bits
-        Uint value = object;
-        // find the largest power of 10 that is just about not greater than value
-        Uint power = 1;
-        while (value > power * 10) {
-            power *= 10;
-        }
-        // std::cout << (uintmax_t)power << std::endl;
-        // now peel the digits off one by one
-        while (power > 0) {
-            auto [quotient, remainder] = Uint::divmod(value, power);
-            // quotient should be in the range 0..9 and therefore only 1-digit
-            if (quotient._digits.size() == 0) {
-                os << '0';
+    std::string Uint::_stringify_for_base() const {
+        // XXX: only base-10 implemented for now
+        // TODO: add a param to specify base when we implement other bases
+        Uint value = *this;
+        std::string digits;
+        do {
+            auto [quotient, remainder] = Uint::divmod(value, 10);
+            if (remainder._digits.size() == 0) {
+                digits = '0' + digits;
             } else {
-                os << std::to_string(quotient._digits.front());
+                digits = std::to_string(remainder._digits.front()) + digits;
             }
-            value = remainder;
-            power /= 10;
-        }
+            value = quotient;
+        } while (value > 0);
+        return digits;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Uint& object) {
+        os << object._stringify_for_base();
         return os;
     }
 
     Uint::operator std::string() const {
-        std::ostringstream os;
-        os << std::dec << *this;
-        return os.str();
+        return this->_stringify_for_base();
     }
 }
