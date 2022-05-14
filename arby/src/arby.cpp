@@ -6,6 +6,7 @@
 
 #include <cstdint>
 
+#include <ranges>
 #include <sstream>
 #include <string>
 
@@ -23,13 +24,14 @@ namespace com::saxbophone::arby {
         do {
             auto [quotient, remainder] = Uint::divmod(value, 10);
             if (remainder._digits.size() == 0) {
-                digits = '0' + digits;
+                digits += '0';
             } else {
-                digits = std::to_string(remainder._digits.front()) + digits;
+                digits += std::to_string(remainder._digits.front());
             }
             value = quotient;
         } while (value > 0);
-        return digits;
+        auto reversed = digits | std::views::reverse;
+        return std::string(begin(reversed), end(reversed));
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
