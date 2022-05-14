@@ -29,7 +29,7 @@ namespace com::saxbophone::arby {
                 digits += std::to_string(remainder._digits.front());
             }
             value = quotient;
-        } while (value > 0);
+        } while (value > 0_uarb);
         std::reverse(digits.begin(), digits.end());
         return digits;
     }

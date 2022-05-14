@@ -180,7 +180,7 @@ namespace com::saxbophone::arby {
          */
         explicit constexprvector operator uintmax_t() const {
             // prevent overflow of uintmax_t
-            if (*this > std::numeric_limits<uintmax_t>::max()) {
+            if (*this > Uint(std::numeric_limits<uintmax_t>::max())) {
                 throw std::overflow_error("value too large for uintmax_t");
             }
             uintmax_t accumulator = 0;
@@ -530,12 +530,12 @@ namespace com::saxbophone::arby {
         static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
             // exponent = 0 is our base case to terminate the recursion
-            if (exponent == 0) {
+            if (exponent == Uint(0)) {
                 return 1;
-            } else if (exponent == 1) {
+            } else if (exponent == Uint(1)) {
                 // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
                 return base;
-            } else if (exponent == 2) {
+            } else if (exponent == Uint(2)) {
                 // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
                 return base * base;
             }
