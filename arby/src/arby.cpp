@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include <ranges>
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -30,8 +30,8 @@ namespace com::saxbophone::arby {
             }
             value = quotient;
         } while (value > 0);
-        auto reversed = digits | std::views::reverse;
-        return std::string(begin(reversed), end(reversed));
+        std::reverse(digits.begin(), digits.end());
+        return digits;
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
