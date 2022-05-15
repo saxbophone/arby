@@ -144,7 +144,13 @@ namespace com::saxbophone::arby {
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
             } else { // otherwise compare the elements until a mismatch is found
-                return _digits <=> rhs._digits;
+                std::size_t i;
+                for (i = 0; i < _digits.size(); i++) {
+                    if (_digits[i] != rhs._digits[i]) {
+                        return _digits[i] <=> rhs._digits[i];
+                    }
+                }
+                return std::strong_ordering::equal;
             }
         }
         /**
