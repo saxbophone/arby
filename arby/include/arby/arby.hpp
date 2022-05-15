@@ -209,6 +209,12 @@ namespace com::saxbophone::arby {
             return accumulator;
         }
         /**
+         * @returns Value of this Uint object cast to long double
+         */
+        explicit constexprvector operator long double() const {
+            return {};
+        }
+        /**
          * @brief custom ostream operator that allows this class to be printed
          * with std::cout and friends
          * @param os stream to output to
