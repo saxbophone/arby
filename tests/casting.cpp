@@ -24,3 +24,16 @@ TEST_CASE("Casting arby::Uint to long double", "[casting]") {
 
     CHECK((long double)arby::Uint(value) == (long double)value);
 }
+
+TEST_CASE("arby::Uint::from_float() with negative value throws std::domain_error") {
+    auto value = GENERATE(
+        take(1000,
+            random(
+                std::numeric_limits<long double>::lowest(),
+                -std::numeric_limits<long double>::denorm_min()
+            )
+        )
+    );
+    CAPTURE(value);
+    CHECK_THROWS_AS(arby::Uint::from_float(value), std::domain_error);
+}
