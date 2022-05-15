@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <limits>
 #include <stdexcept>
 
@@ -36,4 +38,17 @@ TEST_CASE("arby::Uint::from_float() with negative value throws std::domain_error
     );
     CAPTURE(value);
     CHECK_THROWS_AS(arby::Uint::from_float(value), std::domain_error);
+}
+
+TEST_CASE("arby::Uint::from_float() with positive value") {
+    auto value = GENERATE(
+        take(1000,
+            random(
+                0.0L,
+                std::numeric_limits<long double>::max()
+            )
+        )
+    );
+    CAPTURE(value);
+    CHECK((long double)arby::Uint::from_float(value) == std::trunc(value));
 }

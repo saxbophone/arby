@@ -179,6 +179,10 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when `value < 0`
          */
         static constexprvector Uint from_float(long double value) {
+            // prevent initialising from negative values
+            if (value < 0) {
+                throw std::domain_error("Uint cannot be negative");
+            }
             return {};
         }
         /**
