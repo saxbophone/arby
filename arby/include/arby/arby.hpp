@@ -191,6 +191,7 @@ namespace com::saxbophone::arby {
                 StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
                 output._digits.insert(output._digits.begin(), digit);
                 value /= Uint::BASE;
+                value = std::trunc(value);
             }
             return output;
         }
