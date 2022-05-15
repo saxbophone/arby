@@ -175,7 +175,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief Constructor-like static method, creates Uint from floating point value
-         * @details The resulting Uint has the value of the given input, with the fractional part truncated off
+         * @returns Uint with the value of the given float, with the fractional part truncated off
          * @param value Positive floating point value to initialise with
          * @throws std::domain_error when `value < 0`
          */
@@ -188,7 +188,7 @@ namespace com::saxbophone::arby {
             value = std::trunc(value);
             Uint output;
             while (value > 0) {
-                StorageType digit = std::fmod(value, Uint::BASE);
+                StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
                 output._digits.insert(output._digits.begin(), digit);
                 value /= Uint::BASE;
             }
@@ -204,7 +204,7 @@ namespace com::saxbophone::arby {
     private:
         // private helper method to abstract the common part of the casting op
         template <typename T>
-        T _cast_to() const {
+        constexprvector T _cast_to() const {
             T accumulator = 0;
             // read digits out in big-endian order, shifting as we go
             for (auto digit : _digits) {
