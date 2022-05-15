@@ -366,15 +366,22 @@ namespace com::saxbophone::arby {
          * @param rhs value to multiply this Uint by
          * @returns resulting object after multiplication-assignment
          */
-        constexprvector Uint& operator*=(Uint rhs) {
-            // either operand being zero always results in zero
-            if (_digits.size() == 0 or rhs._digits.size() == 0) {
-                _digits.clear();
-            } else {
-                // store a copy of this for use as lhs
-                const Uint lhs = *this;
-                // reset this to zero
-                _digits.clear();
+        constexprvector Uint& operator*=(const Uint& rhs) {
+            Uint product = *this * rhs; // uses friend *operator
+            // assign product's digits back to our digits
+            _digits = product._digits;
+            return *this; // return the result by reference
+        }
+        /**
+         * @brief Multiplication operator for Uint
+         * @param lhs,rhs operands for the multiplication
+         * @returns product of lhs * rhs
+         */
+        friend constexprvector Uint operator*(const Uint& lhs, const Uint& rhs) {
+            // init product to zero
+            Uint product;
+            // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
+            if (lhs._digits.size() != 0 and rhs._digits.size() != 0) {
                 // multiply each digit from lhs with each digit from rhs
                 for (std::size_t l = 0; l < lhs._digits.size(); l++) {
                     for (std::size_t r = 0; r < rhs._digits.size(); r++) {
@@ -386,21 +393,12 @@ namespace com::saxbophone::arby {
                         std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
                         // add that many trailing zeroes to intermediate's digits
                         intermediate._digits.insert(intermediate._digits.end(), shift_amount, 0);
-                        // finally, add it to this as an accumulator
-                        *this += intermediate;
+                        // finally, add it to lhs as an accumulator
+                        product += intermediate;
                     }
                 }
             }
-            return *this; // return the result by reference
-        }
-        /**
-         * @brief Multiplication operator for Uint
-         * @param lhs,rhs operands for the multiplication
-         * @returns product of lhs * rhs
-         */
-        friend constexprvector Uint operator*(Uint lhs, const Uint& rhs) {
-            lhs *= rhs; // reuse compound assignment
-            return lhs; // return the result by value (uses move constructor)
+            return product;
         }
     private: // private helper methods for Uint::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
