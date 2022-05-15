@@ -156,7 +156,7 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexprvector Uint() : _digits(0) {}
+        constexprvector Uint() {} // uses default ctor of vector to init _digits to zero-size
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
@@ -173,11 +173,14 @@ namespace com::saxbophone::arby {
             }
         }
         /**
-         * @brief Float-constructor, initialises with the given floating point value, with the fractional part truncated
+         * @brief Constructor-like static method, creates Uint from floating point value
+         * @details The resulting Uint has the value of the given input, with the fractional part truncated off
          * @param value Positive floating point value to initialise with
          * @throws std::domain_error when `value < 0`
          */
-        explicit constexprvector Uint(long double value) {}
+        static constexprvector Uint from_float(long double value) {
+            return {};
+        }
         /**
          * @brief String-constructor, initialises from string decimal value
          * @param digits string containing the digits of the value to initialise
