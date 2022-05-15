@@ -181,13 +181,13 @@ namespace com::saxbophone::arby {
         Uint(std::string digits);
         /**
          * @returns Value of this Uint object cast to uintmax_t
-         * @throws std::overflow_error when Uint value is out of range for
+         * @throws std::range_error when Uint value is out of range for
          * uintmax_t
          */
         explicit constexprvector operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
-                throw std::overflow_error("value too large for uintmax_t");
+                throw std::range_error("value too large for uintmax_t");
             }
             uintmax_t accumulator = 0;
             uintmax_t current_radix = 1;
