@@ -1,6 +1,7 @@
 #include <compare>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 #include <catch2/catch.hpp>
 
@@ -63,6 +64,15 @@ TEST_CASE("arby::Uint(UINT_MAX) and (uintmax_t)arby::Uint", "[ctor]") {
     arby::Uint output(std::numeric_limits<uintmax_t>::max());
 
     CHECK((uintmax_t)output == std::numeric_limits<uintmax_t>::max());
+}
+
+TEST_CASE("arby::Uint(std::string)", "[ctor]") {
+    uintmax_t value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    std::string string = std::to_string(value);
+
+    arby::Uint object = string;
+
+    CHECK((uintmax_t)object == value);
 }
 
 // only inlude these tests if we have library support for constexpr vector
