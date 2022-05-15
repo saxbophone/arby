@@ -184,8 +184,6 @@ namespace com::saxbophone::arby {
             if (value < 0) {
                 throw std::domain_error("Uint cannot be negative");
             }
-            // truncate the fractional part of the floating-point value
-            value = std::trunc(value);
             Uint output;
             while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Uint::BASE);

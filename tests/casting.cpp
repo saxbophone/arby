@@ -41,7 +41,7 @@ TEST_CASE("arby::Uint::from_float() with negative value throws std::domain_error
 }
 
 TEST_CASE("arby::Uint::from_float() with positive value") {
-    auto power = GENERATE(0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256);
+    auto power = GENERATE(0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256);
     auto value = GENERATE_COPY(
         take(100,
             random(
