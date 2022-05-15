@@ -23,9 +23,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-12]
+        os: [ubuntu-20.04]
         cxx: [g++-10, clang++]
         include:
+          # macos has two separate versions for the different compilers because
+          # the new macos image needed for clang using a new version of XCode
+          # for C++20 three-way-comparison operator support is only available
+          # on the new macos image, however that new image doesn't provide G++10,
+          # which the old image does
+          - os: macos-10.15
+            cxx: g++-10
+          - os: macos-12
+            cxx: clang++
           - os: windows-2019
             cxx: msvc
 
