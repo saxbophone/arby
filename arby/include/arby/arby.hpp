@@ -199,12 +199,10 @@ namespace com::saxbophone::arby {
                 throw std::range_error("value too large for uintmax_t");
             }
             uintmax_t accumulator = 0;
-            uintmax_t current_radix = 1;
-            // digits are stored in big-endian order, but we read them out in little-endian
-            // TODO: loops like this make my head hurt. Let's read it out in big-endian order instead
-            for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
-                accumulator += *digit * current_radix;
-                current_radix *= Uint::BASE;
+            // read digits out in big-endian order, shifting as we go
+            for (auto digit : _digits) {
+                accumulator *= Uint::BASE;
+                accumulator += digit;
             }
             return accumulator;
         }
@@ -212,7 +210,13 @@ namespace com::saxbophone::arby {
          * @returns Value of this Uint object cast to long double
          */
         explicit constexprvector operator long double() const {
-            return {};
+            long double accumulator = 0;
+            // read digits out in big-endian order, shifting as we go
+            for (auto digit : _digits) {
+                accumulator *= Uint::BASE;
+                accumulator += digit;
+            }
+            return accumulator;
         }
         /**
          * @brief custom ostream operator that allows this class to be printed
