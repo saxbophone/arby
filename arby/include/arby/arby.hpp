@@ -29,8 +29,6 @@
 #include <tuple>
 #include <vector>
 
-#include <gcem.hpp>
-
 
 namespace {
     /*
@@ -181,16 +179,16 @@ namespace com::saxbophone::arby {
          * @param value Positive floating point value to initialise with
          * @throws std::domain_error when `value < 0`
          */
-        static constexprvector Uint from_float(long double value) {
+        static Uint from_float(long double value) {
             // prevent initialising from negative values
             if (value < 0) {
                 throw std::domain_error("Uint cannot be negative");
             }
             // truncate the fractional part of the floating-point value
-            // value = gcem::trunc(value);
+            value = std::trunc(value);
             Uint output;
             while (value > 0) {
-                StorageType digit = (StorageType)gcem::fmod(value, (long double)Uint::BASE);
+                StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
                 output._digits.insert(output._digits.begin(), digit);
                 value /= Uint::BASE;
             }
