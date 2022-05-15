@@ -14,7 +14,10 @@
 
 
 namespace com::saxbophone::arby {
-    Uint::Uint(std::string digits) {}
+    Uint::Uint(std::string digits)
+        // use user-defined-literal to convert the digits in the string
+      : _digits(operator "" _uarb(digits.c_str())._digits)
+      {}
 
     std::string Uint::_stringify_for_base() const {
         // XXX: only base-10 implemented for now
