@@ -378,7 +378,8 @@ namespace com::saxbophone::arby {
                 // multiply each digit from lhs with each digit from rhs
                 for (std::size_t l = 0; l < lhs._digits.size(); l++) {
                     for (std::size_t r = 0; r < rhs._digits.size(); r++) {
-                        OverflowType multiplication = lhs._digits[l] * rhs._digits[r];
+                        // cast lhs to OverflowType to make sure both operands get promoted to avoid wrap-around overflow
+                        OverflowType multiplication = (OverflowType)lhs._digits[l] * rhs._digits[r];
                         // create a new Uint with this intermediate result and add trailing places as needed
                         Uint intermediate = multiplication;
                         // we need to remap the indices as the digits are stored big-endian
