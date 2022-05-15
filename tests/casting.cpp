@@ -41,14 +41,15 @@ TEST_CASE("arby::Uint::from_float() with negative value throws std::domain_error
 }
 
 TEST_CASE("arby::Uint::from_float() with positive value") {
-    auto value = GENERATE(
-        take(1000,
+    auto power = GENERATE(0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256);
+    auto value = GENERATE_COPY(
+        take(100,
             random(
                 0.0L,
-                std::numeric_limits<long double>::max()
+                std::pow((long double)std::numeric_limits<uintmax_t>::max(), power)
             )
         )
     );
     CAPTURE(value);
-    CHECK((long double)arby::Uint::from_float(value) == std::trunc(value));
+    CHECK((long double)arby::Uint::from_float(value) == Approx(std::trunc(value)));
 }

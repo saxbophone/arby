@@ -17,6 +17,7 @@
 #ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
 #define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 
@@ -183,7 +184,15 @@ namespace com::saxbophone::arby {
             if (value < 0) {
                 throw std::domain_error("Uint cannot be negative");
             }
-            return {};
+            // truncate the fractional part of the floating-point value
+            value = std::trunc(value);
+            Uint output;
+            while (value > 0) {
+                StorageType digit = std::fmod(value, Uint::BASE);
+                output._digits.insert(output._digits.begin(), digit);
+                value /= Uint::BASE;
+            }
+            return output;
         }
         /**
          * @brief String-constructor, initialises from string decimal value
