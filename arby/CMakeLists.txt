@@ -1,5 +1,12 @@
 include(GNUInstallDirs)
 
+CPMFindPackage(
+    NAME gcem
+    GIT_REPOSITORY https://github.com/kthohr/gcem.git
+    GIT_TAG v1.14.1
+    EXCLUDE_FROM_ALL YES
+)
+
 add_library(arby STATIC)
 # ALIAS target to export a namespaced target even when building in-tree
 add_library(Arby::arby ALIAS arby)
@@ -37,6 +44,8 @@ target_link_libraries(
     arby
         PRIVATE
             $<BUILD_INTERFACE:arby-compiler-options>
+        PUBLIC
+            gcem
 )
 
 # install if we're not being built as a sub-project
