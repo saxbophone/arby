@@ -18,3 +18,9 @@ TEST_CASE("Casting arby::Uint with value higher than UINT_MAX to uintmax_t throw
 
     CHECK_THROWS_AS((uintmax_t)value, std::range_error);
 }
+
+TEST_CASE("Casting arby::Uint to long double", "[casting]") {
+    auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+
+    CHECK((long double)arby::Uint(value) == (long double)value);
+}
