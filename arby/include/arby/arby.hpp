@@ -188,6 +188,19 @@ namespace com::saxbophone::arby {
          * @warning Unimplemented
          */
         Uint(std::string digits);
+    private:
+        // private helper method to abstract the common part of the casting op
+        template <typename T>
+        T _cast_to() const {
+            T accumulator = 0;
+            // read digits out in big-endian order, shifting as we go
+            for (auto digit : _digits) {
+                accumulator *= Uint::BASE;
+                accumulator += digit;
+            }
+            return accumulator;
+        }
+    public:
         /**
          * @returns Value of this Uint object cast to uintmax_t
          * @throws std::range_error when Uint value is out of range for
@@ -198,25 +211,13 @@ namespace com::saxbophone::arby {
             if (*this > std::numeric_limits<uintmax_t>::max()) {
                 throw std::range_error("value too large for uintmax_t");
             }
-            uintmax_t accumulator = 0;
-            // read digits out in big-endian order, shifting as we go
-            for (auto digit : _digits) {
-                accumulator *= Uint::BASE;
-                accumulator += digit;
-            }
-            return accumulator;
+            return this->_cast_to<uintmax_t>();
         }
         /**
          * @returns Value of this Uint object cast to long double
          */
         explicit constexprvector operator long double() const {
-            long double accumulator = 0;
-            // read digits out in big-endian order, shifting as we go
-            for (auto digit : _digits) {
-                accumulator *= Uint::BASE;
-                accumulator += digit;
-            }
-            return accumulator;
+            return this->_cast_to<long double>();
         }
         /**
          * @brief custom ostream operator that allows this class to be printed
