@@ -187,11 +187,14 @@ namespace com::saxbophone::arby {
             // truncate the fractional part of the floating-point value
             value = std::trunc(value);
             Uint output;
-            while (value > 0) {
+            while (value > 1) {
                 StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
                 output._digits.insert(output._digits.begin(), digit);
                 value /= Uint::BASE;
                 value = std::trunc(value);
+            }
+            if (value > 0) {
+                output++;
             }
             return output;
         }
