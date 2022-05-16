@@ -116,8 +116,13 @@ namespace com::saxbophone::arby {
      * @brief Arbitrary-precision unsigned integer type
      * @note `std::numeric_limits<Uint>` is specialised such that most of the
      * members of that type are implemented to describe the traits of this type.
-     * @note Exceptions include any members which describe a finite number of digits
-     * or a maximmum value, neither of which apply to this type as it is unbounded.
+     * @note Exceptions include any members of std::numeric_limits<> which
+     * describe a finite number of digits or a maximmum value, neither of which
+     * apply to this type as it is unbounded.
+     * @exception std::logic_error may be thrown from most methods when the
+     * result of an operation leaves a Uint object with leading zero digits in
+     * its internal representation. Such cases are the result of bugs in this
+     * code and should be reported as such.
      */
     class Uint {
     private:
@@ -184,7 +189,8 @@ namespace com::saxbophone::arby {
          * @brief Constructor-like static method, creates Uint from floating point value
          * @returns Uint with the value of the given float, with the fractional part truncated off
          * @param value Positive floating point value to initialise with
-         * @throws std::domain_error when `value < 0`
+         * @throws std::domain_error when `value < 0` or when `value` is not a
+         * finite number.
          */
         static Uint from_float(long double value) {
             // prevent initialising from negative values
@@ -371,6 +377,7 @@ namespace com::saxbophone::arby {
          * @details Subtracts other value from this Uint and assigns the result to self
          * @param rhs value to subtract from this Uint
          * @returns resulting object after subtraction-assignment
+         * @throws std::underflow_error when rhs is bigger than this
          */
         constexprvector Uint& operator-=(Uint rhs) {
             // TODO: detect underflow early?
@@ -408,6 +415,7 @@ namespace com::saxbophone::arby {
          * @brief Subtraction operator for Uint
          * @param lhs,rhs operands for the subtraction
          * @returns result of lhs - rhs
+         * @throws std::underflow_error when rhs is bigger than lhs
          */
         friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
             lhs -= rhs; // reuse compound assignment
@@ -493,6 +501,7 @@ namespace com::saxbophone::arby {
          * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
          * @param lhs,rhs operands for the division/modulo operation
          * @returns tuple of {quotient, remainder}
+         * @throws std::domain_error when rhs is zero
          */
         static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             // division by zero is undefined
@@ -533,6 +542,7 @@ namespace com::saxbophone::arby {
          * @note This implements floor-division, returning the quotient only
          * @param rhs value to divide this Uint by
          * @returns resulting object after division-assignment
+         * @throws std::domain_error when rhs is zero
          */
         constexprvector Uint& operator/=(const Uint& rhs) {
             Uint quotient = *this / rhs; // uses friend /operator
@@ -557,6 +567,7 @@ namespace com::saxbophone::arby {
          * @note This returns the modulo/remainder of the division operation
          * @param rhs value to modulo-divide this Uint by
          * @returns resulting object after modulo-assignment
+         * @throws std::domain_error when rhs is zero
          */
         constexprvector Uint& operator%=(const Uint& rhs) {
             Uint remainder = *this % rhs; // uses friend %operator
@@ -569,6 +580,7 @@ namespace com::saxbophone::arby {
          * @note This implements modulo-division, returning the remainder only
          * @param lhs,rhs operands for the division
          * @returns remainder of lhs / rhs
+         * @throws std::domain_error when rhs is zero
          */
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
             Uint remainder;
