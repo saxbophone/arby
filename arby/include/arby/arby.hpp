@@ -29,6 +29,8 @@
 #include <tuple>
 #include <vector>
 
+#include <iostream>
+
 
 namespace {
     /*
@@ -180,9 +182,14 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when `value < 0`
          */
         static Uint from_float(long double value) {
+            std::cerr << value << std::endl;
             // prevent initialising from negative values
             if (value < 0) {
                 throw std::domain_error("Uint cannot be negative");
+            }
+            // prevent initialising from ±inf or NaN
+            if (not std::isfinite(value)) {
+                throw std::domain_error("Uint cannot be Infinite or NaN");
             }
             // truncate the fractional part of the floating-point value
             value = std::trunc(value);
@@ -231,7 +238,7 @@ namespace com::saxbophone::arby {
             return this->_cast_to<uintmax_t>();
         }
         /**
-         * @returns Value of this Uint object cast to long double
+         * @returns Value of this Uint object cast to long long double
          */
         explicit constexprvector operator long double() const {
             return this->_cast_to<long double>();

@@ -36,12 +36,28 @@ TEST_CASE("arby::Uint::from_float() with negative value throws std::domain_error
             )
         )
     );
-    CAPTURE(value);
+
     CHECK_THROWS_AS(arby::Uint::from_float(value), std::domain_error);
 }
 
+TEST_CASE("arby::Uint::from_float() with non-finite value throws std::domain_error") {
+    // need IEC 559 float to be sure that qNaN, sNan, ±Inf all exist
+    if (std::numeric_limits<long double>::is_iec559) {
+        auto value = GENERATE(
+            -std::numeric_limits<long double>::infinity(),
+            +std::numeric_limits<long double>::infinity(),
+            std::numeric_limits<long double>::quiet_NaN(),
+            std::numeric_limits<long double>::signaling_NaN()
+        );
+
+        CHECK_THROWS_AS(arby::Uint::from_float(value), std::domain_error);
+    } else {
+        WARN("Can't test for non-finite values because long double isn't IEC 559!");
+    }
+}
+
 TEST_CASE("arby::Uint::from_float() with positive value") {
-    auto power = GENERATE(0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256);
+    auto power = GENERATE(0.125, 0.25, 0.5, 1, 2, 4, 8);
     auto value = GENERATE_COPY(
         take(100,
             random(
@@ -50,6 +66,6 @@ TEST_CASE("arby::Uint::from_float() with positive value") {
             )
         )
     );
-    CAPTURE(value);
+
     CHECK((long double)arby::Uint::from_float(value) == Approx(std::trunc(value)));
 }
