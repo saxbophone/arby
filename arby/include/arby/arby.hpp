@@ -17,6 +17,7 @@
 #ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
 #define COM_SAXBOPHONE_ARBY_ARBY_HPP
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 
@@ -115,13 +116,24 @@ namespace com::saxbophone::arby {
      * @brief Arbitrary-precision unsigned integer type
      * @note `std::numeric_limits<Uint>` is specialised such that most of the
      * members of that type are implemented to describe the traits of this type.
-     * @note Exceptions include any members which describe a finite number of digits
-     * or a maximmum value, neither of which apply to this type as it is unbounded.
+     * @note Exceptions include any members of std::numeric_limits<> which
+     * describe a finite number of digits or a maximmum value, neither of which
+     * apply to this type as it is unbounded.
+     * @exception std::logic_error may be thrown from most methods when the
+     * result of an operation leaves a Uint object with leading zero digits in
+     * its internal representation. Such cases are the result of bugs in this
+     * code and should be reported as such.
      */
     class Uint {
     private:
         using StorageType = GetStorageType<int>::StorageType;
         using OverflowType = GetStorageType<int>::OverflowType;
+        // traps with an exception if there are leading zeroes in the digits array
+        constexprvector void _trap_leading_zero() const {
+            if (_digits.size() > 0 and _digits.front() == 0) {
+                throw std::logic_error("leading zeroes in internal representation");
+            }
+        }
     public:
         /**
          * @brief The number base used internally to store the value
@@ -156,9 +168,9 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexprvector Uint() : Uint(0) {}
+        constexprvector Uint() {} // uses default ctor of vector to init _digits to zero-size
         /**
-         * @brief Value-constructor, initialises with the given value
+         * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
         constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
@@ -171,6 +183,34 @@ namespace com::saxbophone::arby {
                     power /= Uint::BASE;
                 }
             }
+            _trap_leading_zero();
+        }
+        /**
+         * @brief Constructor-like static method, creates Uint from floating point value
+         * @returns Uint with the value of the given float, with the fractional part truncated off
+         * @param value Positive floating point value to initialise with
+         * @throws std::domain_error when `value < 0` or when `value` is not a
+         * finite number.
+         */
+        static Uint from_float(long double value) {
+            // prevent initialising from negative values
+            if (value < 0) {
+                throw std::domain_error("Uint cannot be negative");
+            }
+            // prevent initialising from ±inf or NaN
+            if (not std::isfinite(value)) {
+                throw std::domain_error("Uint cannot be Infinite or NaN");
+            }
+            Uint output;
+            while (value > 0) {
+                StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
+                output._digits.insert(output._digits.begin(), digit);
+                value /= Uint::BASE;
+                // truncate the fractional part of the floating-point value
+                value = std::trunc(value);
+            }
+            output._trap_leading_zero();
+            return output;
         }
         /**
          * @brief String-constructor, initialises from string decimal value
@@ -179,6 +219,19 @@ namespace com::saxbophone::arby {
          * @warning Unimplemented
          */
         Uint(std::string digits);
+    private:
+        // private helper method to abstract the common part of the casting op
+        template <typename T>
+        constexprvector T _cast_to() const {
+            T accumulator = 0;
+            // read digits out in big-endian order, shifting as we go
+            for (auto digit : _digits) {
+                accumulator *= Uint::BASE;
+                accumulator += digit;
+            }
+            return accumulator;
+        }
+    public:
         /**
          * @returns Value of this Uint object cast to uintmax_t
          * @throws std::range_error when Uint value is out of range for
@@ -189,15 +242,13 @@ namespace com::saxbophone::arby {
             if (*this > std::numeric_limits<uintmax_t>::max()) {
                 throw std::range_error("value too large for uintmax_t");
             }
-            uintmax_t accumulator = 0;
-            uintmax_t current_radix = 1;
-            // digits are stored in big-endian order, but we read them out in little-endian
-            // TODO: loops like this make my head hurt. Let's read it out in big-endian order instead
-            for (auto digit = _digits.rbegin(); digit != _digits.rend(); ++digit) {
-                accumulator += *digit * current_radix;
-                current_radix *= Uint::BASE;
-            }
-            return accumulator;
+            return this->_cast_to<uintmax_t>();
+        }
+        /**
+         * @returns Value of this Uint object cast to long long double
+         */
+        explicit constexprvector operator long double() const {
+            return this->_cast_to<long double>();
         }
         /**
          * @brief custom ostream operator that allows this class to be printed
@@ -266,6 +317,7 @@ namespace com::saxbophone::arby {
                     _digits.erase(_digits.begin());
                 }
             }
+            _trap_leading_zero();
             return *this; // return new value by reference
         }
         /**
@@ -308,6 +360,7 @@ namespace com::saxbophone::arby {
                     _digits.insert(_digits.begin(), carry);
                 }
             }
+            _trap_leading_zero();
             return *this; // return the result by reference
         }
         /**
@@ -324,6 +377,7 @@ namespace com::saxbophone::arby {
          * @details Subtracts other value from this Uint and assigns the result to self
          * @param rhs value to subtract from this Uint
          * @returns resulting object after subtraction-assignment
+         * @throws std::underflow_error when rhs is bigger than this
          */
         constexprvector Uint& operator-=(Uint rhs) {
             // TODO: detect underflow early?
@@ -361,6 +415,7 @@ namespace com::saxbophone::arby {
          * @brief Subtraction operator for Uint
          * @param lhs,rhs operands for the subtraction
          * @returns result of lhs - rhs
+         * @throws std::underflow_error when rhs is bigger than lhs
          */
         friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
             lhs -= rhs; // reuse compound assignment
@@ -446,6 +501,7 @@ namespace com::saxbophone::arby {
          * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
          * @param lhs,rhs operands for the division/modulo operation
          * @returns tuple of {quotient, remainder}
+         * @throws std::domain_error when rhs is zero
          */
         static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             // division by zero is undefined
@@ -486,6 +542,7 @@ namespace com::saxbophone::arby {
          * @note This implements floor-division, returning the quotient only
          * @param rhs value to divide this Uint by
          * @returns resulting object after division-assignment
+         * @throws std::domain_error when rhs is zero
          */
         constexprvector Uint& operator/=(const Uint& rhs) {
             Uint quotient = *this / rhs; // uses friend /operator
@@ -510,6 +567,7 @@ namespace com::saxbophone::arby {
          * @note This returns the modulo/remainder of the division operation
          * @param rhs value to modulo-divide this Uint by
          * @returns resulting object after modulo-assignment
+         * @throws std::domain_error when rhs is zero
          */
         constexprvector Uint& operator%=(const Uint& rhs) {
             Uint remainder = *this % rhs; // uses friend %operator
@@ -522,6 +580,7 @@ namespace com::saxbophone::arby {
          * @note This implements modulo-division, returning the remainder only
          * @param lhs,rhs operands for the division
          * @returns remainder of lhs / rhs
+         * @throws std::domain_error when rhs is zero
          */
         friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
             Uint remainder;
