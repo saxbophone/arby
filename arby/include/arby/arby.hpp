@@ -277,7 +277,6 @@ namespace com::saxbophone::arby {
                     _digits.insert(_digits.begin(), 1);
                 }
             }
-            _trap_leading_zero();
             return *this; // return new value by reference
         }
         /**
@@ -403,7 +402,6 @@ namespace com::saxbophone::arby {
             while (_digits.size() > 0 and _digits.front() == 0) {
                 _digits.erase(_digits.begin());
             }
-            _trap_leading_zero();
             return *this; // return the result by reference
         }
         /**
@@ -453,7 +451,6 @@ namespace com::saxbophone::arby {
                     }
                 }
             }
-            product._trap_leading_zero();
             return product;
         }
     private: // private helper methods for Uint::divmod()
@@ -528,8 +525,6 @@ namespace com::saxbophone::arby {
                 // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
                 // terminate.
             }
-            quotient._trap_leading_zero();
-            remainder._trap_leading_zero();
             return {quotient, remainder};
         }
         /**
@@ -604,7 +599,6 @@ namespace com::saxbophone::arby {
             if (remainder == 1) {
                 power *= base;
             }
-            power._trap_leading_zero();
             return power;
         }
         // XXX: unimplemented shift operators commented out until implemented
@@ -633,7 +627,6 @@ namespace com::saxbophone::arby {
          * @returns `false` when value is `0`, otherwise `true`
          */
         explicit constexprvector operator bool() const {
-            _trap_leading_zero();
             // zero is false --all other values are true
             return _digits.size() > 0; // zero is encoded as empty digits array
         }
