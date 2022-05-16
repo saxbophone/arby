@@ -29,8 +29,6 @@
 #include <tuple>
 #include <vector>
 
-#include <iostream>
-
 
 namespace {
     /*
@@ -182,7 +180,6 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when `value < 0`
          */
         static Uint from_float(long double value) {
-            std::cerr << value << std::endl;
             // prevent initialising from negative values
             if (value < 0) {
                 throw std::domain_error("Uint cannot be negative");
@@ -191,17 +188,17 @@ namespace com::saxbophone::arby {
             if (not std::isfinite(value)) {
                 throw std::domain_error("Uint cannot be Infinite or NaN");
             }
-            // truncate the fractional part of the floating-point value
-            value = std::trunc(value);
             Uint output;
-            while (value > 1) {
+            while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
                 output._digits.insert(output._digits.begin(), digit);
                 value /= Uint::BASE;
+                // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
             }
-            if (value > 0) {
-                output++;
+            // mandate that there are no leading zeroes
+            if (output._digits.size() > 0 and output._digits.front() == 0) {
+                throw std::runtime_error("leading zero error");
             }
             return output;
         }

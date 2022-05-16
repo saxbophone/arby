@@ -67,5 +67,8 @@ TEST_CASE("arby::Uint::from_float() with positive value") {
         )
     );
 
-    CHECK((long double)arby::Uint::from_float(value) == Approx(std::trunc(value)));
+    arby::Uint object = arby::Uint::from_float(value);
+
+    // value should be correct
+    CHECK((long double)object == Approx(std::trunc(value)));
 }
