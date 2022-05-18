@@ -145,7 +145,11 @@ namespace com::saxbophone::codlili {
         }
         /* rule of three: */
         // copy constructor
-        constexpr List(const List& other) {} // XXX
+        constexpr List(const List& other) {
+            for (auto element : other) {
+                push_back(element);
+            }
+        }
         // destructor, needed because there is manual memory management
         constexpr ~List() {
             if (_front != nullptr) {
@@ -154,7 +158,13 @@ namespace com::saxbophone::codlili {
             }
         }
         // copy assignment operator
-        constexpr List& operator=(const List& other) noexcept { return *this; } // XXX
+        constexpr List& operator=(const List& other) noexcept {
+            clear();
+            for (auto element : other) {
+                push_back(element);
+            }
+            return *this;
+        }
         /* element access */
         // get a reference to the element at specified location without bounds checking
         constexpr reference operator[](std::size_t index) {
