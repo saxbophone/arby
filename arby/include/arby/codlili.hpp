@@ -57,7 +57,7 @@ namespace com::saxbophone::codlili {
             }
             constexpr iterator operator++(int) {
                 iterator tmp = *this;
-                ++(*this);
+                operator++();
                 return tmp;
             }
             constexpr iterator& operator--() {
@@ -66,15 +66,15 @@ namespace com::saxbophone::codlili {
             }
             constexpr iterator operator--(int) {
                 iterator tmp = *this;
-                --(*this);
+                operator--();
                 return tmp;
             }
             // std::random_access_iterator_tag
             constexpr iterator& operator+=(difference_type offset) {
                 if (offset < 0) { // walk backwards
-                    for (difference_type i = offset; i --> 0; ) { --(*this); }
+                    for (difference_type i = offset; i --> 0; ) { operator--(); }
                 } else { // walk forwards
-                    for (difference_type i = 0; i < offset; i++) { ++(*this); }
+                    for (difference_type i = 0; i < offset; i++) { operator++(); }
                 }
                 return *this;
             }
@@ -94,9 +94,9 @@ namespace com::saxbophone::codlili {
             // TODO: this is almost identical to operator+= --couldn't we just multiply offset by -1 and reuse that operator?
             constexpr iterator& operator-=(difference_type offset) {
                 if (offset > 0) { // walk backwards
-                    for (difference_type i = offset; i --> 0; ) { --(*this); }
+                    for (difference_type i = offset; i --> 0; ) { operator--(); }
                 } else { // walk forwards
-                    for (difference_type i = 0; i < offset; i++) { ++(*this); }
+                    for (difference_type i = 0; i < offset; i++) { operator++(); }
                 }
                 return *this;
             }
@@ -282,7 +282,7 @@ namespace com::saxbophone::codlili {
         constexpr void resize(std::size_t count, const_reference value) {
             std::size_t current_size = size();
             if (count < current_size) { // remove elements
-                for (std::size_t i = 0; i < current_size - count; i++) {
+                for (std::size_t i = current_size; i > count; i--) {
                     pop_back();
                 }
             } else { // add elements
