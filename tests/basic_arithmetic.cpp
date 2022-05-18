@@ -75,12 +75,9 @@ TEST_CASE("arby::Uint(std::string)", "[ctor]") {
     CHECK((uintmax_t)object == value);
 }
 
-// only inlude these tests if we have library support for constexpr vector
-#ifdef __cpp_lib_constexpr_vector
 TEST_CASE("constexpr arby::Uint", "[constexpr]") {
     WARN("No constexpr tests written yet");
 }
-#endif
 
 TEST_CASE("arby::Uint prefix increment", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
