@@ -197,6 +197,8 @@ namespace com::saxbophone::codlili {
         constexpr iterator end() const { return iterator(_back->next); } // 1 past the end, out of bounds
         constexpr reverse_iterator rbegin() { return reverse_iterator(end()); }
         constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
+        constexpr reverse_iterator rbegin() const { return reverse_iterator(end()); }
+        constexpr reverse_iterator rend() const { return reverse_iterator(begin()); }
         /* capacity */
         // is list empty?
         constexpr bool empty() const noexcept { return _front == nullptr; }
