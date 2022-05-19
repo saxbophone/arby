@@ -130,25 +130,25 @@ namespace com::saxbophone::codlili {
         using const_reference = const T&;
         // initialises size to zero, an empty list
         constexpr List() noexcept {
-            debug();
+            // debug();
         }
         // initialises list with the specified number of default-constructed elements
         constexpr List(std::size_t size) : List(size, T{}) {
-            debug();
+            // debug();
         } // reuse (size,value) ctor
         // initialises list with the given elements
         constexpr List(std::initializer_list<T> elements) {
             for (auto element : elements) {
                 push_back(element);
             }
-            debug();
+            // debug();
         }
         // initialises list with the specified number of this element value-copied
         constexpr List(std::size_t size, const_reference value) {
             for (std::size_t i = 0; i < size; i++) {
                 push_back(value);
             }
-            debug();
+            // debug();
         }
         /* rule of three: */
         // copy constructor
@@ -156,7 +156,7 @@ namespace com::saxbophone::codlili {
             for (auto element : other) {
                 push_back(element);
             }
-            debug();
+            // debug();
         }
         // destructor, needed because there is manual memory management
         constexpr ~List() {
@@ -164,7 +164,7 @@ namespace com::saxbophone::codlili {
                 // delete forwards only
                 delete _front;
             }
-            debug();
+            // debug();
         }
         // copy assignment operator
         constexpr List& operator=(const List& other) noexcept {
@@ -172,7 +172,7 @@ namespace com::saxbophone::codlili {
             for (auto element : other) {
                 push_back(element);
             }
-            debug();
+            // debug();
             return *this;
         }
         /* element access */
@@ -182,7 +182,7 @@ namespace com::saxbophone::codlili {
             for (std::size_t i = 0; i < index; i++) {
                 cursor = cursor->next;
             }
-            debug();
+            // debug();
             return cursor->value;
         }
         // get a read-only reference to the element at specified location without bounds checking
@@ -191,7 +191,7 @@ namespace com::saxbophone::codlili {
             for (std::size_t i = 0; i < index; i++) {
                 cursor = cursor->next;
             }
-            debug();
+            // debug();
             return cursor->value;
         }
         // get reference to first element
@@ -223,7 +223,7 @@ namespace com::saxbophone::codlili {
                 count++;
                 cursor = cursor->next;
             }
-            debug();
+            // debug();
             return count;
         }
         /* modifiers */
@@ -234,7 +234,7 @@ namespace com::saxbophone::codlili {
                 _front = nullptr;
                 _back = nullptr;
             }
-            debug();
+            // debug();
         }
         // prepends the given element value to the front of the list
         constexpr void push_front(const_reference value) {
@@ -246,7 +246,7 @@ namespace com::saxbophone::codlili {
                 // create the back-link from old front to new front
                 _front->next->prev = _front;
             }
-            debug();
+            // debug();
         }
         // appends the given element value to the end of the list
         constexpr void push_back(const_reference value) {
@@ -258,21 +258,21 @@ namespace com::saxbophone::codlili {
                 // create the link from old back to new back
                 _back->prev->next = _back;
             }
-            debug();
+            // debug();
         }
         // prepends size copies of the given element value to the front of the list
         constexpr void push_front(std::size_t size, const_reference value) {
             for (std::size_t i = 0; i < size; i++) {
                 push_front(value);
             }
-            debug();
+            // debug();
         }
         // appends count copies of the given element value to the end of the list
         constexpr void push_back(std::size_t size, const_reference value) {
             for (std::size_t i = 0; i < size; i++) {
                 push_back(value);
             }
-            debug();
+            // debug();
         }
         // removes the first element from the list
         constexpr void pop_front() {
@@ -286,7 +286,7 @@ namespace com::saxbophone::codlili {
                 _front->prev = nullptr;
             }
             delete old_front;
-            debug();
+            // debug();
         }
         // removes the last element from the list
         constexpr void pop_back() {
@@ -300,7 +300,7 @@ namespace com::saxbophone::codlili {
                 _back->next = nullptr;
             }
             delete old_back;
-            debug();
+            // debug();
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
         // new default-constructed elements at the end if it is greater
@@ -318,7 +318,7 @@ namespace com::saxbophone::codlili {
                     push_back(value);
                 }
             }
-            debug();
+            // debug();
         }
         // exchanges this list's contents with that of the other
         constexpr void swap(List& other) noexcept {
@@ -328,7 +328,7 @@ namespace com::saxbophone::codlili {
         }
         /* comparison */
         constexpr bool operator==(const List& other) const {
-            debug();
+            // debug();
             if (size() != other.size()) { return false; }
             for (std::size_t i = 0; i < size(); i++) {
                 if ((*this)[i] != other[i]) {
