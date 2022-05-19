@@ -233,11 +233,15 @@ namespace com::saxbophone::codlili {
         /* modifiers */
         // erases all elements from the list, .size() = 0 after this call
         constexpr void clear() noexcept {
-            if (_front != nullptr) {
-                delete _front;
-                _front = nullptr;
-                _back = nullptr;
+            // XXX: replaced with a less efficient implementation while structure is changed
+            while (not empty()) {
+                pop_back();
             }
+            // if (_front != nullptr) {
+            //     delete _front;
+            //     _front = nullptr;
+            //     _back = nullptr;
+            // }
             // debug();
         }
         // prepends the given element value to the front of the list
