@@ -29,14 +29,14 @@ namespace com::saxbophone::codlili {
             constexpr ListNode(T value) : value(value) {}
             constexpr ListNode(T value, ListNode* next) : next(next), value(value) {}
             constexpr ListNode(ListNode* prev, T value) : prev(prev), value(value) {}
-            constexpr ListNode(ListNode* prev, T value, ListNode* next) : next(next), prev(prev), value(value) {}
             constexpr ~ListNode() {
-                if (prev != nullptr) {
-                    // delete backwards only
-                    delete prev;
-                    prev = nullptr;
+                if (next != nullptr) {
+                    // delete forwards only
+                    delete next;
+                    next = nullptr;
                 }
             }
+            // ListNode(ListNode* prev, T value, ListNode* next) {}
             ListNode* next = nullptr;
             ListNode* prev = nullptr;
             T value = {};
@@ -160,10 +160,9 @@ namespace com::saxbophone::codlili {
         }
         // destructor, needed because there is manual memory management
         constexpr ~List() {
-            if (_back != nullptr) {
-                // delete backwards only
-                delete _back;
-                _back = nullptr;
+            if (_front != nullptr) {
+                // delete forwards only
+                delete _front;
             }
             // debug();
         }
@@ -200,9 +199,9 @@ namespace com::saxbophone::codlili {
         // get read-only reference to first element
         constexpr const_reference front() const { return this->_front->value; }
         // get reference to last element
-        constexpr reference back() { return this->_back->prev->value; }
+        constexpr reference back() { return this->_back->value; }
         // get read-only reference to last element
-        constexpr const_reference back() const { return this->_back->prev->value; }
+        constexpr const_reference back() const { return this->_back->value; }
         /* iterators */
         constexpr iterator begin() { return iterator(_front); }
         // XXX: these end() iterators don't work for reverse iteration because they don't store pointers to the previous
@@ -211,9 +210,9 @@ namespace com::saxbophone::codlili {
         // and not accidentally used as a value node. List should be initialised with this as the sole node and should
         // always have at least this node (i.e. pop() and clear() leave the List in a state where this node is juggled
         // around properly to make sure the List has at least this sentinel node in it)
-        constexpr iterator end() { return iterator(_back); } // 1 past the end, out of bounds
+        constexpr iterator end() { return iterator(nullptr); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
-        constexpr iterator end() const { return iterator(_back); } // 1 past the end, out of bounds
+        constexpr iterator end() const { return iterator(nullptr); } // 1 past the end, out of bounds
         constexpr reverse_iterator rbegin() { return reverse_iterator(end()); }
         constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
         constexpr reverse_iterator rbegin() const { return reverse_iterator(end()); }
@@ -247,22 +246,26 @@ namespace com::saxbophone::codlili {
         }
         // prepends the given element value to the front of the list
         constexpr void push_front(const_reference value) {
-            // XXX: insert before front --front might be null if List is empty
-            _front = new ListNode(value, _front != nullptr ? _front : _back);
-            // create the back-link from old front to new front
-            _front->next->prev = _front;
+            if (empty()) {
+                _front = new ListNode(value);
+                _back = _front;
+            } else {
+                _front = new ListNode(value, _front);
+                // create the back-link from old front to new front
+                _front->next->prev = _front;
+            }
             // debug();
         }
         // appends the given element value to the end of the list
         constexpr void push_back(const_reference value) {
-            // XXX: insert between back-1 and back
-            auto behind_back = _back->prev;
-            ListNode* added = new ListNode(behind_back, value, _back);
-            // create back-links from back and previous back-1
-            if (behind_back != nullptr) {
-                behind_back->next = added;
+            if (empty()) {
+                _back = new ListNode(value);
+                _front = _back;
+            } else {
+                _back = new ListNode(_back, value);
+                // create the link from old back to new back
+                _back->prev->next = _back;
             }
-            _back->prev = added;
             // debug();
         }
         // prepends size copies of the given element value to the front of the list
@@ -281,27 +284,30 @@ namespace com::saxbophone::codlili {
         }
         // removes the first element from the list
         constexpr void pop_front() {
-            // XXX: front = front+1, destroy old front
             auto old_front = _front; // keep reference to old front
             _front = old_front->next; // set the 2nd element to be the new front
-            delete old_front; // destroy old front
-            // remove back-link to old front from new front
-            _front->prev = nullptr;
+            // remove the link from old front <-> new front before deleting the former
+            old_front->next = nullptr;
+            if (_front == nullptr) { // if List is now empty, ensure the back pointer is null as well
+                _back = nullptr;
+            } else { // otherwise, just clear prev pointer of new front node
+                _front->prev = nullptr;
+            }
+            delete old_front;
             // debug();
         }
         // removes the last element from the list
         constexpr void pop_back() {
-            // XXX: destroy back-1, replace with back
-            auto behind_back = _back->prev;
-            // create new links between back and back-2
-            if (behind_back != nullptr) {
-                _back->prev = behind_back->prev;
-                // if list was greater than size 1, thus back-2 is not nothing
-                if (_back->prev != nullptr) { _back->prev->next = _back; }
-                // remove back-link from back-1 before destroying
-                behind_back->prev = nullptr;
-                delete behind_back;
+            auto old_back = _back; // keep reference to old back
+            _back = old_back->prev; // set the penultimate element to be the new back
+            // remove the link from old back <-> new back before deleting the former
+            old_back->prev = nullptr;
+            if (_back == nullptr) { // if List is now empty, ensure the front pointer is null as well
+                _front = nullptr;
+            } else { // otherwise, just clear next pointer of new back node
+                _back->next = nullptr;
             }
+            delete old_back;
             // debug();
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
@@ -343,12 +349,12 @@ namespace com::saxbophone::codlili {
     private:
         void debug() const {
             std::cout << "List @" << this << ": ";
-            auto cursor = _back;
+            auto cursor = _front;
             do {
                 std::cout << "[" << cursor;
                 if (cursor != nullptr) {
                     std::cout << ", " << cursor->prev << ", " << cursor->next;
-                    cursor = cursor->prev;
+                    cursor = cursor->next;
                 }
                 std::cout << "] -> ";
             } while (cursor != nullptr);
@@ -360,9 +366,9 @@ namespace com::saxbophone::codlili {
             // std::cin.get();
             std::cout << std::endl;
         }
-        // front pointer and back sentinel node
+        // front and back pointers
         ListNode* _front = nullptr;
-        ListNode* _back = new ListNode();
+        ListNode* _back = nullptr;
     };
 }
 
