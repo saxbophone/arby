@@ -204,6 +204,10 @@ namespace com::saxbophone::codlili {
         constexpr const_reference back() const { return this->_back->value; }
         /* iterators */
         constexpr iterator begin() { return iterator(_front); }
+        // XXX: these end() iterators don't work for reverse iteration because they don't store pointers to the previous
+        // element (i.e. the last true element)
+        // TODO: change iterator implementation to store one dummy iterator at the end that only has a prev pointer and
+        // add a method bool iterator::is_sentinel() for detecting it, use it in iteration code
         constexpr iterator end() { return iterator(nullptr); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
         constexpr iterator end() const { return iterator(nullptr); } // 1 past the end, out of bounds
@@ -218,10 +222,8 @@ namespace com::saxbophone::codlili {
         constexpr std::size_t size() const noexcept {
             // count the number of elements
             std::size_t count = 0;
-            auto cursor = _front;
-            while (cursor != nullptr) {
+            for (auto it : *this) {
                 count++;
-                cursor = cursor->next;
             }
             // debug();
             return count;
