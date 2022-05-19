@@ -206,8 +206,10 @@ namespace com::saxbophone::codlili {
         constexpr iterator begin() { return iterator(_front); }
         // XXX: these end() iterators don't work for reverse iteration because they don't store pointers to the previous
         // element (i.e. the last true element)
-        // TODO: change iterator implementation to store one dummy iterator at the end that only has a prev pointer and
-        // add a method bool iterator::is_sentinel() for detecting it, use it in iteration code
+        // TODO: change iterator implementation to store one dummy iterator at the end that can be detected as a sentinel
+        // and not accidentally used as a value node. List should be initialised with this as the sole node and should
+        // always have at least this node (i.e. pop() and clear() leave the List in a state where this node is juggled
+        // around properly to make sure the List has at least this sentinel node in it)
         constexpr iterator end() { return iterator(nullptr); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
         constexpr iterator end() const { return iterator(nullptr); } // 1 past the end, out of bounds
