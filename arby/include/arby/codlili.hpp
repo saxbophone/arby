@@ -17,6 +17,7 @@
 #include <initializer_list>  // initializer_list
 #include <iterator>          // iterator traits
 
+#include <iostream> // DEBUG
 
 namespace com::saxbophone::codlili {
     template <typename T>  // the type of elements to store
@@ -29,6 +30,7 @@ namespace com::saxbophone::codlili {
             constexpr ListNode(T value, ListNode* next) : next(next), value(value) {}
             constexpr ListNode(ListNode* prev, T value) : prev(prev), value(value) {}
             constexpr ~ListNode() {
+                // std::cout << "~ListNode(" << this << ")" << std::endl;
                 if (next != nullptr) {
                     // delete forwards only
                     delete next;
@@ -52,6 +54,7 @@ namespace com::saxbophone::codlili {
             constexpr reference operator*() const { return _cursor->value; }
             constexpr pointer operator->() { return &_cursor->value; }
             constexpr iterator& operator++() {
+                // std::cout << "ListNode::iterator::operator++(): " << _cursor << " -> " << _cursor->next << std::endl;
                 _cursor = _cursor->next;
                 return *this;
             }
@@ -61,6 +64,7 @@ namespace com::saxbophone::codlili {
                 return tmp;
             }
             constexpr iterator& operator--() {
+                // std::cout << "ListNode::iterator::operator--(): " << _cursor << " -> " << _cursor->prev << std::endl;
                 _cursor = _cursor->prev;
                 return *this;
             }
@@ -72,7 +76,7 @@ namespace com::saxbophone::codlili {
             // std::random_access_iterator_tag
             constexpr iterator& operator+=(difference_type offset) {
                 if (offset < 0) { // walk backwards
-                    for (difference_type i = offset; i --> 0; ) { operator--(); }
+                    for (difference_type i = offset; i < 0; i++) { operator--(); }
                 } else { // walk forwards
                     for (difference_type i = 0; i < offset; i++) { operator++(); }
                 }
@@ -262,7 +266,11 @@ namespace com::saxbophone::codlili {
             _front = old_front->next; // set the 2nd element to be the new front
             // remove the link from old front <-> new front before deleting the former
             old_front->next = nullptr;
-            _front->prev = nullptr;
+            if (_front == nullptr) { // if List is now empty, ensure the back pointer is null as well
+                _back = nullptr;
+            } else { // otherwise, just clear prev pointer of new front node
+                _front->prev = nullptr;
+            }
             delete old_front;
         }
         // removes the last element from the list
@@ -271,7 +279,11 @@ namespace com::saxbophone::codlili {
             _back = old_back->prev; // set the penultimate element to be the new back
             // remove the link from old back <-> new back before deleting the former
             old_back->prev = nullptr;
-            _back->next = nullptr;
+            if (_back == nullptr) { // if List is now empty, ensure the front pointer is null as well
+                _front = nullptr;
+            } else { // otherwise, just clear next pointer of new back node
+                _back->next = nullptr;
+            }
             delete old_back;
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
