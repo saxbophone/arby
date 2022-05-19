@@ -355,7 +355,8 @@ namespace com::saxbophone::codlili {
                 std::cout << ", " << cursor->prev << ", " << cursor->next;
             }
             std::cout << "]";
-            std::cin.get();
+            // std::cin.get();
+            std::cout << std::endl;
         }
         // front and back pointers
         ListNode* _front = nullptr;
