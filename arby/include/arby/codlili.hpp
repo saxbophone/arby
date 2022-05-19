@@ -160,9 +160,10 @@ namespace com::saxbophone::codlili {
         }
         // destructor, needed because there is manual memory management
         constexpr ~List() {
-            if (_back->prev != nullptr) {
+            if (_back != nullptr) {
                 // delete backwards only
-                delete _back->prev;
+                delete _back;
+                _back = nullptr;
             }
             // debug();
         }
@@ -342,12 +343,12 @@ namespace com::saxbophone::codlili {
     private:
         void debug() const {
             std::cout << "List @" << this << ": ";
-            auto cursor = _front;
+            auto cursor = _back;
             do {
                 std::cout << "[" << cursor;
                 if (cursor != nullptr) {
                     std::cout << ", " << cursor->prev << ", " << cursor->next;
-                    cursor = cursor->next;
+                    cursor = cursor->prev;
                 }
                 std::cout << "] -> ";
             } while (cursor != nullptr);
