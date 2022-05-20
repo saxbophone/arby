@@ -27,7 +27,8 @@
 #include <string>
 #include <stdexcept>
 #include <tuple>
-#include <vector>
+
+#include "codlili.hpp"
 
 
 namespace {
@@ -102,15 +103,6 @@ namespace {
     }
 }
 
-#ifdef __cpp_lib_constexpr_vector
-// only define Uint as a constexpr class if there is library support for constexpr std::vector
-#define constexprvector constexpr
-#else
-// otherwise define the special macro as inline to keep the inline semantics of all things that use it
-// this is needed because it can cause linkage issues with duplicated symbols otherwise
-#define constexprvector inline /**< Specifies `constexpr` if std::vector is `constexpr`, otherwise `inline` */
-#endif
-
 namespace com::saxbophone::arby {
     /**
      * @brief Arbitrary-precision unsigned integer type
@@ -129,7 +121,7 @@ namespace com::saxbophone::arby {
         using StorageType = GetStorageType<int>::StorageType;
         using OverflowType = GetStorageType<int>::OverflowType;
         // traps with an exception if there are leading zeroes in the digits array
-        constexprvector void _trap_leading_zero() const {
+        constexpr void _trap_leading_zero() const {
             if (_digits.size() > 0 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
@@ -145,13 +137,13 @@ namespace com::saxbophone::arby {
          * @param rhs other Uint object to compare against
          * @returns `true` if objects are equal, otherwise `false`
          */
-        constexprvector bool operator==(const Uint& rhs) const = default;
+        constexpr bool operator==(const Uint& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
          * @param rhs other Uint object to compare against
          * @returns std::strong_ordering object for comparison
          */
-        constexprvector auto operator<=>(const Uint& rhs) const {
+        constexpr auto operator<=>(const Uint& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
@@ -168,12 +160,12 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexprvector Uint() {} // uses default ctor of vector to init _digits to zero-size
+        constexpr Uint() {} // uses default ctor of vector to init _digits to zero-size
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
-        constexprvector Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
+        constexpr Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
                 uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
@@ -204,7 +196,7 @@ namespace com::saxbophone::arby {
             Uint output;
             while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
-                output._digits.insert(output._digits.begin(), digit);
+                output._digits.push_front(digit);
                 value /= Uint::BASE;
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
@@ -222,7 +214,7 @@ namespace com::saxbophone::arby {
     private:
         // private helper method to abstract the common part of the casting op
         template <typename T>
-        constexprvector T _cast_to() const {
+        constexpr T _cast_to() const {
             T accumulator = 0;
             // read digits out in big-endian order, shifting as we go
             for (auto digit : _digits) {
@@ -237,7 +229,7 @@ namespace com::saxbophone::arby {
          * @throws std::range_error when Uint value is out of range for
          * uintmax_t
          */
-        explicit constexprvector operator uintmax_t() const {
+        explicit constexpr operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
                 throw std::range_error("value too large for uintmax_t");
@@ -247,7 +239,7 @@ namespace com::saxbophone::arby {
         /**
          * @returns Value of this Uint object cast to long long double
          */
-        explicit constexprvector operator long double() const {
+        explicit constexpr operator long double() const {
             return this->_cast_to<long double>();
         }
         /**
@@ -265,22 +257,22 @@ namespace com::saxbophone::arby {
          * @brief prefix increment
          * @returns new value of Uint object after incrementing
          */
-        constexprvector Uint& operator++() {
+        constexpr Uint& operator++() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 _digits.push_back(1);
             } else {
                 // increment least significant digit
-                auto it = _digits.rbegin();
-                (*it)++;
+                std::size_t digit = _digits.size() - 1;
+                _digits[digit]++;
                 // increment remaining digits (rollover) as needed
-                while (it != _digits.rend() and *it == 0) { // last digit overflowed to zero
-                    ++it; // increment index
-                    (*it)++; // increment digit
+                while (digit > 0 and _digits[digit] == 0) { // last digit overflowed to zero
+                    digit--; // decrement index
+                    _digits[digit]++; // increment digit
                 }
                 // if last digit is zero, we need another one
                 if (_digits.front() == 0) {
-                    _digits.insert(_digits.begin(), 1);
+                    _digits.push_front(1);
                 }
             }
             return *this; // return new value by reference
@@ -289,7 +281,7 @@ namespace com::saxbophone::arby {
          * @brief postfix increment
          * @returns old value of Uint object before incrementing
          */
-        constexprvector Uint operator++(int) {
+        constexpr Uint operator++(int) {
             Uint old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
@@ -299,22 +291,22 @@ namespace com::saxbophone::arby {
          * @returns new value of Uint object after decrementing
          * @throws std::underflow_error when value of Uint is `0`
          */
-        constexprvector Uint& operator--() {
+        constexpr Uint& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit
-                auto it = _digits.rbegin();
-                (*it)--;
+                std::size_t digit = _digits.size() - 1;
+                _digits[digit]--;
                 // decrement remaining digits (borrow) as needed
-                while (it != _digits.rend() and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
-                    ++it; // increment index
-                    (*it)--; // decrement digit
+                while (digit > 0 and _digits[digit] == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
+                    digit--; // decrement index
+                    _digits[digit]--; // decrement digit
                 }
                 // if last digit is zero, remove it
                 if (_digits.front() == 0) {
-                    _digits.erase(_digits.begin());
+                    _digits.pop_front();
                 }
             }
             _trap_leading_zero();
@@ -325,7 +317,7 @@ namespace com::saxbophone::arby {
          * @returns old value of Uint object before decrementing
          * @throws std::underflow_error when value of Uint is `0`
          */
-        constexprvector Uint operator--(int) {
+        constexpr Uint operator--(int) {
             Uint old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
@@ -336,14 +328,14 @@ namespace com::saxbophone::arby {
          * @param rhs value to add to this Uint
          * @returns resulting object after addition-assignment
          */
-        constexprvector Uint& operator+=(Uint rhs) {
+        constexpr Uint& operator+=(Uint rhs) {
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
+                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
+                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
@@ -357,7 +349,7 @@ namespace com::saxbophone::arby {
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
-                    _digits.insert(_digits.begin(), carry);
+                    _digits.push_front(carry);
                 }
             }
             _trap_leading_zero();
@@ -368,7 +360,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the addition
          * @returns sum of lhs + rhs
          */
-        friend constexprvector Uint operator+(Uint lhs, const Uint& rhs) {
+        friend constexpr Uint operator+(Uint lhs, const Uint& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -379,15 +371,15 @@ namespace com::saxbophone::arby {
          * @returns resulting object after subtraction-assignment
          * @throws std::underflow_error when rhs is bigger than this
          */
-        constexprvector Uint& operator-=(Uint rhs) {
+        constexpr Uint& operator-=(Uint rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (rhs._digits.size() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
+                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
+                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
@@ -407,7 +399,7 @@ namespace com::saxbophone::arby {
             }
             // remove any leading zeroes
             while (_digits.size() > 0 and _digits.front() == 0) {
-                _digits.erase(_digits.begin());
+                _digits.pop_front();
             }
             return *this; // return the result by reference
         }
@@ -417,7 +409,7 @@ namespace com::saxbophone::arby {
          * @returns result of lhs - rhs
          * @throws std::underflow_error when rhs is bigger than lhs
          */
-        friend constexprvector Uint operator-(Uint lhs, const Uint& rhs) {
+        friend constexpr Uint operator-(Uint lhs, const Uint& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -427,7 +419,7 @@ namespace com::saxbophone::arby {
          * @param rhs value to multiply this Uint by
          * @returns resulting object after multiplication-assignment
          */
-        constexprvector Uint& operator*=(const Uint& rhs) {
+        constexpr Uint& operator*=(const Uint& rhs) {
             Uint product = *this * rhs; // uses friend *operator
             // assign product's digits back to our digits
             _digits = product._digits;
@@ -438,7 +430,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the multiplication
          * @returns product of lhs * rhs
          */
-        friend constexprvector Uint operator*(const Uint& lhs, const Uint& rhs) {
+        friend constexpr Uint operator*(const Uint& lhs, const Uint& rhs) {
             // init product to zero
             Uint product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
@@ -453,7 +445,7 @@ namespace com::saxbophone::arby {
                         // we need to remap the indices as the digits are stored big-endian
                         std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
                         // add that many trailing zeroes to intermediate's digits
-                        intermediate._digits.insert(intermediate._digits.end(), shift_amount, 0);
+                        intermediate._digits.push_back(shift_amount, 0);
                         // finally, add it to lhs as an accumulator
                         product += intermediate;
                     }
@@ -463,7 +455,7 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for Uint::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
-        static constexprvector Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
+        static constexpr Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
@@ -471,11 +463,11 @@ namespace com::saxbophone::arby {
                 wiggle_room--;
             }
             Uint shift = 1;
-            shift._digits.insert(shift._digits.end(), wiggle_room, 0);
+            shift._digits.push_back(wiggle_room, 0);
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
-        static constexprvector OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+        static constexpr OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits[0];
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
@@ -503,7 +495,7 @@ namespace com::saxbophone::arby {
          * @returns tuple of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          */
-        static constexprvector std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
+        static constexpr std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
                 throw std::domain_error("division by zero");
@@ -544,7 +536,7 @@ namespace com::saxbophone::arby {
          * @returns resulting object after division-assignment
          * @throws std::domain_error when rhs is zero
          */
-        constexprvector Uint& operator/=(const Uint& rhs) {
+        constexpr Uint& operator/=(const Uint& rhs) {
             Uint quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
@@ -556,7 +548,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the division
          * @returns quotient of lhs / rhs
          */
-        friend constexprvector Uint operator/(Uint lhs, const Uint& rhs) {
+        friend constexpr Uint operator/(Uint lhs, const Uint& rhs) {
             Uint quotient;
             std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
             return quotient;
@@ -569,7 +561,7 @@ namespace com::saxbophone::arby {
          * @returns resulting object after modulo-assignment
          * @throws std::domain_error when rhs is zero
          */
-        constexprvector Uint& operator%=(const Uint& rhs) {
+        constexpr Uint& operator%=(const Uint& rhs) {
             Uint remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
@@ -582,7 +574,7 @@ namespace com::saxbophone::arby {
          * @returns remainder of lhs / rhs
          * @throws std::domain_error when rhs is zero
          */
-        friend constexprvector Uint operator%(Uint lhs, const Uint& rhs) {
+        friend constexpr Uint operator%(Uint lhs, const Uint& rhs) {
             Uint remainder;
             std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
             return remainder;
@@ -591,7 +583,7 @@ namespace com::saxbophone::arby {
          * @returns base raised to the power of exponent
          * @param base,exponent parameters for the base and exponent
          */
-        static constexprvector Uint pow(const Uint& base, const Uint& exponent) {
+        static constexpr Uint pow(const Uint& base, const Uint& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
             // exponent = 0 is our base case to terminate the recursion
             if (exponent == 0) {
@@ -615,22 +607,22 @@ namespace com::saxbophone::arby {
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
-        // constexprvector Uint& operator<<=(const Uint& n) {
+        // constexpr Uint& operator<<=(const Uint& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // left-shift
-        // friend constexprvector Uint operator<<(Uint lhs, const Uint& rhs) {
+        // friend constexpr Uint operator<<(Uint lhs, const Uint& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
         // // right-shift-assignment
-        // constexprvector Uint& operator>>=(const Uint& n) {
+        // constexpr Uint& operator>>=(const Uint& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // right-shift
-        // friend constexprvector Uint operator>>(Uint lhs, const Uint& rhs) {
+        // friend constexpr Uint operator>>(Uint lhs, const Uint& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
@@ -638,14 +630,14 @@ namespace com::saxbophone::arby {
          * @brief contextual conversion to bool (behaves same way as int)
          * @returns `false` when value is `0`, otherwise `true`
          */
-        explicit constexprvector operator bool() const {
+        explicit constexpr operator bool() const {
             // zero is false --all other values are true
             return _digits.size() > 0; // zero is encoded as empty digits array
         }
     private:
         std::string _stringify_for_base() const;
 
-        std::vector<StorageType> _digits;
+        com::saxbophone::codlili::List<StorageType> _digits;
     };
 
     /**
@@ -656,7 +648,7 @@ namespace com::saxbophone::arby {
      * unbounded, we want to support a potentially infinite number of digits,
      * or certainly more than can be stored in unsigned long long...
      */
-    constexprvector Uint operator "" _uarb(const char* literal) {
+    constexpr Uint operator "" _uarb(const char* literal) {
         // we can't use strlen or std::string to get the length becuase neither are constexpr
         std::size_t length = 0;
         while (literal[length] != 0) { // search for the null-terminator
@@ -702,18 +694,15 @@ public:
     static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
     static constexpr bool tinyness_before = false; // N/A
     // these methods should be made constexpr when constexpr std::vector is widely supported
-    static constexprvector com::saxbophone::arby::Uint min() { return 0; };
-    static constexprvector com::saxbophone::arby::Uint lowest() { return 0; };
-    static constexprvector com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
-    static constexprvector com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
-    static constexprvector com::saxbophone::arby::Uint round_error() { return 0; } // N/A
-    static constexprvector com::saxbophone::arby::Uint infinity() { return 0; } // N/A
-    static constexprvector com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
-    static constexprvector com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
-    static constexprvector com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint min() { return 0; };
+    static constexpr com::saxbophone::arby::Uint lowest() { return 0; };
+    static constexpr com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
+    static constexpr com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint round_error() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint infinity() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
-
-// avoid polluting global macro namespace by tidying up our macros after us
-#undef constexprvector
 
 #endif // include guard
