@@ -705,7 +705,4 @@ public:
     static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
 };
 
-// avoid polluting global macro namespace by tidying up our macros after us
-#undef constexpr
-
 #endif // include guard
