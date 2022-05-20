@@ -115,6 +115,7 @@ namespace com::saxbophone::codlili {
         private:
             ListNode* _cursor;
         };
+        using reverse_iterator = std::reverse_iterator<iterator>;
         using reference = T&;
         using const_reference = const T&;
         // initialises size to zero, an empty list
@@ -190,6 +191,10 @@ namespace com::saxbophone::codlili {
         constexpr iterator end() { return iterator(_back); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
         constexpr iterator end() const { return iterator(_back); } // 1 past the end, out of bounds
+        constexpr reverse_iterator rbegin() { return reverse_iterator(end()); }
+        constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
+        constexpr reverse_iterator rbegin() const { return reverse_iterator(end()); }
+        constexpr reverse_iterator rend() const { return reverse_iterator(begin()); }
         /* capacity */
         // is list empty?
         constexpr bool empty() const noexcept { return _front == _back; }
