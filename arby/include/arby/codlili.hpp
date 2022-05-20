@@ -235,14 +235,9 @@ namespace com::saxbophone::codlili {
         }
         /* comparison */
         constexpr bool operator==(const List& other) const {
-            // if (size() != other.size()) { return false; }
-            // for (std::size_t i = 0; i < size(); i++) {
-            //     if ((*this)[i] != other[i]) {
-            //         return false;
-            //     }
-            // }
             return std::equal(begin(), end(), other.begin(), other.end());
         }
+        // TODO: implement this in the same way as vector's?
         // constexpr friend auto operator<=>(const List<T>& lhs, const List<T>& rhs) {}
     private:
         // front and back pointers

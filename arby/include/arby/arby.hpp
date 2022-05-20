@@ -148,14 +148,10 @@ namespace com::saxbophone::arby {
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
             } else { // otherwise compare the elements until a mismatch is found
-                return std::lexicographical_compare_three_way(_digits.begin(), _digits.end(), rhs._digits.begin(), rhs._digits.end());
-                // std::size_t i;
-                // for (i = 0; i < _digits.size(); i++) {
-                //     if (_digits[i] != rhs._digits[i]) {
-                //         return _digits[i] <=> rhs._digits[i];
-                //     }
-                // }
-                // return std::strong_ordering::equal;
+                return std::lexicographical_compare_three_way(
+                    _digits.begin(), _digits.end(),
+                    rhs._digits.begin(), rhs._digits.end()
+                );
             }
         }
         /**
@@ -341,7 +337,6 @@ namespace com::saxbophone::arby {
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
                 auto rhs_it = rhs._digits.rbegin();
-                // for (std::size_t i = _digits.size(); i --> 0; ) {
                 for (auto it = _digits.rbegin(); it != _digits.rend(); it++, rhs_it++) {
                     OverflowType addition = (OverflowType)*it + *rhs_it + carry;
                     // downcast to chop off any more significant bits
@@ -387,7 +382,6 @@ namespace com::saxbophone::arby {
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
                 auto rhs_it = rhs._digits.rbegin();
-                // for (std::size_t i = _digits.size(); i --> 0; ) {
                 for (auto it = _digits.rbegin(); it != _digits.rend(); it++, rhs_it++) {
                     // this will underflow correctly in a way that means we can get the remainder off the bottom bits
                     OverflowType subtraction = (OverflowType)*it - *rhs_it - borrow;
