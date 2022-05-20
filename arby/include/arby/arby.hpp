@@ -148,10 +148,14 @@ namespace com::saxbophone::arby {
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
             } else { // otherwise compare the elements until a mismatch is found
-                return std::lexicographical_compare_three_way(
-                    _digits.begin(), _digits.end(),
-                    rhs._digits.begin(), rhs._digits.end()
-                );
+                auto it = _digits.begin();
+                auto rhs_it = rhs._digits.begin();
+                for (; it != _digits.end(); it++, rhs_it++) {
+                    if (*it != *rhs_it) {
+                        return *it <=> *rhs_it;
+                    }
+                }
+                return std::strong_ordering::equal;
             }
         }
         /**
