@@ -459,7 +459,7 @@ namespace com::saxbophone::arby {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
-            if (wiggle_room > 0 and lhs._digits[0] < rhs._digits[0]) {
+            if (wiggle_room > 0 and lhs._digits.front() < rhs._digits.front()) {
                 wiggle_room--;
             }
             Uint shift = 1;
@@ -468,15 +468,15 @@ namespace com::saxbophone::arby {
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
         static constexpr OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
-            OverflowType denominator = (OverflowType)rhs._digits[0];
+            OverflowType denominator = (OverflowType)rhs._digits.front();
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(++rhs._digits.begin(), rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
                 // increment denominator, we don't know what those other digits are so we have to assume denominator
                 // is closer in value to denominator+1 and estimate accordingly, by deliberately underestimating...
                 denominator++;
             }
-            if (lhs._digits[0] >= denominator) { // use lhs[0] / rhs[0] only
-                return (OverflowType)lhs._digits[0] / denominator;
+            if (lhs._digits.front() >= denominator) { // use lhs[0] / rhs[0] only
+                return (OverflowType)lhs._digits.front() / denominator;
             } else { // use lhs[0..1] / rhs[0]
                 // chop off all but the leading two digits of lhs to get the numerator
                 Uint leading_digits = lhs;

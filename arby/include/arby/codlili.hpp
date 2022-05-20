@@ -116,22 +116,6 @@ namespace com::saxbophone::codlili {
             return *this;
         }
         /* element access */
-        // get a reference to the element at specified location without bounds checking
-        constexpr reference operator[](std::size_t index) {
-            auto cursor = _front;
-            for (std::size_t i = 0; i < index; i++) {
-                cursor = cursor->next;
-            }
-            return cursor->value;
-        }
-        // get a read-only reference to the element at specified location without bounds checking
-        constexpr const_reference operator[](std::size_t index) const {
-            auto cursor = _front;
-            for (std::size_t i = 0; i < index; i++) {
-                cursor = cursor->next;
-            }
-            return cursor->value;
-        }
         // get reference to first element
         constexpr reference front() { return this->_front->value; }
         // get read-only reference to first element
