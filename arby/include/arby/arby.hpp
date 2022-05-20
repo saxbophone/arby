@@ -470,7 +470,7 @@ namespace com::saxbophone::arby {
         static constexpr OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits[0];
             // if any of the other digits of rhs are non-zero...
-            if (std::any_of(rhs._digits.begin() + 1, rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
+            if (std::any_of(++rhs._digits.begin(), rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
                 // increment denominator, we don't know what those other digits are so we have to assume denominator
                 // is closer in value to denominator+1 and estimate accordingly, by deliberately underestimating...
                 denominator++;
