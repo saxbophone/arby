@@ -148,13 +148,14 @@ namespace com::saxbophone::arby {
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
             } else { // otherwise compare the elements until a mismatch is found
-                std::size_t i;
-                for (i = 0; i < _digits.size(); i++) {
-                    if (_digits[i] != rhs._digits[i]) {
-                        return _digits[i] <=> rhs._digits[i];
-                    }
-                }
-                return std::strong_ordering::equal;
+                return std::lexicographical_compare_three_way(_digits.begin(), _digits.end(), rhs._digits.begin(), rhs._digits.end());
+                // std::size_t i;
+                // for (i = 0; i < _digits.size(); i++) {
+                //     if (_digits[i] != rhs._digits[i]) {
+                //         return _digits[i] <=> rhs._digits[i];
+                //     }
+                // }
+                // return std::strong_ordering::equal;
             }
         }
         /**
@@ -339,11 +340,13 @@ namespace com::saxbophone::arby {
                 }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
-                for (std::size_t i = _digits.size(); i --> 0; ) {
-                    OverflowType addition = (OverflowType)_digits[i] + rhs._digits[i] + carry;
+                auto rhs_it = rhs._digits.rbegin();
+                // for (std::size_t i = _digits.size(); i --> 0; ) {
+                for (auto it = _digits.rbegin(); it != _digits.rend(); it++, rhs_it++) {
+                    OverflowType addition = (OverflowType)*it + *rhs_it + carry;
                     // downcast to chop off any more significant bits
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
-                    _digits[i] = (StorageType)addition;
+                    *it = (StorageType)addition;
                     // update the carry with the value in the top significant bits
                     carry = (StorageType)(addition >> GetStorageType<int>::BITS_BETWEEN);
                 }
@@ -383,12 +386,14 @@ namespace com::saxbophone::arby {
                 }
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
-                for (std::size_t i = _digits.size(); i --> 0; ) {
+                auto rhs_it = rhs._digits.rbegin();
+                // for (std::size_t i = _digits.size(); i --> 0; ) {
+                for (auto it = _digits.rbegin(); it != _digits.rend(); it++, rhs_it++) {
                     // this will underflow correctly in a way that means we can get the remainder off the bottom bits
-                    OverflowType subtraction = (OverflowType)_digits[i] - rhs._digits[i] - borrow;
+                    OverflowType subtraction = (OverflowType)*it - *rhs_it - borrow;
                     // downcast to chop off any more significant bits
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
-                    _digits[i] = (StorageType)subtraction;
+                    *it = (StorageType)subtraction;
                     // detect any borrow that is needed
                     borrow = subtraction > std::numeric_limits<StorageType>::max();
                 }
@@ -436,10 +441,14 @@ namespace com::saxbophone::arby {
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
             if (lhs._digits.size() != 0 and rhs._digits.size() != 0) {
                 // multiply each digit from lhs with each digit from rhs
-                for (std::size_t l = 0; l < lhs._digits.size(); l++) {
-                    for (std::size_t r = 0; r < rhs._digits.size(); r++) {
+                std::size_t l = 0; // manual indices to track which digit we are on,
+                std::size_t r = 0; // as codlili's iterators are not random-access
+                for (auto lhs_digit : lhs._digits) {
+                    // reset r index as it cycles through multiple times
+                    r = 0;
+                    for (auto rhs_digit : rhs._digits) {
                         // cast lhs to OverflowType to make sure both operands get promoted to avoid wrap-around overflow
-                        OverflowType multiplication = (OverflowType)lhs._digits[l] * rhs._digits[r];
+                        OverflowType multiplication = (OverflowType)lhs_digit * rhs_digit;
                         // create a new Uint with this intermediate result and add trailing places as needed
                         Uint intermediate = multiplication;
                         // we need to remap the indices as the digits are stored big-endian
@@ -448,7 +457,10 @@ namespace com::saxbophone::arby {
                         intermediate._digits.push_back(shift_amount, 0);
                         // finally, add it to lhs as an accumulator
                         product += intermediate;
+                        // increment manual indices
+                        r++;
                     }
+                    l++;
                 }
             }
             return product;
