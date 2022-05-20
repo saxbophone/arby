@@ -214,6 +214,7 @@ namespace com::saxbophone::codlili {
         constexpr bool empty() const noexcept { return _front == _back; }
         // get size of list in number of elements
         constexpr std::size_t size() const noexcept {
+            debug();
             // count the number of elements
             std::size_t count = 0;
             for (auto it : *this) {
@@ -240,12 +241,12 @@ namespace com::saxbophone::codlili {
         }
         // prepends the given element value to the front of the list
         constexpr void push_front(const_reference value) {
-            // debug();
+            debug();
             auto old_front = _front;
             _front = new ListNode(value, old_front);
             // create the back-link from old front to new front
             old_front->prev = _front;
-            // debug();
+            debug();
         }
         // appends the given element value to the end of the list
         constexpr void push_back(const_reference value) {
@@ -344,8 +345,8 @@ namespace com::saxbophone::codlili {
                 std::cout << cursor << "<->";
             }
             std::cout << " [" << _back << "]";
-            std::cin.get();
-            // std::cout << std::endl;
+            // std::cin.get();
+            std::cout << std::endl;
         }
         // front and back pointers
         ListNode* _front = new ListNode();
