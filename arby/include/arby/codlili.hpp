@@ -150,7 +150,8 @@ namespace com::saxbophone::codlili {
                 cursor = next;
             }
             _front = nullptr;
-            _back = nullptr;
+            // XXX: can't set a const pointer to nullptr!
+            // _back = nullptr;
         }
         // copy assignment operator
         constexpr List& operator=(const List& other) noexcept {
@@ -288,6 +289,8 @@ namespace com::saxbophone::codlili {
         constexpr void swap(List& other) noexcept {
             // swapping the front and back pointers should be enough to exchange contents
             std::swap(_front, other._front);
+            // hmmm, but _back is now a const pointer --how can these be swapped?
+            // unless we dereference and copy, but then that'd invalidate existing pointers to them!
             std::swap(_back, other._back);
         }
         /* comparison */
@@ -303,8 +306,8 @@ namespace com::saxbophone::codlili {
         // constexpr friend auto operator<=>(const List<T>& lhs, const List<T>& rhs) {}
     private:
         // front and back pointers
-        ListNode* _front = new ListNode();
-        ListNode* _back = _front;
+        ListNode* const _back = new ListNode();
+        ListNode* _front = _back;
     };
 }
 
