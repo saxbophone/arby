@@ -1,5 +1,5 @@
 /*
- * codlili
+ * codlili v0.1.0
  *
  * /kɒdliːliː/
  *
@@ -125,7 +125,6 @@ namespace com::saxbophone::codlili {
         private:
             ListNode* _cursor;
         };
-        using reverse_iterator = std::reverse_iterator<iterator>;
         using reference = T&;
         using const_reference = const T&;
         // initialises size to zero, an empty list
@@ -204,19 +203,9 @@ namespace com::saxbophone::codlili {
         constexpr const_reference back() const { return this->_back->value; }
         /* iterators */
         constexpr iterator begin() { return iterator(_front); }
-        // XXX: these end() iterators don't work for reverse iteration because they don't store pointers to the previous
-        // element (i.e. the last true element)
-        // TODO: change iterator implementation to store one dummy iterator at the end that can be detected as a sentinel
-        // and not accidentally used as a value node. List should be initialised with this as the sole node and should
-        // always have at least this node (i.e. pop() and clear() leave the List in a state where this node is juggled
-        // around properly to make sure the List has at least this sentinel node in it)
         constexpr iterator end() { return iterator(nullptr); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
         constexpr iterator end() const { return iterator(nullptr); } // 1 past the end, out of bounds
-        constexpr reverse_iterator rbegin() { return reverse_iterator(end()); }
-        constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
-        constexpr reverse_iterator rbegin() const { return reverse_iterator(end()); }
-        constexpr reverse_iterator rend() const { return reverse_iterator(begin()); }
         /* capacity */
         // is list empty?
         constexpr bool empty() const noexcept { return _front == nullptr; }
@@ -233,16 +222,12 @@ namespace com::saxbophone::codlili {
         /* modifiers */
         // erases all elements from the list, .size() = 0 after this call
         constexpr void clear() noexcept {
-            // XXX: replaced with a less efficient implementation while structure is changed
-            while (not empty()) {
-                pop_back();
+            if (_front != nullptr) {
+                delete _front;
+                _front = nullptr;
+                _back = nullptr;
             }
-            // if (_front != nullptr) {
-            //     delete _front;
-            //     _front = nullptr;
-            //     _back = nullptr;
-            // }
-            // debug();
+            debug();
         }
         // prepends the given element value to the front of the list
         constexpr void push_front(const_reference value) {
