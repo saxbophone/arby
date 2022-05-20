@@ -29,14 +29,7 @@ namespace com::saxbophone::codlili {
             constexpr ListNode(T value) : value(value) {}
             constexpr ListNode(T value, ListNode* next) : next(next), value(value) {}
             constexpr ListNode(ListNode* prev, T value) : prev(prev), value(value) {}
-            constexpr ~ListNode() {
-                if (next != nullptr) {
-                    // delete forwards only
-                    delete next;
-                    next = nullptr;
-                }
-            }
-            // ListNode(ListNode* prev, T value, ListNode* next) {}
+            constexpr ListNode(ListNode* prev, T value, ListNode* next) : next(next), prev(prev), value(value) {}
             ListNode* next = nullptr;
             ListNode* prev = nullptr;
             T value = {};
@@ -137,6 +130,7 @@ namespace com::saxbophone::codlili {
         } // reuse (size,value) ctor
         // initialises list with the given elements
         constexpr List(std::initializer_list<T> elements) {
+            // debug();
             for (auto element : elements) {
                 push_back(element);
             }
@@ -144,6 +138,7 @@ namespace com::saxbophone::codlili {
         }
         // initialises list with the specified number of this element value-copied
         constexpr List(std::size_t size, const_reference value) {
+            // debug();
             for (std::size_t i = 0; i < size; i++) {
                 push_back(value);
             }
@@ -152,6 +147,7 @@ namespace com::saxbophone::codlili {
         /* rule of three: */
         // copy constructor
         constexpr List(const List& other) {
+            // debug();
             for (auto element : other) {
                 push_back(element);
             }
@@ -159,14 +155,21 @@ namespace com::saxbophone::codlili {
         }
         // destructor, needed because there is manual memory management
         constexpr ~List() {
-            if (_front != nullptr) {
-                // delete forwards only
-                delete _front;
+            // debug();
+            // delete the entire chain of ListNode pointers
+            auto cursor = _back;
+            while (cursor != nullptr) {
+                auto next = cursor->prev;
+                delete cursor;
+                cursor = next;
             }
+            _front = nullptr;
+            _back = nullptr;
             // debug();
         }
         // copy assignment operator
         constexpr List& operator=(const List& other) noexcept {
+            // debug();
             clear();
             for (auto element : other) {
                 push_back(element);
@@ -198,17 +201,17 @@ namespace com::saxbophone::codlili {
         // get read-only reference to first element
         constexpr const_reference front() const { return this->_front->value; }
         // get reference to last element
-        constexpr reference back() { return this->_back->value; }
+        constexpr reference back() { return this->_back->prev->value; }
         // get read-only reference to last element
-        constexpr const_reference back() const { return this->_back->value; }
+        constexpr const_reference back() const { return this->_back->prev->value; }
         /* iterators */
         constexpr iterator begin() { return iterator(_front); }
-        constexpr iterator end() { return iterator(nullptr); } // 1 past the end, out of bounds
+        constexpr iterator end() { return iterator(_back); } // 1 past the end, out of bounds
         constexpr iterator begin() const { return iterator(_front); }
-        constexpr iterator end() const { return iterator(nullptr); } // 1 past the end, out of bounds
+        constexpr iterator end() const { return iterator(_back); } // 1 past the end, out of bounds
         /* capacity */
         // is list empty?
-        constexpr bool empty() const noexcept { return _front == nullptr; }
+        constexpr bool empty() const noexcept { return _front == _back; }
         // get size of list in number of elements
         constexpr std::size_t size() const noexcept {
             // count the number of elements
@@ -217,40 +220,44 @@ namespace com::saxbophone::codlili {
                 count++;
             }
             // debug();
+            // std::cout << "size()" << std::endl;
             return count;
         }
         /* modifiers */
         // erases all elements from the list, .size() = 0 after this call
         constexpr void clear() noexcept {
-            if (_front != nullptr) {
-                delete _front;
-                _front = nullptr;
-                _back = nullptr;
+            // delete all except back, and reset front to back after
+            auto cursor = _back->prev;
+            while (cursor != nullptr) {
+                auto next = cursor->prev;
+                delete cursor;
+                cursor = next;
             }
-            debug();
+            // reset back's links and set front to back
+            _back->prev = nullptr;
+            _front = _back;
+            // debug();
         }
         // prepends the given element value to the front of the list
         constexpr void push_front(const_reference value) {
-            if (empty()) {
-                _front = new ListNode(value);
-                _back = _front;
-            } else {
-                _front = new ListNode(value, _front);
-                // create the back-link from old front to new front
-                _front->next->prev = _front;
-            }
+            // debug();
+            auto old_front = _front;
+            _front = new ListNode(value, old_front);
+            // create the back-link from old front to new front
+            old_front->prev = _front;
             // debug();
         }
         // appends the given element value to the end of the list
         constexpr void push_back(const_reference value) {
-            if (empty()) {
-                _back = new ListNode(value);
-                _front = _back;
-            } else {
-                _back = new ListNode(_back, value);
-                // create the link from old back to new back
-                _back->prev->next = _back;
-            }
+            // debug();
+            // when empty it's the same as push_front()
+            if (empty()) { return push_front(value); }
+            // insert between back and back-1
+            auto behind = _back->prev;
+            ListNode* added = new ListNode(behind, value, _back);
+            // create back-references
+            behind->next = added;
+            _back->prev = added;
             // debug();
         }
         // prepends size copies of the given element value to the front of the list
@@ -269,12 +276,11 @@ namespace com::saxbophone::codlili {
         }
         // removes the first element from the list
         constexpr void pop_front() {
+            // debug();
             auto old_front = _front; // keep reference to old front
             _front = old_front->next; // set the 2nd element to be the new front
-            // remove the link from old front <-> new front before deleting the former
-            old_front->next = nullptr;
-            if (_front == nullptr) { // if List is now empty, ensure the back pointer is null as well
-                _back = nullptr;
+            if (_front == _back) { // if front is now back marker, list is now empty, so set back->prev
+                _back->prev = nullptr;
             } else { // otherwise, just clear prev pointer of new front node
                 _front->prev = nullptr;
             }
@@ -283,16 +289,16 @@ namespace com::saxbophone::codlili {
         }
         // removes the last element from the list
         constexpr void pop_back() {
-            auto old_back = _back; // keep reference to old back
-            _back = old_back->prev; // set the penultimate element to be the new back
-            // remove the link from old back <-> new back before deleting the former
-            old_back->prev = nullptr;
-            if (_back == nullptr) { // if List is now empty, ensure the front pointer is null as well
-                _front = nullptr;
-            } else { // otherwise, just clear next pointer of new back node
-                _back->next = nullptr;
-            }
-            delete old_back;
+            // debug();
+            // remove back-1
+            auto behind = _back->prev;
+            // create the backlink from back to whatever was behind behind
+            _back->prev = behind->prev;
+            // if there is something behind behind, link it forward to back
+            if (behind->prev != nullptr) { behind->prev->next = _back; }
+            // now set behind's backlink to null so we can delete it without destroying everything else
+            behind->prev = nullptr;
+            delete behind;
             // debug();
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
@@ -334,26 +340,16 @@ namespace com::saxbophone::codlili {
     private:
         void debug() const {
             std::cout << "List @" << this << ": ";
-            auto cursor = _front;
-            do {
-                std::cout << "[" << cursor;
-                if (cursor != nullptr) {
-                    std::cout << ", " << cursor->prev << ", " << cursor->next;
-                    cursor = cursor->next;
-                }
-                std::cout << "] -> ";
-            } while (cursor != nullptr);
-            std::cout << "[" << cursor;
-            if (cursor != nullptr) {
-                std::cout << ", " << cursor->prev << ", " << cursor->next;
+            for (auto cursor = _front; cursor != nullptr; cursor = cursor->next) {
+                std::cout << cursor << "<->";
             }
-            std::cout << "]";
-            // std::cin.get();
-            std::cout << std::endl;
+            std::cout << " [" << _back << "]";
+            std::cin.get();
+            // std::cout << std::endl;
         }
         // front and back pointers
-        ListNode* _front = nullptr;
-        ListNode* _back = nullptr;
+        ListNode* _front = new ListNode();
+        ListNode* _back = _front;
     };
 }
 
