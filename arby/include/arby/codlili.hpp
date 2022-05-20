@@ -196,11 +196,7 @@ namespace com::saxbophone::codlili {
         // get size of list in number of elements
         constexpr std::size_t size() const noexcept {
             // count the number of elements
-            std::size_t count = 0;
-            for (auto it[[maybe_unused]] : *this) {
-                count++;
-            }
-            return count;
+            return (std::size_t)std::distance(begin(), end());
         }
         /* modifiers */
         // erases all elements from the list, .size() = 0 after this call
