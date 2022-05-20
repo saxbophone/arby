@@ -263,12 +263,12 @@ namespace com::saxbophone::arby {
                 _digits.push_back(1);
             } else {
                 // increment least significant digit
-                std::size_t digit = _digits.size() - 1;
-                _digits[digit]++;
+                auto it = _digits.rbegin();
+                (*it)++;
                 // increment remaining digits (rollover) as needed
-                while (digit > 0 and _digits[digit] == 0) { // last digit overflowed to zero
-                    digit--; // decrement index
-                    _digits[digit]++; // increment digit
+                while (it != _digits.rend() and *it == 0) { // last digit overflowed to zero
+                    ++it; // increment index
+                    (*it)++; // increment digit
                 }
                 // if last digit is zero, we need another one
                 if (_digits.front() == 0) {
@@ -297,12 +297,12 @@ namespace com::saxbophone::arby {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit
-                std::size_t digit = _digits.size() - 1;
-                _digits[digit]--;
+                auto it = _digits.rbegin();
+                (*it)--;
                 // decrement remaining digits (borrow) as needed
-                while (digit > 0 and _digits[digit] == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
-                    digit--; // decrement index
-                    _digits[digit]--; // decrement digit
+                while (it != _digits.rend() and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
+                    ++it; // increment index
+                    (*it)--; // decrement digit
                 }
                 // if last digit is zero, remove it
                 if (_digits.front() == 0) {
