@@ -25,9 +25,7 @@ namespace com::saxbophone::codlili {
         // simple record type for the doubly-linked-list nodes
         struct ListNode {
             constexpr ListNode() {}
-            constexpr ListNode(T value) : value(value) {}
             constexpr ListNode(T value, ListNode* next) : next(next), value(value) {}
-            constexpr ListNode(ListNode* prev, T value) : prev(prev), value(value) {}
             constexpr ListNode(ListNode* prev, T value, ListNode* next) : next(next), prev(prev), value(value) {}
             ListNode* next = nullptr;
             ListNode* prev = nullptr;
@@ -199,7 +197,7 @@ namespace com::saxbophone::codlili {
         constexpr std::size_t size() const noexcept {
             // count the number of elements
             std::size_t count = 0;
-            for (auto it : *this) {
+            for (auto it[[maybe_unused]] : *this) {
                 count++;
             }
             return count;
@@ -267,8 +265,6 @@ namespace com::saxbophone::codlili {
             _back->prev = behind->prev;
             // if there is something behind behind, link it forward to back
             if (behind->prev != nullptr) { behind->prev->next = _back; }
-            // now set behind's backlink to null so we can delete it without destroying everything else
-            behind->prev = nullptr;
             delete behind;
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
