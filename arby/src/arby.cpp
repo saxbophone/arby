@@ -21,18 +21,19 @@ namespace com::saxbophone::arby {
 
     std::string Uint::_stringify_for_base(std::uint8_t base) const {
         Uint value = *this;
-        std::string digits;
+        std::ostringstream digits;
         do {
             auto [quotient, remainder] = Uint::divmod(value, base);
             if (remainder._digits.size() == 0) {
-                digits += '0';
+                digits << '0';
             } else {
-                digits += std::to_string(remainder._digits.front());
+                digits << std::hex << remainder._digits.front();
             }
             value = quotient;
         } while (value > 0);
-        std::reverse(digits.begin(), digits.end());
-        return digits;
+        std::string output = digits.str();
+        std::reverse(output.begin(), output.end());
+        return output;
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
@@ -40,15 +41,8 @@ namespace com::saxbophone::arby {
         // only one of them will be set in the IO stream flags if the proper
         // stdlib function is used to set those flags
         // we test for hex, bin, then fallback to dec
-        uint8_t base = 10;
-        if (os.flags() & std::ios::hex) {
-            // ...
-        }
-        // XXX: whoops! there is no ios::bin! only ::oct!
-        // else if (os.flags() & std::ios::bin) { 
-            // ...
-        // }
-        os << object._stringify_for_base(10);
+        uint8_t base = (os.flags() & os.hex) ? 16 : 10;
+        os << object._stringify_for_base(base);
         return os;
     }
 
