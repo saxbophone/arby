@@ -32,7 +32,6 @@ namespace com::saxbophone::codlili {
             T value = {};
         };
         struct iterator {
-            // TODO: convert to std::random_access_iterator_tag in future
             using iterator_category = std::bidirectional_iterator_tag;
             using difference_type = std::ptrdiff_t;
             using value_type = T;
@@ -60,58 +59,8 @@ namespace com::saxbophone::codlili {
                 operator--();
                 return tmp;
             }
-            // std::random_access_iterator_tag
-            constexpr iterator& operator+=(difference_type offset) {
-                if (offset < 0) { // walk backwards
-                    for (difference_type i = offset; i < 0; i++) { operator--(); }
-                } else { // walk forwards
-                    for (difference_type i = 0; i < offset; i++) { operator++(); }
-                }
-                return *this;
-            }
-            // std::random_access_iterator_tag
-            constexpr iterator operator+(difference_type offset) const {
-                // reuse compound assignment
-                iterator jump = *this;
-                jump += offset;
-                return jump;
-            }
-            // std::random_access_iterator_tag
-            constexpr friend iterator operator+(difference_type offset, const iterator& rhs) {
-                // reuse operator+
-                return rhs + offset;
-            }
-            // std::random_access_iterator_tag
-            // TODO: this is almost identical to operator+= --couldn't we just multiply offset by -1 and reuse that operator?
-            constexpr iterator& operator-=(difference_type offset) {
-                if (offset > 0) { // walk backwards
-                    for (difference_type i = offset; i --> 0; ) { operator--(); }
-                } else { // walk forwards
-                    for (difference_type i = 0; i < offset; i++) { operator++(); }
-                }
-                return *this;
-            }
-            // std::random_access_iterator_tag
-            constexpr iterator operator-(difference_type offset) const {
-                // reuse compound assignment
-                iterator jump = *this;
-                jump -= offset;
-                return jump;
-            }
-            // std::random_access_iterator_tag
-            // constexpr difference_type operator-(const iterator& rhs) const {
-            //     return 0; // TODO: calculate signed delta between iterators and return that
-            // }
             // comparison
-            constexpr friend bool operator==(const iterator& a, const iterator& b) {
-                return a._cursor == b._cursor;
-            };
-            constexpr friend bool operator!=(const iterator& a, const iterator& b) {
-                return a._cursor != b._cursor;
-            };
-            // std::random_access_iterator_tag
-            // TODO: implement once signed delta between iterators is implemented
-            // constexpr friend auto operator<=>(const iterator& lhs, const iterator& rhs) {}
+            constexpr friend bool operator==(const iterator& a, const iterator& b) = default;
         private:
             ListNode* _cursor;
         };
@@ -162,22 +111,6 @@ namespace com::saxbophone::codlili {
             return *this;
         }
         /* element access */
-        // get a reference to the element at specified location without bounds checking
-        constexpr reference operator[](std::size_t index) {
-            auto cursor = _front;
-            for (std::size_t i = 0; i < index; i++) {
-                cursor = cursor->next;
-            }
-            return cursor->value;
-        }
-        // get a read-only reference to the element at specified location without bounds checking
-        constexpr const_reference operator[](std::size_t index) const {
-            auto cursor = _front;
-            for (std::size_t i = 0; i < index; i++) {
-                cursor = cursor->next;
-            }
-            return cursor->value;
-        }
         // get reference to first element
         constexpr reference front() { return this->_front->value; }
         // get read-only reference to first element
@@ -297,15 +230,8 @@ namespace com::saxbophone::codlili {
         }
         /* comparison */
         constexpr bool operator==(const List& other) const {
-            if (size() != other.size()) { return false; }
-            for (std::size_t i = 0; i < size(); i++) {
-                if ((*this)[i] != other[i]) {
-                    return false;
-                }
-            }
-            return true;
+            return std::equal(begin(), end(), other.begin(), other.end());
         }
-        // constexpr friend auto operator<=>(const List<T>& lhs, const List<T>& rhs) {}
     private:
         // front and back pointers
         ListNode* _front = new ListNode();
