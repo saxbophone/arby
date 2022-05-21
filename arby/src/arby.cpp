@@ -40,11 +40,10 @@ namespace com::saxbophone::arby {
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
-        // the implementation of std::dec, std::hex and std::bin guarantees that
+        // the implementation of std::dec, std::hex and std::oct guarantees that
         // only one of them will be set in the IO stream flags if the proper
         // stdlib function is used to set those flags
         // we test for hex, bin, then fallback to dec
-        // uint8_t base = (os.flags() & os.hex) ? 16 : 10;
         uint8_t base = 10;
         if (os.flags() & os.hex) {
             base = 16;
