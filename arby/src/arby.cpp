@@ -24,7 +24,7 @@ namespace com::saxbophone::arby {
         std::ostringstream digits;
         do {
             auto [quotient, remainder] = Uint::divmod(value, base);
-            if (remainder._digits.size() == 0) {
+            if (remainder == 0) {
                 digits << '0';
             } else {
                 // regardless of what base is requested, we can use hex for all
