@@ -659,18 +659,37 @@ namespace com::saxbophone::arby {
      * or certainly more than can be stored in unsigned long long...
      */
     constexpr Uint operator "" _uarb(const char* literal) {
-        // we can't use strlen or std::string to get the length becuase neither are constexpr
-        std::size_t length = 0;
-        while (literal[length] != 0) { // search for the null-terminator
-            length++;
+        // detect number base
+        std::uint8_t base = 10; // base-10 is the fallback base
+        if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
+            switch (literal[1]) {
+            case 'X': // hexadecimal
+            case 'x':
+                base = 16;
+                // advance string pointer to skip the prefix
+                literal = literal + 2;
+                break;
+            case 'B': // binary
+            case 'b':
+                base = 2;
+                literal = literal + 2;
+                break;
+            default: // not allowed --we don't support 0-prefixed octal literals or anything else
+                throw std::invalid_argument("invalid arby::Uint literal");
+            }
         }
-        Uint value;
-        // go through character by character, adding them to the final value
-        Uint power = Uint::pow(10, length - 1);
-        for (std::size_t i = 0; i < length; i++) {
-            auto digit = literal[i] - '0';
-            value += (uintmax_t)digit * power;
-            power /= 10;
+        Uint value; // accumulator
+        // consume digits
+        while (*literal != 0) { // until null-terminator is found
+            std::uint8_t digit = (std::uint8_t)*literal; // get character
+            // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
+            if (digit > 'Z') { digit -= 32; }
+            // calculate digit's value, handling the two contiguous ranges of 0-9 and A-F
+            std::uint8_t digit_value = digit >= 'A' ? (digit - 'A') + 10 : digit - '0';
+            // add to accumulator and then shift it up
+            value *= base;
+            value += digit_value;
+            literal++; // next character
         }
         return value;
     }
