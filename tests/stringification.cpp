@@ -61,13 +61,15 @@ TEST_CASE("Using std::ostream << std::hex << arby::Uint generates hexadecimal st
     CHECK(generated.str() == std::get<1>(values));
 }
 
-TEST_CASE("Using std::ostream << std::hex << with random arby::Uint generates hexadecimal string of value", "[stringification]") {
+TEST_CASE("Using std::ostream with number base specifier and random arby::Uint generates string of value in the specified base", "[stringification]") {
+    auto base = GENERATE(std::dec, std::oct, std::hex);
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     arby::Uint arb = value;
     std::ostringstream generated, expected;
-    expected << std::hex << value;
+    expected << base << value;
+    CAPTURE(base, value);
 
-    generated << std::hex << arb;
+    generated << base << arb;
 
     CHECK(generated.str() == expected.str());
 }

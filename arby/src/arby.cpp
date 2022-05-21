@@ -27,10 +27,13 @@ namespace com::saxbophone::arby {
             if (remainder._digits.size() == 0) {
                 digits << '0';
             } else {
+                // regardless of what base is requested, we can use hex for all
+                // of them as we're only doing one digit at a time
                 digits << std::hex << remainder._digits.front();
             }
             value = quotient;
         } while (value > 0);
+        // output the digits in little-endian order, so we need to reverse them
         std::string output = digits.str();
         std::reverse(output.begin(), output.end());
         return output;
@@ -41,7 +44,13 @@ namespace com::saxbophone::arby {
         // only one of them will be set in the IO stream flags if the proper
         // stdlib function is used to set those flags
         // we test for hex, bin, then fallback to dec
-        uint8_t base = (os.flags() & os.hex) ? 16 : 10;
+        // uint8_t base = (os.flags() & os.hex) ? 16 : 10;
+        uint8_t base = 10;
+        if (os.flags() & os.hex) {
+            base = 16;
+        } else if (os.flags() & os.oct) {
+            base = 8;
+        }
         os << object._stringify_for_base(base);
         return os;
     }
