@@ -30,8 +30,6 @@
 
 #include "codlili.hpp"
 
-#include <iostream>
-
 
 namespace {
     /*
@@ -661,7 +659,6 @@ namespace com::saxbophone::arby {
      * or certainly more than can be stored in unsigned long long...
      */
     inline Uint operator "" _uarb(const char* literal) {
-        std::cout << literal << std::endl;
         // detect number base
         std::uint8_t base = 10; // base-10 is the fallback base
         if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
@@ -681,34 +678,19 @@ namespace com::saxbophone::arby {
                 throw std::invalid_argument("invalid arby::Uint literal");
             }
         }
-        const char* digits = "0123456789ABCDEF";
         Uint value; // accumulator
         // consume digits
         while (*literal != 0) { // until null-terminator is found
             char digit = *literal; // get character
             // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
             if (digit > 'Z') { digit -= 32; }
-            // calculate digit's value
-            std::uint8_t digit_value = digit - '0';
+            // calculate digit's value, handling the two contiguous ranges of 0-9 and A-F
+            std::uint8_t digit_value = digit >= 'A' ? (digit - 'A') + 10 : digit - '0';
             // add to accumulator and then shift it up
-            value += digit_value;
             value *= base;
+            value += digit_value;
             literal++; // next character
         }
-        // OLD CODE:
-        // // we can't use strlen or std::string to get the length becuase neither are constexpr
-        // std::size_t length = 0;
-        // while (literal[length] != 0) { // search for the null-terminator
-        //     length++;
-        // }
-        // Uint value;
-        // // go through character by character, adding them to the final value
-        // Uint power = Uint::pow(10, length - 1);
-        // for (std::size_t i = 0; i < length; i++) {
-        //     auto digit = literal[i] - '0';
-        //     value += (uintmax_t)digit * power;
-        //     power /= 10;
-        // }
         return value;
     }
 }
