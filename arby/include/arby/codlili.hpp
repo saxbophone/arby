@@ -60,12 +60,7 @@ namespace com::saxbophone::codlili {
                 return tmp;
             }
             // comparison
-            constexpr friend bool operator==(const iterator& a, const iterator& b) {
-                return a._cursor == b._cursor;
-            };
-            constexpr friend bool operator!=(const iterator& a, const iterator& b) {
-                return a._cursor != b._cursor;
-            };
+            constexpr friend bool operator==(const iterator& a, const iterator& b) = default;
         private:
             ListNode* _cursor;
         };
@@ -237,8 +232,6 @@ namespace com::saxbophone::codlili {
         constexpr bool operator==(const List& other) const {
             return std::equal(begin(), end(), other.begin(), other.end());
         }
-        // TODO: implement this in the same way as vector's?
-        // constexpr friend auto operator<=>(const List<T>& lhs, const List<T>& rhs) {}
     private:
         // front and back pointers
         ListNode* _front = new ListNode();
