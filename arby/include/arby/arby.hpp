@@ -658,7 +658,7 @@ namespace com::saxbophone::arby {
      * unbounded, we want to support a potentially infinite number of digits,
      * or certainly more than can be stored in unsigned long long...
      */
-    inline Uint operator "" _uarb(const char* literal) {
+    constexpr Uint operator "" _uarb(const char* literal) {
         // detect number base
         std::uint8_t base = 10; // base-10 is the fallback base
         if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?

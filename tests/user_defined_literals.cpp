@@ -63,3 +63,7 @@ TEST_CASE("Initialising arby::Uint objects with binary _uarb user-defined-litera
 
     CHECK(literal == object);
 }
+
+TEST_CASE("Malformed octal _uarb literal throws std::invalid_argument") {
+    CHECK_THROWS_AS(01234_uarb, std::invalid_argument);
+}
