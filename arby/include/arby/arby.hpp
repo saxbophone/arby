@@ -30,6 +30,8 @@
 
 #include "codlili.hpp"
 
+#include <iostream>
+
 
 namespace {
     /*
@@ -658,10 +660,11 @@ namespace com::saxbophone::arby {
      * unbounded, we want to support a potentially infinite number of digits,
      * or certainly more than can be stored in unsigned long long...
      */
-    constexpr Uint operator "" _uarb(const char* literal) {
+    inline Uint operator "" _uarb(const char* literal) {
+        std::cout << literal << std::endl;
         // detect number base
         std::uint8_t base = 10; // base-10 is the fallback base
-        if (literal[0] == '0') { // first digit 0, maybe a 0x/0b prefix?
+        if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
             switch (literal[1]) {
             case 'X': // hexadecimal
             case 'x':
@@ -679,9 +682,19 @@ namespace com::saxbophone::arby {
             }
         }
         const char* digits = "0123456789ABCDEF";
-        // NOTE: when dealing with digits, subtract 32 from any > 90 to convert lowercase to upper
-        // TODO: consume digits
-
+        Uint value; // accumulator
+        // consume digits
+        while (*literal != 0) { // until null-terminator is found
+            char digit = *literal; // get character
+            // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
+            if (digit > 'Z') { digit -= 32; }
+            // calculate digit's value
+            std::uint8_t digit_value = digit - '0';
+            // add to accumulator and then shift it up
+            value += digit_value;
+            value *= base;
+            literal++; // next character
+        }
         // OLD CODE:
         // // we can't use strlen or std::string to get the length becuase neither are constexpr
         // std::size_t length = 0;
@@ -696,7 +709,7 @@ namespace com::saxbophone::arby {
         //     value += (uintmax_t)digit * power;
         //     power /= 10;
         // }
-        return {};
+        return value;
     }
 }
 
