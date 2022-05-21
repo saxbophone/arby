@@ -681,7 +681,7 @@ namespace com::saxbophone::arby {
         Uint value; // accumulator
         // consume digits
         while (*literal != 0) { // until null-terminator is found
-            char digit = *literal; // get character
+            std::uint8_t digit = (std::uint8_t)*literal; // get character
             // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
             if (digit > 'Z') { digit -= 32; }
             // calculate digit's value, handling the two contiguous ranges of 0-9 and A-F
