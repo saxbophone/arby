@@ -659,20 +659,44 @@ namespace com::saxbophone::arby {
      * or certainly more than can be stored in unsigned long long...
      */
     constexpr Uint operator "" _uarb(const char* literal) {
-        // we can't use strlen or std::string to get the length becuase neither are constexpr
-        std::size_t length = 0;
-        while (literal[length] != 0) { // search for the null-terminator
-            length++;
+        // detect number base
+        std::uint8_t base = 10; // base-10 is the fallback base
+        if (literal[0] == '0') { // first digit 0, maybe a 0x/0b prefix?
+            switch (literal[1]) {
+            case 'X': // hexadecimal
+            case 'x':
+                base = 16;
+                // advance string pointer to skip the prefix
+                literal = literal + 2;
+                break;
+            case 'B': // binary
+            case 'b':
+                base = 2;
+                literal = literal + 2;
+                break;
+            default: // not allowed --we don't support 0-prefixed octal literals or anything else
+                throw std::invalid_argument("invalid arby::Uint literal");
+            }
         }
-        Uint value;
-        // go through character by character, adding them to the final value
-        Uint power = Uint::pow(10, length - 1);
-        for (std::size_t i = 0; i < length; i++) {
-            auto digit = literal[i] - '0';
-            value += (uintmax_t)digit * power;
-            power /= 10;
-        }
-        return value;
+        const char* digits = "0123456789ABCDEF";
+        // NOTE: when dealing with digits, subtract 32 from any > 90 to convert lowercase to upper
+        // TODO: consume digits
+
+        // OLD CODE:
+        // // we can't use strlen or std::string to get the length becuase neither are constexpr
+        // std::size_t length = 0;
+        // while (literal[length] != 0) { // search for the null-terminator
+        //     length++;
+        // }
+        // Uint value;
+        // // go through character by character, adding them to the final value
+        // Uint power = Uint::pow(10, length - 1);
+        // for (std::size_t i = 0; i < length; i++) {
+        //     auto digit = literal[i] - '0';
+        //     value += (uintmax_t)digit * power;
+        //     power /= 10;
+        // }
+        return {};
     }
 }
 
