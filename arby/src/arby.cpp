@@ -19,30 +19,42 @@ namespace com::saxbophone::arby {
       : _digits(operator "" _uarb(digits.c_str())._digits)
       {}
 
-    std::string Uint::_stringify_for_base() const {
-        // XXX: only base-10 implemented for now
-        // TODO: add a param to specify base when we implement other bases
+    std::string Uint::_stringify_for_base(std::uint8_t base) const {
         Uint value = *this;
-        std::string digits;
+        std::ostringstream digits;
         do {
-            auto [quotient, remainder] = Uint::divmod(value, 10);
-            if (remainder._digits.size() == 0) {
-                digits += '0';
+            auto [quotient, remainder] = Uint::divmod(value, base);
+            if (remainder == 0) {
+                digits << '0';
             } else {
-                digits += std::to_string(remainder._digits.front());
+                // regardless of what base is requested, we can use hex for all
+                // of them as we're only doing one digit at a time
+                digits << std::hex << remainder._digits.front();
             }
             value = quotient;
         } while (value > 0);
-        std::reverse(digits.begin(), digits.end());
-        return digits;
+        // output the digits in little-endian order, so we need to reverse them
+        std::string output = digits.str();
+        std::reverse(output.begin(), output.end());
+        return output;
     }
 
     std::ostream& operator<<(std::ostream& os, const Uint& object) {
-        os << object._stringify_for_base();
+        // the implementation of std::dec, std::hex and std::oct guarantees that
+        // only one of them will be set in the IO stream flags if the proper
+        // stdlib function is used to set those flags
+        // we test for hex, bin, then fallback to dec
+        uint8_t base = 10;
+        if (os.flags() & os.hex) {
+            base = 16;
+        } else if (os.flags() & os.oct) {
+            base = 8;
+        }
+        os << object._stringify_for_base(base);
         return os;
     }
 
     Uint::operator std::string() const {
-        return this->_stringify_for_base();
+        return this->_stringify_for_base(10);
     }
 }
