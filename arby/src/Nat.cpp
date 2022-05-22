@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-#include <arby/arby.hpp>
+#include <arby/Nat.hpp>
 
 
 namespace com::saxbophone::arby {

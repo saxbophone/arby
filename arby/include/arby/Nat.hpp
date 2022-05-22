@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
-#define COM_SAXBOPHONE_ARBY_ARBY_HPP
+#ifndef COM_SAXBOPHONE_ARBY_NAT_HPP
+#define COM_SAXBOPHONE_ARBY_NAT_HPP
 
 #include <cmath>
 #include <cstddef>
