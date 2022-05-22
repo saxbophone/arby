@@ -74,9 +74,10 @@ TEST_CASE("arby::Uint::from_float() with positive value") {
 }
 
 TEST_CASE("arby::Uint can be constructed from unsigned types smaller than uintmax_t - uint8_t",) {
-    std::uint8_t input = (uint16_t)GENERATE(take(1000, random((std::uint16_t)0x00, (std::uint16_t)0xFF)));
+    // workaround for Catch bug: https://github.com/catchorg/Catch2/issues/2433
+    std::uint16_t input = GENERATE(take(1000, random((std::uint16_t)0x00, (std::uint16_t)0xFF)));
 
-    arby::Uint object = input;
+    arby::Uint object = (std::uint8_t)input;
 
     CHECK((uintmax_t)object == input);
 }
