@@ -263,8 +263,20 @@ namespace com::saxbophone::arby {
             return this->_cast_to<long double>();
         }
         /**
-         * @brief custom ostream operator that allows class Nat to be printed
+         * @returns Value of this Nat object cast to any numeric type
+         * @tparam Numeric The data type to cast to
+         * @note Type Numeric must satisfy certain constraints for this template
+         * to be valid. These are specified using C++20 concepts/constraints.
+         */
+        template <typename Numeric>
+        explicit constexpr operator Numeric() const {
+            return {};
+        }
+        /**
+         * @brief custom ostream operator that allows this class to be printed
          * with std::cout and friends
+         * @param os stream to output to
+         * @param object Nat to print
          */
         friend std::ostream& operator<<(std::ostream& os, const Nat& object);
         /**

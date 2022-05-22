@@ -31,7 +31,7 @@ TEMPLATE_TEST_CASE(
     "Casting arby::Nat with value higher than max to other type throws range_error", "[casting]",
     std::uint8_t, std::int8_t, std::uint16_t, std::int16_t, std::uint32_t, std::int32_t
 ) {
-    arby::Nat value = arby::Nat(std::numeric_limits<TestType>::max()) + 1;
+    arby::Nat value = arby::Nat((uintmax_t)std::numeric_limits<TestType>::max()) + 1;
 
     CHECK_THROWS_AS((TestType)value, std::range_error);
 }
@@ -39,20 +39,29 @@ TEMPLATE_TEST_CASE(
 TEST_CASE("Casting arby::Nat to other type - uint8_t", "[casting]",) {
     auto value = GENERATE(take(1000, random((std::uint16_t)0, (std::uint16_t)std::numeric_limits<std::uint8_t>::max())));
 
-    CHECK((std::uint8_t)arby::Nat(value) == (std::uint8_t)value);
+    CHECK((std::uint8_t)arby::Nat((uintmax_t)value) == (std::uint8_t)value);
 }
 
 TEST_CASE("Casting arby::Nat to other type - int8_t", "[casting]",) {
     auto value = GENERATE(take(1000, random((std::int16_t)0, (std::int16_t)std::numeric_limits<std::int8_t>::max())));
 
-    CHECK((std::int8_t)arby::Nat(value) == (std::int8_t)value);
+    CHECK((std::int8_t)arby::Nat((uintmax_t)value) == (std::int8_t)value);
 }
 
 TEMPLATE_TEST_CASE(
     "Casting arby::Nat to other type", "[casting]",
-    std::uint16_t, std::int16_t, std::uint32_t, std::int32_t, float, double
+    std::uint16_t, std::int16_t, std::uint32_t, std::int32_t
 ) {
     auto value = GENERATE(take(1000, random((TestType)0, std::numeric_limits<TestType>::max())));
+
+    CHECK((TestType)arby::Nat((uintmax_t)value) == (TestType)value);
+}
+
+TEMPLATE_TEST_CASE(
+    "Casting arby::Nat to other floating-point type", "[casting]",
+    float, double
+) {
+    auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     CHECK((TestType)arby::Nat(value) == (TestType)value);
 }
