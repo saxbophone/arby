@@ -1,7 +1,7 @@
 CPMFindPackage(
     NAME Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v2.13.4
+    GIT_TAG v2.13.9
     EXCLUDE_FROM_ALL YES
 )
 
