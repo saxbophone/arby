@@ -18,7 +18,7 @@
 #include <iterator>          // iterator traits
 
 
-namespace com::saxbophone::codlili {
+namespace com::saxbophone::arby::PRIVATE::codlili {
     template <typename T>  // the type of elements to store
     class List {
     public:

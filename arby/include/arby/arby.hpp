@@ -31,79 +31,80 @@
 #include "codlili.hpp"
 
 
-namespace {
-    /*
-     * these template specialisations are used for selecting the unsigned type
-     * to use for storing the digits of our arbitrary-size numbers
-     *
-     * the template specialisations pick the corresponding unsigned type and the
-     * next-smallest unsigned type for the given signed type, this is to ensure
-     * that the number base is not out of range of int on any given system, and
-     * means we can report it from the radix() method in numeric_limits<>
-     * (which returns int).
-     *
-     * - OverflowType denotes the unsigned equivalent of the given signed type,
-     * this can safely store MAX*MAX of the next-lowest unsigned type, so is
-     * useful to store the intermediate results for multiplication and addition.
-     * - StorageType denotes the next-lowest unsigned type. This is the type
-     * which is used to store the digits of the arbitrary-size number.
-     * - BITS_BETWEEN denotes the number of bits needed to shift StorageType
-     * up to OverflowType
-     */
-    template <typename T>
-    struct GetStorageType {
-        using OverflowType = void;
-        using StorageType = void;
-        static constexpr std::size_t BITS_BETWEEN = 0;
-    };
-
-    template <>
-    struct GetStorageType<std::int64_t> {
-        using OverflowType = std::uint64_t;
-        using StorageType = std::uint32_t;
-        static constexpr std::size_t BITS_BETWEEN = 32;
-    };
-
-    template <>
-    struct GetStorageType<std::int32_t> {
-        using OverflowType = std::uint32_t;
-        using StorageType = std::uint16_t;
-        static constexpr std::size_t BITS_BETWEEN = 16;
-    };
-
-    template <>
-    struct GetStorageType<std::int16_t> {
-        using OverflowType = std::uint16_t;
-        using StorageType = std::uint8_t;
-        static constexpr std::size_t BITS_BETWEEN = 8;
-    };
-
-    // returns ceil(logₐ(n))
-    constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
-        // n = 0 is the exception --we don't use any digits at all for 0
-        if (n == 0) {
-            return 0;
-        }
-        std::size_t remainder;
-        std::size_t exponent = 0;
-        do {
-            remainder = n / a;
-            n = remainder;
-            exponent++;
-        } while (n > 0);
-        return exponent;
-    }
-    // returns xⁿ
-    constexpr uintmax_t exp(uintmax_t x, uintmax_t n) {
-        if (n == 0) {
-            return 1;
-        } else {
-            return x * exp(x, n - 1);
-        }
-    }
-}
-
 namespace com::saxbophone::arby {
+    namespace PRIVATE {
+        /*
+         * these template specialisations are used for selecting the unsigned type
+         * to use for storing the digits of our arbitrary-size numbers
+         *
+         * the template specialisations pick the corresponding unsigned type and the
+         * next-smallest unsigned type for the given signed type, this is to ensure
+         * that the number base is not out of range of int on any given system, and
+         * means we can report it from the radix() method in numeric_limits<>
+         * (which returns int).
+         *
+         * - OverflowType denotes the unsigned equivalent of the given signed type,
+         * this can safely store MAX*MAX of the next-lowest unsigned type, so is
+         * useful to store the intermediate results for multiplication and addition.
+         * - StorageType denotes the next-lowest unsigned type. This is the type
+         * which is used to store the digits of the arbitrary-size number.
+         * - BITS_BETWEEN denotes the number of bits needed to shift StorageType
+         * up to OverflowType
+         */
+        template <typename T>
+        struct GetStorageType {
+            using OverflowType = void;
+            using StorageType = void;
+            static constexpr std::size_t BITS_BETWEEN = 0;
+        };
+
+        template <>
+        struct GetStorageType<std::int64_t> {
+            using OverflowType = std::uint64_t;
+            using StorageType = std::uint32_t;
+            static constexpr std::size_t BITS_BETWEEN = 32;
+        };
+
+        template <>
+        struct GetStorageType<std::int32_t> {
+            using OverflowType = std::uint32_t;
+            using StorageType = std::uint16_t;
+            static constexpr std::size_t BITS_BETWEEN = 16;
+        };
+
+        template <>
+        struct GetStorageType<std::int16_t> {
+            using OverflowType = std::uint16_t;
+            using StorageType = std::uint8_t;
+            static constexpr std::size_t BITS_BETWEEN = 8;
+        };
+
+        // returns ceil(logₐ(n))
+        constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
+            // n = 0 is the exception --we don't use any digits at all for 0
+            if (n == 0) {
+                return 0;
+            }
+            std::size_t remainder;
+            std::size_t exponent = 0;
+            do {
+                remainder = n / a;
+                n = remainder;
+                exponent++;
+            } while (n > 0);
+            return exponent;
+        }
+        // returns xⁿ
+        constexpr uintmax_t exp(uintmax_t x, uintmax_t n) {
+            if (n == 0) {
+                return 1;
+            } else {
+                return x * exp(x, n - 1);
+            }
+        }
+    }
+    // end of PRIVATE
+
     /**
      * @brief Arbitrary-precision unsigned integer type
      * @note `std::numeric_limits<Uint>` is specialised such that most of the
@@ -118,8 +119,8 @@ namespace com::saxbophone::arby {
      */
     class Uint {
     private:
-        using StorageType = GetStorageType<int>::StorageType;
-        using OverflowType = GetStorageType<int>::OverflowType;
+        using StorageType = PRIVATE::GetStorageType<int>::StorageType;
+        using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         // traps with an exception if there are leading zeroes in the digits array
         constexpr void _trap_leading_zero() const {
             if (_digits.size() > 0 and _digits.front() == 0) {
@@ -166,10 +167,10 @@ namespace com::saxbophone::arby {
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
-        constexpr Uint(uintmax_t value) : _digits(fit(value, Uint::BASE)) {
+        constexpr Uint(uintmax_t value) : _digits(PRIVATE::fit(value, Uint::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
-                uintmax_t power = exp(Uint::BASE, _digits.size() - 1);
+                uintmax_t power = PRIVATE::exp(Uint::BASE, _digits.size() - 1);
                 for (auto& digit : _digits) {
                     digit = (StorageType)(value / power);
                     value %= power;
@@ -347,7 +348,7 @@ namespace com::saxbophone::arby {
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
                     *it = (StorageType)addition;
                     // update the carry with the value in the top significant bits
-                    carry = (StorageType)(addition >> GetStorageType<int>::BITS_BETWEEN);
+                    carry = (StorageType)(addition >> PRIVATE::GetStorageType<int>::BITS_BETWEEN);
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
@@ -647,7 +648,7 @@ namespace com::saxbophone::arby {
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
-        com::saxbophone::codlili::List<StorageType> _digits;
+        PRIVATE::codlili::List<StorageType> _digits;
     };
 
     /**
