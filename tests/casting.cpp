@@ -73,10 +73,18 @@ TEST_CASE("arby::Uint::from_float() with positive value") {
     CHECK((long double)object == Approx(std::trunc(value)));
 }
 
+TEST_CASE("arby::Uint can be constructed from unsigned types smaller than uintmax_t - uint8_t",) {
+    std::uint8_t input = GENERATE(take(1000, random((std::uint16_t)0x00, (std::uint16_t)0xFF)));
+
+    arby::Uint object = input;
+
+    CHECK((uintmax_t)object == input);
+}
+
 TEMPLATE_TEST_CASE(
     "arby::Uint can be constructed from unsigned types smaller than uintmax_t",
     "",
-    std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t
+    std::uint16_t, std::uint32_t, std::uint64_t
 ) {
     TestType input = GENERATE(take(1000, random((TestType)0, std::numeric_limits<TestType>::max())));
 
