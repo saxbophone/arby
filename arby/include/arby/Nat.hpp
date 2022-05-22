@@ -122,6 +122,14 @@ namespace com::saxbophone::arby {
     }
     // end of PRIVATE
 
+    /**
+     * @brief Concept specifying which types Nat can be explicitly cast to
+     * @details Nat has a templated explicit cast operator which can cast to any
+     * data type which satisfies the following requirements:
+     * @details - Type T can be cast to Nat
+     * @details - `T *= Nat::StorageType` is valid and returns T or T&
+     * @details - `T += Nat::StorageType` is valid and returns T or T&
+     */
     template <typename T, typename N> concept CastableFromNat =
     requires(T a, N::StorageType b) {
         { (N)a } -> std::convertible_to<N>;
@@ -274,8 +282,8 @@ namespace com::saxbophone::arby {
          * @tparam To The data type to cast to
          * @note Type T must satisfy certain constraints for this template
          * to be valid. These are specified using C++20 concepts/constraints.
+         * @see `CastableFromNat` for details of the constraints for `To`
          */
-        // template <typename To>
         template <CastableFromNat<Nat> To>
         explicit constexpr operator To() const {
             // prevent overflow of To if it's a bounded type
