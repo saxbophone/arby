@@ -131,7 +131,7 @@ namespace com::saxbophone::arby {
      * @details - `T += Nat::StorageType` is valid and returns T or T&
      */
     template <typename T, typename N> concept CastableFromNat =
-    requires(T a, N::StorageType b) {
+    requires(T a, typename N::StorageType b) {
         { (N)a } -> std::convertible_to<N>;
         { a *= b } -> std::convertible_to<T>;
         { a += b } -> std::convertible_to<T>;
