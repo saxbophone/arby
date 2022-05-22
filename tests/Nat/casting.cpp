@@ -57,15 +57,6 @@ TEMPLATE_TEST_CASE(
     CHECK((TestType)arby::Nat((uintmax_t)value) == (TestType)value);
 }
 
-TEMPLATE_TEST_CASE(
-    "Casting arby::Nat to other floating-point type", "[casting]",
-    float, double
-) {
-    auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-
-    CHECK((TestType)arby::Nat(value) == (TestType)value);
-}
-
 TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error") {
     auto value = GENERATE(
         take(1000,

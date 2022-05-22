@@ -122,6 +122,13 @@ namespace com::saxbophone::arby {
     }
     // end of PRIVATE
 
+    template <typename T, typename N> concept CastableFromNat =
+    requires(T a, N::StorageType b) {
+        { (N)a } -> std::convertible_to<N>;
+        { a *= b } -> std::convertible_to<T>;
+        { a += b } -> std::convertible_to<T>;
+    };
+
     /**
      * @brief Arbitrary-precision unsigned integer type
      * @details This is named after \f$\mathbb{N}\f$, the set of Natural numbers,
@@ -264,13 +271,20 @@ namespace com::saxbophone::arby {
         }
         /**
          * @returns Value of this Nat object cast to any numeric type
-         * @tparam Numeric The data type to cast to
-         * @note Type Numeric must satisfy certain constraints for this template
+         * @tparam To The data type to cast to
+         * @note Type T must satisfy certain constraints for this template
          * to be valid. These are specified using C++20 concepts/constraints.
          */
-        template <typename Numeric>
-        explicit constexpr operator Numeric() const {
-            return {};
+        // template <typename To>
+        template <CastableFromNat<Nat> To>
+        explicit constexpr operator To() const {
+            // prevent overflow of To if it's a bounded type
+            if constexpr (std::numeric_limits<To>::is_bounded) {
+                if (*this > (Nat)std::numeric_limits<To>::max()) {
+                    throw std::range_error("value too large for uintmax_t");
+                }
+            }
+            return this->_cast_to<To>();
         }
         /**
          * @brief custom ostream operator that allows this class to be printed
