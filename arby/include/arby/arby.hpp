@@ -210,7 +210,6 @@ namespace com::saxbophone::arby {
          * @brief String-constructor, initialises from string decimal value
          * @param digits string containing the digits of the value to initialise
          * with, written in decimal
-         * @warning Unimplemented
          */
         Uint(std::string digits);
     private:
