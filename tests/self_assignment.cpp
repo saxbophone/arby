@@ -5,7 +5,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <arby/arby.hpp>
+#include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
 
@@ -17,7 +17,7 @@ using namespace com::saxbophone;
 
 TEST_CASE("Addition self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() / 2)));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
     value += value;
 
     arb += arb;
@@ -27,7 +27,7 @@ TEST_CASE("Addition self-assignment", "[self-assignment]") {
 
 TEST_CASE("Subtraction self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
 
     arb -= arb;
 
@@ -36,7 +36,7 @@ TEST_CASE("Subtraction self-assignment", "[self-assignment]") {
 
 TEST_CASE("Multiplication self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, (uintmax_t)std::sqrt(std::numeric_limits<uintmax_t>::max()))));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
     value *= value;
 
     arb *= arb;
@@ -46,7 +46,7 @@ TEST_CASE("Multiplication self-assignment", "[self-assignment]") {
 
 TEST_CASE("Division self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
 
     arb /= arb;
 
@@ -55,7 +55,7 @@ TEST_CASE("Division self-assignment", "[self-assignment]") {
 
 TEST_CASE("Modulo self-assignment", "[self-assignment]") {
     auto value = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
 
     arb %= arb;
 

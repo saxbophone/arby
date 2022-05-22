@@ -10,20 +10,20 @@
 #include <sstream>
 #include <string>
 
-#include <arby/arby.hpp>
+#include <arby/Nat.hpp>
 
 
 namespace com::saxbophone::arby {
-    Uint::Uint(std::string digits)
+    Nat::Nat(std::string digits)
         // use user-defined-literal to convert the digits in the string
       : _digits(operator "" _uarb(digits.c_str())._digits)
       {}
 
-    std::string Uint::_stringify_for_base(std::uint8_t base) const {
-        Uint value = *this;
+    std::string Nat::_stringify_for_base(std::uint8_t base) const {
+        Nat value = *this;
         std::ostringstream digits;
         do {
-            auto [quotient, remainder] = Uint::divmod(value, base);
+            auto [quotient, remainder] = Nat::divmod(value, base);
             if (remainder == 0) {
                 digits << '0';
             } else {
@@ -39,7 +39,7 @@ namespace com::saxbophone::arby {
         return output;
     }
 
-    std::ostream& operator<<(std::ostream& os, const Uint& object) {
+    std::ostream& operator<<(std::ostream& os, const Nat& object) {
         // the implementation of std::dec, std::hex and std::oct guarantees that
         // only one of them will be set in the IO stream flags if the proper
         // stdlib function is used to set those flags
@@ -54,7 +54,7 @@ namespace com::saxbophone::arby {
         return os;
     }
 
-    Uint::operator std::string() const {
+    Nat::operator std::string() const {
         return this->_stringify_for_base(10);
     }
 }

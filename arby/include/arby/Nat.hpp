@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef COM_SAXBOPHONE_ARBY_ARBY_HPP
-#define COM_SAXBOPHONE_ARBY_ARBY_HPP
+#ifndef COM_SAXBOPHONE_ARBY_NAT_HPP
+#define COM_SAXBOPHONE_ARBY_NAT_HPP
 
 #include <cmath>
 #include <cstddef>
@@ -107,17 +107,18 @@ namespace com::saxbophone::arby {
 
     /**
      * @brief Arbitrary-precision unsigned integer type
-     * @note `std::numeric_limits<Uint>` is specialised such that most of the
+     * @details This is named after 𝐍, the set of Natural numbers, which this type models
+     * @note `std::numeric_limits<Nat>` is specialised such that most of the
      * members of that type are implemented to describe the traits of this type.
      * @note Exceptions include any members of std::numeric_limits<> which
      * describe a finite number of digits or a maximmum value, neither of which
      * apply to this type as it is unbounded.
      * @exception std::logic_error may be thrown from most methods when the
-     * result of an operation leaves a Uint object with leading zero digits in
+     * result of an operation leaves a Nat object with leading zero digits in
      * its internal representation. Such cases are the result of bugs in this
      * code and should be reported as such.
      */
-    class Uint {
+    class Nat {
     private:
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
@@ -134,17 +135,17 @@ namespace com::saxbophone::arby {
          */
         static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
         /**
-         * @brief Defaulted equality operator for Uint objects
-         * @param rhs other Uint object to compare against
+         * @brief Defaulted equality operator for Nat objects
+         * @param rhs other Nat object to compare against
          * @returns `true` if objects are equal, otherwise `false`
          */
-        constexpr bool operator==(const Uint& rhs) const = default;
+        constexpr bool operator==(const Nat& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
-         * @param rhs other Uint object to compare against
+         * @param rhs other Nat object to compare against
          * @returns std::strong_ordering object for comparison
          */
-        constexpr auto operator<=>(const Uint& rhs) const {
+        constexpr auto operator<=>(const Nat& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
@@ -162,44 +163,44 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Uint() {} // uses default ctor of vector to init _digits to zero-size
+        constexpr Nat() {} // uses default ctor of vector to init _digits to zero-size
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
-        constexpr Uint(uintmax_t value) : _digits(PRIVATE::fit(value, Uint::BASE)) {
+        constexpr Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
-                uintmax_t power = PRIVATE::exp(Uint::BASE, _digits.size() - 1);
+                uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
                 for (auto& digit : _digits) {
                     digit = (StorageType)(value / power);
                     value %= power;
-                    power /= Uint::BASE;
+                    power /= Nat::BASE;
                 }
             }
             _trap_leading_zero();
         }
         /**
-         * @brief Constructor-like static method, creates Uint from floating point value
-         * @returns Uint with the value of the given float, with the fractional part truncated off
+         * @brief Constructor-like static method, creates Nat from floating point value
+         * @returns Nat with the value of the given float, with the fractional part truncated off
          * @param value Positive floating point value to initialise with
          * @throws std::domain_error when `value < 0` or when `value` is not a
          * finite number.
          */
-        static Uint from_float(long double value) {
+        static Nat from_float(long double value) {
             // prevent initialising from negative values
             if (value < 0) {
-                throw std::domain_error("Uint cannot be negative");
+                throw std::domain_error("Nat cannot be negative");
             }
             // prevent initialising from ±inf or NaN
             if (not std::isfinite(value)) {
-                throw std::domain_error("Uint cannot be Infinite or NaN");
+                throw std::domain_error("Nat cannot be Infinite or NaN");
             }
-            Uint output;
+            Nat output;
             while (value > 0) {
-                StorageType digit = (StorageType)std::fmod(value, Uint::BASE);
+                StorageType digit = (StorageType)std::fmod(value, Nat::BASE);
                 output._digits.push_front(digit);
-                value /= Uint::BASE;
+                value /= Nat::BASE;
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
             }
@@ -211,7 +212,7 @@ namespace com::saxbophone::arby {
          * @param digits string containing the digits of the value to initialise
          * with, written in decimal
          */
-        Uint(std::string digits);
+        Nat(std::string digits);
     private:
         // private helper method to abstract the common part of the casting op
         template <typename T>
@@ -219,15 +220,15 @@ namespace com::saxbophone::arby {
             T accumulator = 0;
             // read digits out in big-endian order, shifting as we go
             for (auto digit : _digits) {
-                accumulator *= Uint::BASE;
+                accumulator *= Nat::BASE;
                 accumulator += digit;
             }
             return accumulator;
         }
     public:
         /**
-         * @returns Value of this Uint object cast to uintmax_t
-         * @throws std::range_error when Uint value is out of range for
+         * @returns Value of this Nat object cast to uintmax_t
+         * @throws std::range_error when Nat value is out of range for
          * uintmax_t
          */
         explicit constexpr operator uintmax_t() const {
@@ -238,7 +239,7 @@ namespace com::saxbophone::arby {
             return this->_cast_to<uintmax_t>();
         }
         /**
-         * @returns Value of this Uint object cast to long long double
+         * @returns Value of this Nat object cast to long long double
          */
         explicit constexpr operator long double() const {
             return this->_cast_to<long double>();
@@ -247,18 +248,18 @@ namespace com::saxbophone::arby {
          * @brief custom ostream operator that allows this class to be printed
          * with std::cout and friends
          * @param os stream to output to
-         * @param object Uint to print
+         * @param object Nat to print
          */
-        friend std::ostream& operator<<(std::ostream& os, const Uint& object);
+        friend std::ostream& operator<<(std::ostream& os, const Nat& object);
         /**
-         * @returns string representing the value of this Uint, in decimal
+         * @returns string representing the value of this Nat, in decimal
          */
         explicit operator std::string() const;
         /**
          * @brief prefix increment
-         * @returns new value of Uint object after incrementing
+         * @returns new value of Nat object after incrementing
          */
-        constexpr Uint& operator++() {
+        constexpr Nat& operator++() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 _digits.push_back(1);
@@ -280,19 +281,19 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief postfix increment
-         * @returns old value of Uint object before incrementing
+         * @returns old value of Nat object before incrementing
          */
-        constexpr Uint operator++(int) {
-            Uint old = *this; // copy old value
+        constexpr Nat operator++(int) {
+            Nat old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
         }
         /**
          * @brief prefix decrement
-         * @returns new value of Uint object after decrementing
-         * @throws std::underflow_error when value of Uint is `0`
+         * @returns new value of Nat object after decrementing
+         * @throws std::underflow_error when value of Nat is `0`
          */
-        constexpr Uint& operator--() {
+        constexpr Nat& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.size() == 0) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
@@ -315,21 +316,21 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief postfix decrement
-         * @returns old value of Uint object before decrementing
-         * @throws std::underflow_error when value of Uint is `0`
+         * @returns old value of Nat object before decrementing
+         * @throws std::underflow_error when value of Nat is `0`
          */
-        constexpr Uint operator--(int) {
-            Uint old = *this; // copy old value
+        constexpr Nat operator--(int) {
+            Nat old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
         }
         /**
          * @brief addition-assignment
-         * @details Adds other value to this Uint and assigns the result to self
-         * @param rhs value to add to this Uint
+         * @details Adds other value to this Nat and assigns the result to self
+         * @param rhs value to add to this Nat
          * @returns resulting object after addition-assignment
          */
-        constexpr Uint& operator+=(Uint rhs) {
+        constexpr Nat& operator+=(Nat rhs) {
             // either arg being a zero is a no-op, guard against this
             if (_digits.size() != 0 or rhs._digits.size() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
@@ -358,22 +359,22 @@ namespace com::saxbophone::arby {
             return *this; // return the result by reference
         }
         /**
-         * @brief Addition operator for Uint
+         * @brief Addition operator for Nat
          * @param lhs,rhs operands for the addition
          * @returns sum of lhs + rhs
          */
-        friend constexpr Uint operator+(Uint lhs, const Uint& rhs) {
+        friend constexpr Nat operator+(Nat lhs, const Nat& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
         /**
          * @brief subtraction-assignment
-         * @details Subtracts other value from this Uint and assigns the result to self
-         * @param rhs value to subtract from this Uint
+         * @details Subtracts other value from this Nat and assigns the result to self
+         * @param rhs value to subtract from this Nat
          * @returns resulting object after subtraction-assignment
          * @throws std::underflow_error when rhs is bigger than this
          */
-        constexpr Uint& operator-=(Uint rhs) {
+        constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (rhs._digits.size() != 0) {
@@ -407,35 +408,35 @@ namespace com::saxbophone::arby {
             return *this; // return the result by reference
         }
         /**
-         * @brief Subtraction operator for Uint
+         * @brief Subtraction operator for Nat
          * @param lhs,rhs operands for the subtraction
          * @returns result of lhs - rhs
          * @throws std::underflow_error when rhs is bigger than lhs
          */
-        friend constexpr Uint operator-(Uint lhs, const Uint& rhs) {
+        friend constexpr Nat operator-(Nat lhs, const Nat& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
         /**
          * @brief multiplication-assignment
-         * @details Multiplies this Uint by other value and assigns the result to self
-         * @param rhs value to multiply this Uint by
+         * @details Multiplies this Nat by other value and assigns the result to self
+         * @param rhs value to multiply this Nat by
          * @returns resulting object after multiplication-assignment
          */
-        constexpr Uint& operator*=(const Uint& rhs) {
-            Uint product = *this * rhs; // uses friend *operator
+        constexpr Nat& operator*=(const Nat& rhs) {
+            Nat product = *this * rhs; // uses friend *operator
             // assign product's digits back to our digits
             _digits = product._digits;
             return *this; // return the result by reference
         }
         /**
-         * @brief Multiplication operator for Uint
+         * @brief Multiplication operator for Nat
          * @param lhs,rhs operands for the multiplication
          * @returns product of lhs * rhs
          */
-        friend constexpr Uint operator*(const Uint& lhs, const Uint& rhs) {
+        friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
             // init product to zero
-            Uint product;
+            Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
             if (lhs._digits.size() != 0 and rhs._digits.size() != 0) {
                 // multiply each digit from lhs with each digit from rhs
@@ -447,8 +448,8 @@ namespace com::saxbophone::arby {
                     for (auto rhs_digit : rhs._digits) {
                         // cast lhs to OverflowType to make sure both operands get promoted to avoid wrap-around overflow
                         OverflowType multiplication = (OverflowType)lhs_digit * rhs_digit;
-                        // create a new Uint with this intermediate result and add trailing places as needed
-                        Uint intermediate = multiplication;
+                        // create a new Nat with this intermediate result and add trailing places as needed
+                        Nat intermediate = multiplication;
                         // we need to remap the indices as the digits are stored big-endian
                         std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
                         // add that many trailing zeroes to intermediate's digits
@@ -463,21 +464,21 @@ namespace com::saxbophone::arby {
             }
             return product;
         }
-    private: // private helper methods for Uint::divmod()
+    private: // private helper methods for Nat::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
-        static constexpr Uint get_max_shift(const Uint& lhs, const Uint& rhs) {
+        static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
             if (wiggle_room > 0 and lhs._digits.front() < rhs._digits.front()) {
                 wiggle_room--;
             }
-            Uint shift = 1;
+            Nat shift = 1;
             shift._digits.push_back(wiggle_room, 0);
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
-        static constexpr OverflowType estimate_division(const Uint& lhs, const Uint& rhs) {
+        static constexpr OverflowType estimate_division(const Nat& lhs, const Nat& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits.front();
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(++rhs._digits.begin(), rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
@@ -489,7 +490,7 @@ namespace com::saxbophone::arby {
                 return (OverflowType)lhs._digits.front() / denominator;
             } else { // use lhs[0..1] / rhs[0]
                 // chop off all but the leading two digits of lhs to get the numerator
-                Uint leading_digits = lhs;
+                Nat leading_digits = lhs;
                 // NOTE: we can guarantee that lhs will not be shorter than 2 digits here ONLY because the caller will
                 // not call this method if lhs < rhs AND to get to this branch, the first digit of lhs is less than that
                 // of rhs. These facts taken together prove that lhs is at least 2 digits long at this point.
@@ -505,23 +506,23 @@ namespace com::saxbophone::arby {
          * @returns tuple of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          */
-        static constexpr std::tuple<Uint, Uint> divmod(const Uint& lhs, const Uint& rhs) {
+        static constexpr std::tuple<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
                 throw std::domain_error("division by zero");
             }
             // this will gradually accumulate the calculated quotient
-            Uint quotient;
+            Nat quotient;
             // this will gradually decrement with each subtraction
-            Uint remainder = lhs;
+            Nat remainder = lhs;
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
                 // exponent denotes a raw value describing how many places we can shift rhs up by
-                Uint exponent = Uint::get_max_shift(remainder, rhs);
+                Nat exponent = Nat::get_max_shift(remainder, rhs);
                 // estimate how many times it goes in and subtract this many of rhs
-                Uint estimate = Uint::estimate_division(remainder, rhs);
+                Nat estimate = Nat::estimate_division(remainder, rhs);
                 // we'll actually be subtracting rhs shifted by exponent
-                Uint shifted_rhs = rhs * exponent;
+                Nat shifted_rhs = rhs * exponent;
                 if (remainder >= (estimate * shifted_rhs)) {
                     remainder -= estimate * shifted_rhs;
                     quotient += estimate * exponent;
@@ -540,60 +541,60 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief division-assignment
-         * @details Divides this Uint by other value and stores result to this
+         * @details Divides this Nat by other value and stores result to this
          * @note This implements floor-division, returning the quotient only
-         * @param rhs value to divide this Uint by
+         * @param rhs value to divide this Nat by
          * @returns resulting object after division-assignment
          * @throws std::domain_error when rhs is zero
          */
-        constexpr Uint& operator/=(const Uint& rhs) {
-            Uint quotient = *this / rhs; // uses friend /operator
+        constexpr Nat& operator/=(const Nat& rhs) {
+            Nat quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
             return *this; // return the result by reference
         }
         /**
-         * @brief Division operator for Uint
+         * @brief Division operator for Nat
          * @note This implements floor-division, returning the quotient only
          * @param lhs,rhs operands for the division
          * @returns quotient of lhs / rhs
          */
-        friend constexpr Uint operator/(Uint lhs, const Uint& rhs) {
-            Uint quotient;
-            std::tie(quotient, std::ignore) = Uint::divmod(lhs, rhs);
+        friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
+            Nat quotient;
+            std::tie(quotient, std::ignore) = Nat::divmod(lhs, rhs);
             return quotient;
         }
         /**
          * @brief modulo-assignment
-         * @details Modulo-divides this Uint by other value and stores result to this
+         * @details Modulo-divides this Nat by other value and stores result to this
          * @note This returns the modulo/remainder of the division operation
-         * @param rhs value to modulo-divide this Uint by
+         * @param rhs value to modulo-divide this Nat by
          * @returns resulting object after modulo-assignment
          * @throws std::domain_error when rhs is zero
          */
-        constexpr Uint& operator%=(const Uint& rhs) {
-            Uint remainder = *this % rhs; // uses friend %operator
+        constexpr Nat& operator%=(const Nat& rhs) {
+            Nat remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
             return *this; // return the result by reference
         }
         /**
-         * @brief Modulo operator for Uint
+         * @brief Modulo operator for Nat
          * @note This implements modulo-division, returning the remainder only
          * @param lhs,rhs operands for the division
          * @returns remainder of lhs / rhs
          * @throws std::domain_error when rhs is zero
          */
-        friend constexpr Uint operator%(Uint lhs, const Uint& rhs) {
-            Uint remainder;
-            std::tie(std::ignore, remainder) = Uint::divmod(lhs, rhs);
+        friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
+            Nat remainder;
+            std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
         }
         /**
          * @returns base raised to the power of exponent
          * @param base,exponent parameters for the base and exponent
          */
-        static constexpr Uint pow(const Uint& base, const Uint& exponent) {
+        static constexpr Nat pow(const Nat& base, const Nat& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
             // exponent = 0 is our base case to terminate the recursion
             if (exponent == 0) {
@@ -605,9 +606,9 @@ namespace com::saxbophone::arby {
                 // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
                 return base * base;
             }
-            auto [quotient, remainder] = Uint::divmod(exponent, 2);
+            auto [quotient, remainder] = Nat::divmod(exponent, 2);
             // instead of calculating x^n, do x^(n/2)
-            Uint power = Uint::pow(base, quotient);
+            Nat power = Nat::pow(base, quotient);
             power *= power;
             // and multiply by base again if n was odd
             if (remainder == 1) {
@@ -617,22 +618,22 @@ namespace com::saxbophone::arby {
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
-        // constexpr Uint& operator<<=(const Uint& n) {
+        // constexpr Nat& operator<<=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // left-shift
-        // friend constexpr Uint operator<<(Uint lhs, const Uint& rhs) {
+        // friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
         // // right-shift-assignment
-        // constexpr Uint& operator>>=(const Uint& n) {
+        // constexpr Nat& operator>>=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // right-shift
-        // friend constexpr Uint operator>>(Uint lhs, const Uint& rhs) {
+        // friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
@@ -651,14 +652,14 @@ namespace com::saxbophone::arby {
     };
 
     /**
-     * @brief raw user-defined-literal for Uint class
+     * @brief raw user-defined-literal for Nat class
      * @param literal the literal
-     * @returns Corresponding arby::Uint value
-     * @note we use a raw literal in this case because as the Uint type is
+     * @returns Corresponding arby::Nat value
+     * @note we use a raw literal in this case because as the Nat type is
      * unbounded, we want to support a potentially infinite number of digits,
      * or certainly more than can be stored in unsigned long long...
      */
-    constexpr Uint operator "" _uarb(const char* literal) {
+    constexpr Nat operator "" _uarb(const char* literal) {
         // detect number base
         std::uint8_t base = 10; // base-10 is the fallback base
         if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
@@ -675,10 +676,10 @@ namespace com::saxbophone::arby {
                 literal = literal + 2;
                 break;
             default: // not allowed --we don't support 0-prefixed octal literals or anything else
-                throw std::invalid_argument("invalid arby::Uint literal");
+                throw std::invalid_argument("invalid arby::Nat literal");
             }
         }
-        Uint value; // accumulator
+        Nat value; // accumulator
         // consume digits
         while (*literal != 0) { // until null-terminator is found
             std::uint8_t digit = (std::uint8_t)*literal; // get character
@@ -695,9 +696,9 @@ namespace com::saxbophone::arby {
     }
 }
 
-// adding template specialisation to std::numeric_limits<> for arby::Uint
+// adding template specialisation to std::numeric_limits<> for arby::Nat
 template <>
-class std::numeric_limits<com::saxbophone::arby::Uint> {
+class std::numeric_limits<com::saxbophone::arby::Nat> {
 public:
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = false;
@@ -711,11 +712,11 @@ public:
     static constexpr std::float_round_style round_style = std::round_toward_zero;
     static constexpr bool is_iec559 = false;
     static constexpr bool is_bounded = false; // an unbounded type!
-    static constexpr bool is_modulo = false; // Uint increases number of digits on overflow. Underflow is undefined.
+    static constexpr bool is_modulo = false; // Nat increases number of digits on overflow. Underflow is undefined.
     static constexpr int digits = 0; // N/A --no hard limit
     static constexpr int digits10 = 0; // N/A --no hard limit
     static constexpr int max_digits10 = 0; // N/A --no hard limit
-    static constexpr int radix = com::saxbophone::arby::Uint::BASE; // NOTE: this is the radix used for each digit, all of which are binary
+    static constexpr int radix = com::saxbophone::arby::Nat::BASE; // NOTE: this is the radix used for each digit, all of which are binary
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A
@@ -723,15 +724,15 @@ public:
     static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
     static constexpr bool tinyness_before = false; // N/A
     // these methods should be made constexpr when constexpr std::vector is widely supported
-    static constexpr com::saxbophone::arby::Uint min() { return 0; };
-    static constexpr com::saxbophone::arby::Uint lowest() { return 0; };
-    static constexpr com::saxbophone::arby::Uint max() { return 0; }; // N/A --no hard limit on maximum value
-    static constexpr com::saxbophone::arby::Uint epsilon() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint round_error() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint infinity() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint quiet_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint signaling_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Uint denorm_min() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat min() { return 0; };
+    static constexpr com::saxbophone::arby::Nat lowest() { return 0; };
+    static constexpr com::saxbophone::arby::Nat max() { return 0; }; // N/A --no hard limit on maximum value
+    static constexpr com::saxbophone::arby::Nat epsilon() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat round_error() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat infinity() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat quiet_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat signaling_NaN() { return 0; } // N/A
+    static constexpr com::saxbophone::arby::Nat denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard
