@@ -9,9 +9,9 @@
 
 using namespace com::saxbophone::arby;
 
-TEST_CASE("Initialising arby::Uint objects with decimal _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with decimal _uarb user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Uint, Uint>(
+        table<Nat, Nat>(
             {
                 {0_uarb, 0},
                 {10_uarb, 10},
@@ -29,9 +29,9 @@ TEST_CASE("Initialising arby::Uint objects with decimal _uarb user-defined-liter
     CHECK(literal == object);
 }
 
-TEST_CASE("Initialising arby::Uint objects with hexadecimal _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with hexadecimal _uarb user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Uint, Uint>(
+        table<Nat, Nat>(
             {
                 {0x1172443_uarb, 0x1172443},
                 {0x19721871_uarb, 0x19721871},
@@ -48,9 +48,9 @@ TEST_CASE("Initialising arby::Uint objects with hexadecimal _uarb user-defined-l
     CHECK(literal == object);
 }
 
-TEST_CASE("Initialising arby::Uint objects with binary _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with binary _uarb user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Uint, Uint>(
+        table<Nat, Nat>(
             {
                 {0b0_uarb, 0b0},
                 {0b1_uarb, 0b1},

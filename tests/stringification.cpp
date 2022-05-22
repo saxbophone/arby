@@ -9,17 +9,17 @@
 using namespace com::saxbophone;
 using namespace com::saxbophone::arby;
 
-TEST_CASE("Using std::ostream << arby::Uint generates decimal string of value", "[stringification]") {
+TEST_CASE("Using std::ostream << arby::Nat generates decimal string of value", "[stringification]") {
     auto values = GENERATE(
-        table<arby::Uint, std::string>(
+        table<arby::Nat, std::string>(
             {
-                {arby::Uint(), "0"},
-                {arby::Uint(123456789), "123456789"},
-                {arby::Uint(19743358), "19743358"},
-                {arby::Uint(std::numeric_limits<uintmax_t>::max()), std::to_string(std::numeric_limits<uintmax_t>::max())},
-                {arby::Uint(491274912), "491274912"},
-                {arby::Uint(900100390), "900100390"},
-                {arby::Uint(503), "503"},
+                {arby::Nat(), "0"},
+                {arby::Nat(123456789), "123456789"},
+                {arby::Nat(19743358), "19743358"},
+                {arby::Nat(std::numeric_limits<uintmax_t>::max()), std::to_string(std::numeric_limits<uintmax_t>::max())},
+                {arby::Nat(491274912), "491274912"},
+                {arby::Nat(900100390), "900100390"},
+                {arby::Nat(503), "503"},
             }
         )
     );
@@ -30,9 +30,9 @@ TEST_CASE("Using std::ostream << arby::Uint generates decimal string of value", 
     CHECK(os.str() == std::get<1>(values));
 }
 
-TEST_CASE("Using std::ostream << with random arby::Uint generates decimal string of value", "[stringification]") {
+TEST_CASE("Using std::ostream << with random arby::Nat generates decimal string of value", "[stringification]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
     std::string expected_str = std::to_string(value);
     std::ostringstream os;
 
@@ -41,9 +41,9 @@ TEST_CASE("Using std::ostream << with random arby::Uint generates decimal string
     CHECK(os.str() == expected_str);
 }
 
-TEST_CASE("Using std::ostream << std::hex << arby::Uint generates hexadecimal string of value", "[stringification]") {
+TEST_CASE("Using std::ostream << std::hex << arby::Nat generates hexadecimal string of value", "[stringification]") {
     auto values = GENERATE(
-        table<arby::Uint, std::string>(
+        table<arby::Nat, std::string>(
             {
                 {0_uarb, "0"},
                 {0x123456789_uarb, "123456789"},
@@ -61,10 +61,10 @@ TEST_CASE("Using std::ostream << std::hex << arby::Uint generates hexadecimal st
     CHECK(generated.str() == std::get<1>(values));
 }
 
-TEST_CASE("Using std::ostream with number base specifier and random arby::Uint generates string of value in the specified base", "[stringification]") {
+TEST_CASE("Using std::ostream with number base specifier and random arby::Nat generates string of value in the specified base", "[stringification]") {
     auto base = GENERATE(std::dec, std::oct, std::hex);
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
     std::ostringstream generated, expected;
     expected << base << value;
     CAPTURE(base, value);
@@ -74,9 +74,9 @@ TEST_CASE("Using std::ostream with number base specifier and random arby::Uint g
     CHECK(generated.str() == expected.str());
 }
 
-TEST_CASE("(std::string)arby::Uint generates same string as std::cout << std::dec << arby::Uint", "[stringification]") {
+TEST_CASE("(std::string)arby::Nat generates same string as std::cout << std::dec << arby::Nat", "[stringification]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Uint arb = value;
+    arby::Nat arb = value;
     std::ostringstream os;
     os << std::dec << arb;
     std::string expected_str = os.str();
