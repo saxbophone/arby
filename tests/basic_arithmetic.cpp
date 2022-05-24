@@ -115,8 +115,6 @@ TEST_CASE("arby::Nat postfix increment", "[basic-arithmetic]") {
     CHECK((uintmax_t)previous == input);
 }
 
-///
-
 TEST_CASE("arby::Nat prefix increment requiring additional digits", "[basic-arithmetic]") {
     // setting input value to BASE-1 means an increment will add another digit
     arby::Nat original = arby::Nat::BASE - 1;
@@ -134,8 +132,6 @@ TEST_CASE("arby::Nat postfix increment requiring additional digits", "[basic-ari
     CHECK((uintmax_t)original == arby::Nat::BASE);
     CHECK((uintmax_t)previous == arby::Nat::BASE - 1);
 }
-
-///
 
 TEST_CASE("arby::Nat prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
@@ -157,8 +153,6 @@ TEST_CASE("arby::Nat postfix decrement", "[basic-arithmetic]") {
     CHECK((uintmax_t)previous == input);
 }
 
-///
-
 TEST_CASE("arby::Nat prefix decrement requiring digit removal", "[basic-arithmetic]") {
     // setting input value to BASE means a decrement will remove a digit
     arby::Nat original = arby::Nat::BASE;
@@ -176,8 +170,6 @@ TEST_CASE("arby::Nat postfix decrement requiring digit removal", "[basic-arithme
     CHECK((uintmax_t)original == arby::Nat::BASE - 1);
     CHECK((uintmax_t)previous == arby::Nat::BASE);
 }
-
-///
 
 // NOTE: no need for increment overflow tests as Nat doesn't overflow --it expands as necessary
 // TODO: consider writing a test case that applies very large size-increasing operations (maybe exponents)
