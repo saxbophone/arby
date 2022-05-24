@@ -1,5 +1,5 @@
 /*
- * codlili v0.1.0
+ * codlili v0.2.0
  *
  * /kɒdliːliː/
  *
@@ -7,6 +7,20 @@
  * - Doubly
  * - LInked
  * - LIst
+ *
+ * This file forms part of arby
+ * arby is a C++ library providing arbitrary-precision integer types
+ *
+ * Warning: codlili is currently bundled with arby but is planned to be moved
+ * to its own separate project/package at a later date.
+ *
+ * Created by Joshua Saxby <joshua.a.saxby@gmail.com>, May 2022
+ *
+ * Copyright Joshua Saxby <joshua.a.saxby@gmail.com> 2022
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 #ifndef COM_SAXBOPHONE_CODLILI_LIST_HPP

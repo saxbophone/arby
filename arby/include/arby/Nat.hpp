@@ -1,17 +1,18 @@
 /**
  * @file
- * This is a sample public compilation unit.
+ * @brief This file forms part of arby
+ * @details arby is a C++ library providing arbitrary-precision integer types
+ * @warning arby is alpha-quality software
  *
- * @author Your Name <your.email.address@goes.here>
- * @date Creation/Edit Date
+ * @author Joshua Saxby <joshua.a.saxby@gmail.com>
+ * @date May 2022
  *
- * @copyright Copyright information goes here
+ * @copyright Copyright Joshua Saxby <joshua.a.saxby@gmail.com> 2022
  *
  * @copyright
- * Copyright information can span multiple paragraphs if needed, such as if you
- * use a well-known software license for which license header text (to be
- * placed in locations like these) are provided by the license custodians.
- *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 #ifndef COM_SAXBOPHONE_ARBY_NAT_HPP
