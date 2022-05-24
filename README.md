@@ -27,7 +27,23 @@ arby is designed with the following goals in mind:
 
 ### What's currently provided?
 
+- Arbitrary-precision unsigned integers (the [Natural Numbers](https://en.wikipedia.org/wiki/Natural_number)) via class **`Nat`**
+  - All basic mathematical operators overloaded
+  - Divide and remainder (**`divmod()`**)
+  - Raise to power (**`pow()`**)
+  - All comparisons
+  - cast to/from `uintmax_t` and `long double`
+  - conversion to/from decimal, octal and hexadecimal string
+
 ### What will be provided in future?
+
+- Additions to **`Nat`**:
+  - bitwise operators
+  - bit-shift operators
+- Arbitrary-precision signed integers (the [Integers](https://en.wikipedia.org/wiki/Integer)) via class **`Int`**
+  - All operations supported by **`Nat`** with the exception of bitwise ones
+  - sign change
+  - absolute value
 
 ### Getting it
 
