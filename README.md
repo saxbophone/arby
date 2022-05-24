@@ -51,6 +51,12 @@ arby is designed with the following goals in mind:
   - All operations supported by **`Int`**
   - simplify operation to reduce the size of numerator and denominator at the expense of precision
 
+### Performance
+
+arby hasn't been benchmarked yet, but it is not expected to perform as well as other long-established bignum libraries for C/C++.
+
+Much of the code is not expected to perform terribly, however it must be noted that converting `Nat` to strings is particularly slow for very large numbers. This is an area for potential future optimisation efforts.
+
 ### Getting it
 
 Use CPM
