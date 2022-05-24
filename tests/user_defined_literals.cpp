@@ -7,21 +7,22 @@
 
 #include <arby/Nat.hpp>
 
-using namespace com::saxbophone::arby;
+using namespace com::saxbophone;
+using namespace com::saxbophone::arby::literals;
 
-TEST_CASE("Initialising arby::Nat objects with decimal _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with decimal _nat user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Nat, Nat>(
+        table<arby::Nat, arby::Nat>(
             {
-                {0_uarb, 0},
-                {10_uarb, 10},
-                {123_uarb, 123},
-                {1234_uarb, 1234},
-                {10000_uarb, 10000},
-                {100000_uarb, 100000},
-                {123456_uarb, 123456},
-                {9999999_uarb, 9999999},
-                {56213870_uarb, 56213870},
+                {0_nat, 0},
+                {10_nat, 10},
+                {123_nat, 123},
+                {1234_nat, 1234},
+                {10000_nat, 10000},
+                {100000_nat, 100000},
+                {123456_nat, 123456},
+                {9999999_nat, 9999999},
+                {56213870_nat, 56213870},
             }
         )
     );
@@ -29,18 +30,18 @@ TEST_CASE("Initialising arby::Nat objects with decimal _uarb user-defined-litera
     CHECK(literal == object);
 }
 
-TEST_CASE("Initialising arby::Nat objects with hexadecimal _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with hexadecimal _nat user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Nat, Nat>(
+        table<arby::Nat, arby::Nat>(
             {
-                {0x1172443_uarb, 0x1172443},
-                {0x19721871_uarb, 0x19721871},
-                {0x0_uarb, 0x0},
-                {0xf3c1d28a_uarb, 0xf3c1d28a},
-                {0x01234567_uarb, 0x01234567},
-                {0x89abcdef_uarb, 0x89abcdef},
-                {0xffffffff_uarb, 0xffffffff},
-                {0xf00000e1_uarb, 0xf00000e1},
+                {0x1172443_nat, 0x1172443},
+                {0x19721871_nat, 0x19721871},
+                {0x0_nat, 0x0},
+                {0xf3c1d28a_nat, 0xf3c1d28a},
+                {0x01234567_nat, 0x01234567},
+                {0x89abcdef_nat, 0x89abcdef},
+                {0xffffffff_nat, 0xffffffff},
+                {0xf00000e1_nat, 0xf00000e1},
             }
         )
     );
@@ -48,15 +49,15 @@ TEST_CASE("Initialising arby::Nat objects with hexadecimal _uarb user-defined-li
     CHECK(literal == object);
 }
 
-TEST_CASE("Initialising arby::Nat objects with binary _uarb user-defined-literal", "[user-defined-literal]") {
+TEST_CASE("Initialising arby::Nat objects with binary _nat user-defined-literal", "[user-defined-literal]") {
     auto [literal, object] = GENERATE(
-        table<Nat, Nat>(
+        table<arby::Nat, arby::Nat>(
             {
-                {0b0_uarb, 0b0},
-                {0b1_uarb, 0b1},
-                {0b11010010_uarb, 0b11010010},
-                {0b1111111111111111111111111111_uarb, 0b1111111111111111111111111111},
-                {0b1010011010100011110101110101_uarb, 0b1010011010100011110101110101},
+                {0b0_nat, 0b0},
+                {0b1_nat, 0b1},
+                {0b11010010_nat, 0b11010010},
+                {0b1111111111111111111111111111_nat, 0b1111111111111111111111111111},
+                {0b1010011010100011110101110101_nat, 0b1010011010100011110101110101},
             }
         )
     );
@@ -64,6 +65,6 @@ TEST_CASE("Initialising arby::Nat objects with binary _uarb user-defined-literal
     CHECK(literal == object);
 }
 
-TEST_CASE("Malformed octal _uarb literal throws std::invalid_argument") {
-    CHECK_THROWS_AS(01234_uarb, std::invalid_argument);
+TEST_CASE("Malformed octal _nat literal throws std::invalid_argument") {
+    CHECK_THROWS_AS(01234_nat, std::invalid_argument);
 }

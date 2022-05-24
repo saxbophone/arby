@@ -16,7 +16,7 @@
 namespace com::saxbophone::arby {
     Nat::Nat(std::string digits)
         // use user-defined-literal to convert the digits in the string
-      : _digits(operator "" _uarb(digits.c_str())._digits)
+      : _digits(literals::operator "" _nat(digits.c_str())._digits)
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
