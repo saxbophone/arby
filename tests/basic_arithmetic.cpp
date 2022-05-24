@@ -141,6 +141,28 @@ TEST_CASE("arby::Nat postfix decrement", "[basic-arithmetic]") {
     CHECK((uintmax_t)previous == input);
 }
 
+///
+
+TEST_CASE("arby::Nat prefix decrement requiring digit removal", "[basic-arithmetic]") {
+    // setting input value to BASE means a decrement will remove a digit
+    arby::Nat original = arby::Nat::BASE;
+    arby::Nat changed = --original;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE);
+    CHECK((uintmax_t)changed == arby::Nat::BASE);
+}
+
+TEST_CASE("arby::Nat postfix decrement requiring digit removal", "[basic-arithmetic]") {
+    // setting input value to BASE means a decrement will remove a digit
+    arby::Nat original = arby::Nat::BASE;
+    arby::Nat previous = original--;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE - 1);
+    CHECK((uintmax_t)previous == arby::Nat::BASE);
+}
+
+///
+
 // NOTE: no need for increment overflow tests as Nat doesn't overflow --it expands as necessary
 // TODO: consider writing a test case that applies very large size-increasing operations (maybe exponents)
 // on Nat to force a failure condition when memory runs out an an exception is thrown.
