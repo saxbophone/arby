@@ -264,14 +264,13 @@ namespace com::saxbophone::arby {
             if (_digits.size() == 0) {
                 _digits.push_back(1);
             } else {
-                // increment least significant digit
+                // increment least significant digit then rollove remaining digits as needed
                 auto it = _digits.rbegin();
-                (*it)++;
-                // increment remaining digits (rollover) as needed
-                while (it != _digits.rend() and *it == 0) { // last digit overflowed to zero
-                    ++it; // increment index
+                do {
                     (*it)++; // increment digit
-                }
+                    ++it; // increment index
+                    // increment remaining digits (rollover) as needed
+                } while (it != _digits.rend() and *it == 0); // last digit overflowed to zero
                 // if last digit is zero, we need another one
                 if (_digits.front() == 0) {
                     _digits.push_front(1);
