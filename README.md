@@ -59,7 +59,17 @@ Much of the code is not expected to perform terribly, however it must be noted t
 
 ### Getting it
 
-Use CPM
+Although mostly a header-only library, there are a few routines that are compiled into binary; it's recommended to use CMake for building and installing arby, and further recommended to use CPM to simplify package-management:
+
+```cmake
+CPMFindPackage(
+    NAME Arby
+    GIT_REPOSITORY git@github.com:saxbophone/arby.git
+    GIT_TAG v0.3.0
+)
+
+# link your targets against Arby::arby
+```
 
 ### Using it
 
