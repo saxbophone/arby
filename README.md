@@ -57,6 +57,14 @@ arby hasn't been benchmarked yet, but it is not expected to perform as well as o
 
 Much of the code is not expected to perform terribly, however it must be noted that converting `Nat` to strings is particularly slow for very large numbers. This is an area for potential future optimisation efforts.
 
+### Usability
+
+arby is alpha-quality software. Although fairly thoroughly unit-tested, more work can be done to make it robust.
+
+In particular, arby currently stores number digits in a custom-made doubly linked list type, due to lack of cross-platform stdlib support for `constexpr std::vector`. Nonetheless, this type doesn't work fully in `constexpr` contexts on all platforms.
+
+Even with good-quality `constexpr` support, language limitations mean one can't store any of arby's types as compile-time constants, however it _is_ possible to store values of other types calculated from arby's types at compile-time, by casting to one of those types and returning such value from a `constexpr` or `consteval` function. This could be useful if calculation of a value that will fit in a fixed-size variable requires intermediate calculations of arbitrary size. Again, support for this requires good `constexpr` support on the platform to work.
+
 ### Getting it
 
 Although mostly a header-only library, there are a few routines that are compiled into binary; it's recommended to use CMake for building and installing arby, and further recommended to use CPM to simplify package-management:
