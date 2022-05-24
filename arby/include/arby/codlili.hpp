@@ -111,6 +111,7 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
             return *this;
         }
         /* element access */
+        // TODO: make these trap when accessed on an empty List
         // get reference to first element
         constexpr reference front() { return this->_front->value; }
         // get read-only reference to first element

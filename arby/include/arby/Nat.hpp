@@ -260,23 +260,18 @@ namespace com::saxbophone::arby {
          * @returns new value of Nat object after incrementing
          */
         constexpr Nat& operator++() {
-            // empty digits vector (means value is zero) is a special case
-            if (_digits.size() == 0) {
-                _digits.push_back(1);
-            } else {
-                // increment least significant digit
-                auto it = _digits.rbegin();
-                (*it)++;
-                // increment remaining digits (rollover) as needed
-                while (it != _digits.rend() and *it == 0) { // last digit overflowed to zero
-                    ++it; // increment index
-                    (*it)++; // increment digit
-                }
-                // if last digit is zero, we need another one
-                if (_digits.front() == 0) {
-                    _digits.push_front(1);
+            // increment least significant digit then rollover remaining digits as needed
+            for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
+                // only contine to next digit if incrementing this one rolls over
+                if (++(*it) != 0) {
+                    break;
                 }
             }
+            // if last digit is zero, we need another one
+            if (_digits.empty() or _digits.front() == 0) {
+                _digits.push_front(1);
+            }
+            _trap_leading_zero();
             return *this; // return new value by reference
         }
         /**
@@ -298,13 +293,12 @@ namespace com::saxbophone::arby {
             if (_digits.size() == 0) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
-                // decrement least significant digit
-                auto it = _digits.rbegin();
-                (*it)--;
-                // decrement remaining digits (borrow) as needed
-                while (it != _digits.rend() and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
-                    ++it; // increment index
-                    (*it)--; // decrement digit
+                // decrement least significant digit then borrow from remaining digits as needed
+                for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
+                    // only continue to next digit if decrementing this one rolls over
+                    if (--(*it) != std::numeric_limits<StorageType>::max()) {
+                        break;
+                    }
                 }
                 // if last digit is zero, remove it
                 if (_digits.front() == 0) {

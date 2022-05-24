@@ -79,6 +79,22 @@ TEST_CASE("constexpr arby::Nat", "[constexpr]") {
     WARN("No constexpr tests written yet");
 }
 
+TEST_CASE("arby::Nat prefix increment 0", "[basic-arithmetic]") {
+    arby::Nat original;
+    arby::Nat changed = ++original;
+
+    CHECK((uintmax_t)original == 1);
+    CHECK((uintmax_t)changed == 1);
+}
+
+TEST_CASE("arby::Nat postfix increment 0", "[basic-arithmetic]") {
+    arby::Nat original;
+    arby::Nat previous = original++;
+
+    CHECK((uintmax_t)original == 1);
+    CHECK((uintmax_t)previous == 0);
+}
+
 TEST_CASE("arby::Nat prefix increment", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 
@@ -99,6 +115,24 @@ TEST_CASE("arby::Nat postfix increment", "[basic-arithmetic]") {
     CHECK((uintmax_t)previous == input);
 }
 
+TEST_CASE("arby::Nat prefix increment requiring additional digits", "[basic-arithmetic]") {
+    // setting input value to BASE-1 means an increment will add another digit
+    arby::Nat original = arby::Nat::BASE - 1;
+    arby::Nat changed = ++original;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE);
+    CHECK((uintmax_t)changed == arby::Nat::BASE);
+}
+
+TEST_CASE("arby::Nat postfix increment requiring additional digits", "[basic-arithmetic]") {
+    // setting input value to BASE-1 means an increment will add another digit
+    arby::Nat original = arby::Nat::BASE - 1;
+    arby::Nat previous = original++;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE);
+    CHECK((uintmax_t)previous == arby::Nat::BASE - 1);
+}
+
 TEST_CASE("arby::Nat prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
@@ -117,6 +151,24 @@ TEST_CASE("arby::Nat postfix decrement", "[basic-arithmetic]") {
 
     CHECK((uintmax_t)original == input - 1);
     CHECK((uintmax_t)previous == input);
+}
+
+TEST_CASE("arby::Nat prefix decrement requiring digit removal", "[basic-arithmetic]") {
+    // setting input value to BASE means a decrement will remove a digit
+    arby::Nat original = arby::Nat::BASE;
+    arby::Nat changed = --original;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE - 1);
+    CHECK((uintmax_t)changed == arby::Nat::BASE - 1);
+}
+
+TEST_CASE("arby::Nat postfix decrement requiring digit removal", "[basic-arithmetic]") {
+    // setting input value to BASE means a decrement will remove a digit
+    arby::Nat original = arby::Nat::BASE;
+    arby::Nat previous = original--;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE - 1);
+    CHECK((uintmax_t)previous == arby::Nat::BASE);
 }
 
 // NOTE: no need for increment overflow tests as Nat doesn't overflow --it expands as necessary
