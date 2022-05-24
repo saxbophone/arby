@@ -67,7 +67,7 @@ Even with good-quality `constexpr` support, language limitations mean one can't 
 
 ### Getting it
 
-Although mostly a header-only library, there are a few routines that are compiled into binary; it's recommended to use CMake for building and installing arby, and further recommended to use CPM to simplify package-management:
+Although mostly a header-only library, there are a few routines that are compiled into binary; it's recommended to use CMake for building and installing arby, and further recommended to use [CPM](https://github.com/cpm-cmake/CPM.cmake) to simplify package-management:
 
 ```cmake
 CPMFindPackage(
