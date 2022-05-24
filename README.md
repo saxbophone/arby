@@ -45,8 +45,18 @@ arby is designed with the following goals in mind:
   - sign change
   - absolute value
 
+### What _might_ be provided in future?
+
+- Arbitrary-precision integer fractions (the [Rationals](https://en.wikipedia.org/wiki/Rational_number)) via class **`Rat`**
+  - All operations supported by **`Int`**
+  - simplify operation to reduce the size of numerator and denominator at the expense of precision
+
 ### Getting it
 
+Use CPM
+
 ### Using it
+
+Write C++ code
 
 Docs: [saxbophone.com/arby/](saxbophone.com/arby/)
