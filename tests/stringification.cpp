@@ -7,7 +7,7 @@
 #include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
-using namespace com::saxbophone::arby;
+using namespace com::saxbophone::arby::literals;
 
 TEST_CASE("Using std::ostream << arby::Nat generates decimal string of value", "[stringification]") {
     auto values = GENERATE(
@@ -45,11 +45,11 @@ TEST_CASE("Using std::ostream << std::hex << arby::Nat generates hexadecimal str
     auto values = GENERATE(
         table<arby::Nat, std::string>(
             {
-                {0_uarb, "0"},
-                {0x123456789_uarb, "123456789"},
+                {0_nat, "0"},
+                {0x123456789_nat, "123456789"},
                 {0xcafebabe3362, "cafebabe3362"},
-                {0x100f32a8d1_uarb, "100f32a8d1"},
-                {0x900100390_uarb, "900100390"},
+                {0x100f32a8d1_nat, "100f32a8d1"},
+                {0x900100390_nat, "900100390"},
                 {0xf503, "f503"},
             }
         )

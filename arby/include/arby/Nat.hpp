@@ -646,47 +646,59 @@ namespace com::saxbophone::arby {
     };
 
     /**
-     * @brief raw user-defined-literal for Nat class
-     * @param literal the literal
-     * @returns Corresponding arby::Nat value
-     * @note we use a raw literal in this case because as the Nat type is
-     * unbounded, we want to support a potentially infinite number of digits,
-     * or certainly more than can be stored in unsigned long long...
+     * @brief Various custom user-defined-literals for creating arby objects
+     * @note You need to introduce this namespace into global scope with
+     * `using namespace com::saxbophone::arby::literals` in order to be able
+     * to use these literals in your code e.g. `arby::Nat f = 12345_nat`
+     * This can be done without bringing the whole of arby into global scope
+     * and these literals are provided in a sub-namespace for this exact reason
+     * @todo Maybe we should also import this namespace into arby's so that
+     * users get literals in global scope when they put arby into global scope
      */
-    constexpr Nat operator "" _uarb(const char* literal) {
-        // detect number base
-        std::uint8_t base = 10; // base-10 is the fallback base
-        if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
-            switch (literal[1]) {
-            case 'X': // hexadecimal
-            case 'x':
-                base = 16;
-                // advance string pointer to skip the prefix
-                literal = literal + 2;
-                break;
-            case 'B': // binary
-            case 'b':
-                base = 2;
-                literal = literal + 2;
-                break;
-            default: // not allowed --we don't support 0-prefixed octal literals or anything else
-                throw std::invalid_argument("invalid arby::Nat literal");
+    namespace literals {
+        /**
+         * @brief raw user-defined-literal for Nat class
+         * @param literal the literal
+         * @returns Corresponding arby::Nat value
+         * @note we use a raw literal in this case because as the Nat type is
+         * unbounded, we want to support a potentially infinite number of digits,
+         * or certainly more than can be stored in unsigned long long...
+         */
+        constexpr Nat operator "" _nat(const char* literal) {
+            // detect number base
+            std::uint8_t base = 10; // base-10 is the fallback base
+            if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
+                switch (literal[1]) {
+                case 'X': // hexadecimal
+                case 'x':
+                    base = 16;
+                    // advance string pointer to skip the prefix
+                    literal = literal + 2;
+                    break;
+                case 'B': // binary
+                case 'b':
+                    base = 2;
+                    literal = literal + 2;
+                    break;
+                default: // not allowed --we don't support 0-prefixed octal literals or anything else
+                    throw std::invalid_argument("invalid arby::Nat literal");
+                }
             }
+            Nat value; // accumulator
+            // consume digits
+            while (*literal != 0) { // until null-terminator is found
+                std::uint8_t digit = (std::uint8_t)*literal; // get character
+                // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
+                if (digit > 'Z') { digit -= 32; }
+                // calculate digit's value, handling the two contiguous ranges of 0-9 and A-F
+                std::uint8_t digit_value = digit >= 'A' ? (digit - 'A') + 10 : digit - '0';
+                // add to accumulator and then shift it up
+                value *= base;
+                value += digit_value;
+                literal++; // next character
+            }
+            return value;
         }
-        Nat value; // accumulator
-        // consume digits
-        while (*literal != 0) { // until null-terminator is found
-            std::uint8_t digit = (std::uint8_t)*literal; // get character
-            // when dealing with digits, subtract 32 from any after 'Z' to convert lowercase to upper
-            if (digit > 'Z') { digit -= 32; }
-            // calculate digit's value, handling the two contiguous ranges of 0-9 and A-F
-            std::uint8_t digit_value = digit >= 'A' ? (digit - 'A') + 10 : digit - '0';
-            // add to accumulator and then shift it up
-            value *= base;
-            value += digit_value;
-            literal++; // next character
-        }
-        return value;
     }
 }
 
