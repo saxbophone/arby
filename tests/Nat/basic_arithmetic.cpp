@@ -75,7 +75,7 @@ TEST_CASE("arby::Nat(std::string)", "[ctor]") {
 }
 
 TEST_CASE("constexpr arby::Nat", "[constexpr]") {
-    WARN("No constexpr tests written yet");
+    constexpr uintmax_t VALUE = (uintmax_t)arby::Nat(10000000000);
 }
 
 TEST_CASE("arby::Nat prefix increment 0", "[basic-arithmetic]") {
