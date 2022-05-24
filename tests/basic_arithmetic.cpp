@@ -99,6 +99,28 @@ TEST_CASE("arby::Nat postfix increment", "[basic-arithmetic]") {
     CHECK((uintmax_t)previous == input);
 }
 
+///
+
+TEST_CASE("arby::Nat prefix increment requiring additional digits", "[basic-arithmetic]") {
+    // setting input value to BASE-1 means an increment will add another digit
+    arby::Nat original = arby::Nat::BASE - 1;
+    arby::Nat changed = ++original;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE);
+    CHECK((uintmax_t)changed == arby::Nat::BASE);
+}
+
+TEST_CASE("arby::Nat postfix increment requiring additional digits", "[basic-arithmetic]") {
+    // setting input value to BASE-1 means an increment will add another digit
+    arby::Nat original = arby::Nat::BASE - 1;
+    arby::Nat previous = original++;
+
+    CHECK((uintmax_t)original == arby::Nat::BASE);
+    CHECK((uintmax_t)previous == arby::Nat::BASE - 1);
+}
+
+///
+
 TEST_CASE("arby::Nat prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
