@@ -131,4 +131,6 @@ Sample output:
 95529531307686166289154167942030308320
 ```
 
-Docs: [saxbophone.com/arby/](saxbophone.com/arby/)
+### Documentation
+
+Full API Docs available at: [saxbophone.com/arby/](saxbophone.com/arby/)
