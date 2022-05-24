@@ -125,7 +125,7 @@ namespace com::saxbophone::arby {
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         // traps with an exception if there are leading zeroes in the digits array
         constexpr void _trap_leading_zero() const {
-            if (_digits.size() > 0 and _digits.front() == 0) {
+            if (_digits.size() > 1 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
         }
@@ -501,7 +501,7 @@ namespace com::saxbophone::arby {
          * @returns tuple of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          */
-        static constexpr std::tuple<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
                 throw std::domain_error("division by zero");
