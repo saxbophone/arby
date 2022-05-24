@@ -79,6 +79,22 @@ TEST_CASE("constexpr arby::Nat", "[constexpr]") {
     WARN("No constexpr tests written yet");
 }
 
+TEST_CASE("arby::Nat prefix increment 0", "[basic-arithmetic]") {
+    arby::Nat original;
+    arby::Nat changed = ++original;
+
+    CHECK((uintmax_t)original == 1);
+    CHECK((uintmax_t)changed == 1);
+}
+
+TEST_CASE("arby::Nat postfix increment 0", "[basic-arithmetic]") {
+    arby::Nat original;
+    arby::Nat previous = original++;
+
+    CHECK((uintmax_t)original == 1);
+    CHECK((uintmax_t)previous == 0);
+}
+
 TEST_CASE("arby::Nat prefix increment", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max() - 1)));
 

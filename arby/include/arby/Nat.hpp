@@ -260,22 +260,18 @@ namespace com::saxbophone::arby {
          * @returns new value of Nat object after incrementing
          */
         constexpr Nat& operator++() {
-            // empty digits vector (means value is zero) is a special case
-            if (_digits.size() == 0) {
-                _digits.push_back(1);
-            } else {
-                // increment least significant digit then rollove remaining digits as needed
-                auto it = _digits.rbegin();
-                do {
-                    (*it)++; // increment digit
-                    ++it; // increment index
-                    // increment remaining digits (rollover) as needed
-                } while (it != _digits.rend() and *it == 0); // last digit overflowed to zero
-                // if last digit is zero, we need another one
-                if (_digits.front() == 0) {
-                    _digits.push_front(1);
+            // increment least significant digit then rollover remaining digits as needed
+            for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
+                // only contine to next digit if incrementing this one rolls over
+                if (++(*it) != 0) {
+                    break;
                 }
             }
+            // if last digit is zero, we need another one
+            if (_digits.empty() or _digits.front() == 0) {
+                _digits.push_front(1);
+            }
+            _trap_leading_zero();
             return *this; // return new value by reference
         }
         /**
