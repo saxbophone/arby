@@ -293,13 +293,12 @@ namespace com::saxbophone::arby {
             if (_digits.size() == 0) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
-                // decrement least significant digit
-                auto it = _digits.rbegin();
-                (*it)--;
-                // decrement remaining digits (borrow) as needed
-                while (it != _digits.rend() and *it == std::numeric_limits<StorageType>::max()) { // last digit overflowed to zero
-                    ++it; // increment index
-                    (*it)--; // decrement digit
+                // decrement least significant digit then borrow from remaining digits as needed
+                for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
+                    // only continue to next digit if decrementing this one rolls over
+                    if (--(*it) != std::numeric_limits<StorageType>::max()) {
+                        break;
+                    }
                 }
                 // if last digit is zero, remove it
                 if (_digits.front() == 0) {
