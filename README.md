@@ -73,6 +73,54 @@ CPMFindPackage(
 
 ### Using it
 
-Write C++ code
+Short demo program:
+
+```c++
+#include <iostream>
+
+#include <arby/Nat.hpp>
+
+
+using namespace com::saxbophone;
+
+int main() {
+    // powers of 11
+    for (unsigned int power = 0; power < 20; power++) {
+        std::cout << arby::Nat::pow(11, power) << std::endl;
+    }
+    std::cout << arby::Nat::pow(2, 64) << std::endl;
+    // demo of custom literals
+    using namespace com::saxbophone::arby::literals;
+    arby::Nat foo = 1234567891011121314151617181920_nat * 77378921_nat;
+    std::cout << foo << std::endl;
+}
+```
+
+Sample output:
+
+```
+1
+11
+121
+1331
+14641
+161051
+1771561
+19487171
+214358881
+2357947691
+25937424601
+285311670611
+3138428376721
+34522712143931
+379749833583241
+4177248169415651
+45949729863572161
+505447028499293771
+5559917313492231481
+61159090448414546291
+18446744073709551616
+95529531307686166289154167942030308320
+```
 
 Docs: [saxbophone.com/arby/](saxbophone.com/arby/)
