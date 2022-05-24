@@ -148,8 +148,8 @@ TEST_CASE("arby::Nat prefix decrement requiring digit removal", "[basic-arithmet
     arby::Nat original = arby::Nat::BASE;
     arby::Nat changed = --original;
 
-    CHECK((uintmax_t)original == arby::Nat::BASE);
-    CHECK((uintmax_t)changed == arby::Nat::BASE);
+    CHECK((uintmax_t)original == arby::Nat::BASE - 1);
+    CHECK((uintmax_t)changed == arby::Nat::BASE - 1);
 }
 
 TEST_CASE("arby::Nat postfix decrement requiring digit removal", "[basic-arithmetic]") {
