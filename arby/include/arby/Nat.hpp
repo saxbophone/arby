@@ -601,6 +601,12 @@ namespace com::saxbophone::arby {
         /**
          * @returns base raised to the power of exponent
          * @param base,exponent parameters for the base and exponent
+         * @todo This currently uses a divide-and-conquer approach that divides
+         * exponent by 2 each time, for a binary-recursion on the order of
+         * \f$\mathcal{O}(n\log{}n)\f$. This is fine, but it would be nice to
+         * see if we can make incremental improvements to the optimisation by
+         * using factors, logarithms or something else to divide the exponent
+         * into more than 2 chunks at each level of recursion.
          */
         static constexpr Nat pow(const Nat& base, const Nat& exponent) {
             // use divide-and-conquer recursion to break up huge powers into products of smaller powers
