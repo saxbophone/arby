@@ -14,6 +14,7 @@ target_sources(
         divmod.cpp
         misc.cpp
         multiplication.cpp
+        namespaces.cpp
         pow.cpp
         self_assignment.cpp
         stringification.cpp
