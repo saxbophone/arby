@@ -1,6 +1,6 @@
 # begin basic metadata
-# minimum CMake version required for C++20 support, among other things
-cmake_minimum_required(VERSION 3.15)
+# minimum CMake version required for C++20 support and precompiled headers
+cmake_minimum_required(VERSION 3.16)
 
 # detect if Arby is being used as a sub-project of another CMake project
 if(NOT DEFINED PROJECT_NAME)

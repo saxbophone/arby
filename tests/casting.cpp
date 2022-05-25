@@ -66,6 +66,7 @@ TEST_CASE("arby::Nat::from_float() with positive value") {
             )
         )
     );
+    CAPTURE(power, value);
 
     arby::Nat object = arby::Nat::from_float(value);
 
