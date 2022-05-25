@@ -59,7 +59,15 @@ namespace com::saxbophone::arby {
         }
         return power;
     }
-    // returns pair of {ceil, floor} for integer logarithm of x, in given base
+    /**
+     * @brief Calculates integer log of `x` in `base`
+     * @returns pair of \f$floor(log_b(x)),\ ceil(log_b(x))\f$ for the given
+     * base \f$b\f$ and \f$x\f$
+     * @param base base to use for \f$b\f$
+     * @param x value to get the log of
+     * @throws std::domain_error when \f$b<2\f$
+     * @throws std::domain_error when \f$x<1\f$
+     */
     constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
             throw std::domain_error("ilog: base cannot be < 2");
