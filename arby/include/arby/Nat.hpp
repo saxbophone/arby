@@ -498,7 +498,7 @@ namespace com::saxbophone::arby {
         /**
          * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
          * @param lhs,rhs operands for the division/modulo operation
-         * @returns tuple of {quotient, remainder}
+         * @returns pair of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          */
         static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
