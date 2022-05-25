@@ -26,6 +26,7 @@ target_link_libraries(
         arby
         Catch2::Catch2  # unit testing framework
 )
+target_precompile_headers(tests PRIVATE <arby/Nat.hpp>)
 
 enable_testing()
 
