@@ -66,7 +66,16 @@ namespace com::saxbophone::arby {
         } else if (x < 1) {
             throw std::domain_error("ilog: x cannot be < 1");
         }
-        return {};
+        // find the smallest power of base that is just >= than x
+        Nat power = 1;
+        Nat floor = 0;
+        Nat exponent = 0;
+        while (power < x) {
+            power *= base;
+            floor = exponent++; // increment and store old value in floor
+        }
+        // floor = ceil when power = x
+        return {power == x ? exponent : floor, exponent};
     }
 }
 
