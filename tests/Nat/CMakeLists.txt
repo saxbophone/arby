@@ -6,7 +6,6 @@ add_library(
         misc.cpp
         multiplication.cpp
         namespaces.cpp
-        pow.cpp
         self_assignment.cpp
         stringification.cpp
         user_defined_literals.cpp
