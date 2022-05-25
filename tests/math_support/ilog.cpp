@@ -56,3 +56,26 @@ TEST_CASE("arby::ilog(base>1, nonzero)", "[math-support][ilog]") {
     CHECK(result_floor == expected_floor);
     CHECK(result_ceil == expected_ceil);
 }
+
+TEST_CASE("arby::ilog() with hardcoded values", "[math-support][ilog]") {
+    auto [base, x, expected_floor, expected_ceil] = GENERATE(
+        table<uintmax_t, uintmax_t, uintmax_t, uintmax_t>(
+            {
+                {2, 1, 0, 0},
+                {3, 10, 2, 3},
+                {4, 5, 1, 2},
+                {33, 10, 0, 1},
+                {2068, 1, 0, 0},
+                {2068, 2, 0, 1},
+                {10, 317, 2, 3},
+                {3, 317, 5, 6}
+            }
+        )
+    );
+
+    auto [result_floor, result_ceil] = arby::ilog(base, x);
+
+    CAPTURE(base, x);
+    CHECK(result_floor == expected_floor);
+    CHECK(result_ceil == expected_ceil);
+}
