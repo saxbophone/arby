@@ -1,5 +1,6 @@
 add_library(
     math-support OBJECT
+        ilog.cpp
         pow.cpp
 )
 target_link_libraries(math-support PRIVATE tests-config)

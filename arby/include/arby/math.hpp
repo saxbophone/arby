@@ -19,6 +19,8 @@
 #ifndef COM_SAXBOPHONE_ARBY_MATH_HPP
 #define COM_SAXBOPHONE_ARBY_MATH_HPP
 
+#include <utility>
+
 #include <arby/Nat.hpp>
 
 
@@ -55,6 +57,10 @@ namespace com::saxbophone::arby {
             power *= base;
         }
         return power;
+    }
+    // returns pair of {ceil, floor} for integer logarithm of x, in given base
+    constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
+        return {};
     }
 }
 

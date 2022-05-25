@@ -24,6 +24,7 @@ add_executable(tests)
 target_sources(
     tests PRIVATE
         main.cpp
+        $<TARGET_OBJECTS:math-support>
         $<TARGET_OBJECTS:Nat>
 )
 target_link_libraries(
