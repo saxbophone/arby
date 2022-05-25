@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief This file forms part of arby
+ * @brief Nat class supporting arbitrary-size unsigned (Natural) integers
+ * @note This file forms part of arby
  * @details arby is a C++ library providing arbitrary-precision integer types
  * @warning arby is alpha-quality software
  *

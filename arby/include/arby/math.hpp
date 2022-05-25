@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief This file forms part of arby
+ * @brief cmath-like math support functions
+ * @note This file forms part of arby
  * @details arby is a C++ library providing arbitrary-precision integer types
  * @warning arby is alpha-quality software
  *
@@ -31,6 +32,7 @@ namespace com::saxbophone::arby {
      * see if we can make incremental improvements to the optimisation by
      * using factors, logarithms or something else to divide the exponent
      * into more than 2 chunks at each level of recursion.
+     * @relatedalso Nat
      */
     constexpr Nat pow(const Nat& base, const Nat& exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers

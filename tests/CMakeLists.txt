@@ -7,7 +7,6 @@ CPMFindPackage(
 
 # common option-propagating target to use for test suite sub-targets
 add_library(tests-config INTERFACE)
-target_precompile_headers(tests-config INTERFACE <arby/Nat.hpp>)
 target_link_libraries(
     tests-config
     INTERFACE
