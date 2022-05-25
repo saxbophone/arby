@@ -598,38 +598,6 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
         }
-        /**
-         * @returns base raised to the power of exponent
-         * @param base,exponent parameters for the base and exponent
-         * @todo This currently uses a divide-and-conquer approach that divides
-         * exponent by 2 each time, for a binary-recursion on the order of
-         * \f$\mathcal{O}(n\log{}n)\f$. This is fine, but it would be nice to
-         * see if we can make incremental improvements to the optimisation by
-         * using factors, logarithms or something else to divide the exponent
-         * into more than 2 chunks at each level of recursion.
-         */
-        static constexpr Nat pow(const Nat& base, const Nat& exponent) {
-            // use divide-and-conquer recursion to break up huge powers into products of smaller powers
-            // exponent = 0 is our base case to terminate the recursion
-            if (exponent == 0) {
-                return 1;
-            } else if (exponent == 1) {
-                // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
-                return base;
-            } else if (exponent == 2) {
-                // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
-                return base * base;
-            }
-            auto [quotient, remainder] = Nat::divmod(exponent, 2);
-            // instead of calculating x^n, do x^(n/2)
-            Nat power = Nat::pow(base, quotient);
-            power *= power;
-            // and multiply by base again if n was odd
-            if (remainder == 1) {
-                power *= base;
-            }
-            return power;
-        }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
         // constexpr Nat& operator<<=(const Nat& n) {
