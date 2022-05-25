@@ -47,6 +47,9 @@ namespace com::saxbophone::arby {
         return output;
     }
 
+    /**
+     * @see std::ostream& Nat::operator<<(std::ostream& os, const Nat& object)
+     */
     std::ostream& operator<<(std::ostream& os, const Nat& object) {
         // the implementation of std::dec, std::hex and std::oct guarantees that
         // only one of them will be set in the IO stream flags if the proper

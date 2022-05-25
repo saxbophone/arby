@@ -32,6 +32,21 @@
 #include "codlili.hpp"
 
 
+/**
+ * @brief Main namespace
+ * @details Usage:
+ * @code{.cpp}
+ * using namespace com::saxbophone;
+ * using namespace com::saxbophone::arby::literals;
+ * @endcode
+ * - Introduces library symbols into scope `arby`
+ * - Introduces literal operators into global scope, allowing them to be used as literals
+ * @details OR:
+ * @code{.cpp}
+ * using namespace com::saxbophone::arby;
+ * @endcode
+ * - Introduces all library symbols into global scope, including literals
+ */
 namespace com::saxbophone::arby {
     namespace PRIVATE {
         /*
@@ -246,10 +261,8 @@ namespace com::saxbophone::arby {
             return this->_cast_to<long double>();
         }
         /**
-         * @brief custom ostream operator that allows this class to be printed
+         * @brief custom ostream operator that allows class Nat to be printed
          * with std::cout and friends
-         * @param os stream to output to
-         * @param object Nat to print
          */
         friend std::ostream& operator<<(std::ostream& os, const Nat& object);
         /**
@@ -653,8 +666,9 @@ namespace com::saxbophone::arby {
      * to use these literals in your code e.g. `arby::Nat f = 12345_nat`
      * This can be done without bringing the whole of arby into global scope
      * and these literals are provided in a sub-namespace for this exact reason
-     * @todo Maybe we should also import this namespace into arby's so that
-     * users get literals in global scope when they put arby into global scope
+     * @note If you introduce namespace com::saxbophone::arby into global scope,
+     * you don't need to also introduce this literals namespace --arby introduces
+     * this one automatically.
      */
     namespace literals {
         /**
@@ -664,6 +678,7 @@ namespace com::saxbophone::arby {
          * @note we use a raw literal in this case because as the Nat type is
          * unbounded, we want to support a potentially infinite number of digits,
          * or certainly more than can be stored in unsigned long long...
+         * @relatedalso com::saxbophone::arby::Nat
          */
         constexpr Nat operator "" _nat(const char* literal) {
             // detect number base
@@ -701,6 +716,9 @@ namespace com::saxbophone::arby {
             return value;
         }
     }
+
+    // introduce literals namespace into the scope of arby namespace
+    using namespace literals;
 }
 
 // adding template specialisation to std::numeric_limits<> for arby::Nat
