@@ -58,7 +58,7 @@ TEST_CASE("arby::Nat::from_float() with non-finite value throws std::domain_erro
 
 TEST_CASE("arby::Nat::from_float() with value between 0 and 1") {
     // NOTE: top range is the last float value > 1
-    long double zero_ish = GENERATE(0.0L, std::nextafter(1.0L, 0.0L));
+    long double zero_ish = GENERATE(take(1000, random(0.0L, std::nextafter(1.0L, 0.0L))));
     CAPTURE(zero_ish);
 
     arby::Nat object = arby::Nat::from_float(zero_ish);
