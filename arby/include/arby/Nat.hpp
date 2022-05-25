@@ -198,7 +198,7 @@ namespace com::saxbophone::arby {
                 throw std::domain_error("Nat cannot be Infinite or NaN");
             }
             Nat output;
-            while (value > 0) {
+            while (value > 1) { // value < 1 is zero which we store implicitly as empty array
                 StorageType digit = (StorageType)std::fmod(value, Nat::BASE);
                 output._digits.push_front(digit);
                 value /= Nat::BASE;
