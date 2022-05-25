@@ -27,7 +27,7 @@
 #include <limits>
 #include <string>
 #include <stdexcept>
-#include <tuple>
+#include <utility>
 
 #include "codlili.hpp"
 
@@ -501,7 +501,7 @@ namespace com::saxbophone::arby {
          * @returns tuple of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          */
-        static constexpr std::tuple<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.size() == 0) {
                 throw std::domain_error("division by zero");

@@ -133,4 +133,4 @@ Sample output:
 
 ### Documentation
 
-Full API Docs available at: [saxbophone.com/arby/](saxbophone.com/arby/)
+Full API Docs available at: [saxbophone.com/arby/](https://saxbophone.com/arby/)
