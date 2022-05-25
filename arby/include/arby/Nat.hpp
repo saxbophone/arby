@@ -27,7 +27,7 @@
 #include <limits>
 #include <string>
 #include <stdexcept>
-#include <tuple>
+#include <utility>
 
 #include "codlili.hpp"
 
@@ -125,7 +125,7 @@ namespace com::saxbophone::arby {
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         // traps with an exception if there are leading zeroes in the digits array
         constexpr void _trap_leading_zero() const {
-            if (_digits.size() > 1 and _digits.front() == 0) {
+            if (_digits.size() > 0 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
         }
