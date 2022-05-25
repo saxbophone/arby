@@ -19,6 +19,7 @@
 #ifndef COM_SAXBOPHONE_ARBY_MATH_HPP
 #define COM_SAXBOPHONE_ARBY_MATH_HPP
 
+#include <stdexcept>
 #include <utility>
 
 #include <arby/Nat.hpp>
@@ -60,6 +61,11 @@ namespace com::saxbophone::arby {
     }
     // returns pair of {ceil, floor} for integer logarithm of x, in given base
     constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
+        if (base < 2) {
+            throw std::domain_error("ilog: base cannot be < 2");
+        } else if (x < 1) {
+            throw std::domain_error("ilog: x cannot be < 1");
+        }
         return {};
     }
 }
