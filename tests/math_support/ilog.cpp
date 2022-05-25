@@ -34,8 +34,8 @@ static std::pair<uintmax_t, uintmax_t> integer_log(uintmax_t base, uintmax_t x) 
 
 TEST_CASE("arby::ilog(base>1, nonzero) with small base", "[math-support][ilog]") {
     // don't use a base that's too small to get a variety of results
-    uintmax_t base = GENERATE(take(1000, random((uintmax_t)2, (uintmax_t)1000)));
-    uintmax_t x = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t base = GENERATE(take(100, random((uintmax_t)2, (uintmax_t)1000)));
+    uintmax_t x = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     auto [expected_floor, expected_ceil] = integer_log(base, x);
 
     auto [result_floor, result_ceil] = arby::ilog(base, x);
@@ -46,8 +46,8 @@ TEST_CASE("arby::ilog(base>1, nonzero) with small base", "[math-support][ilog]")
 }
 
 TEST_CASE("arby::ilog(base>1, nonzero)", "[math-support][ilog]") {
-    uintmax_t base = GENERATE(take(1000, random((uintmax_t)2, std::numeric_limits<uintmax_t>::max())));
-    uintmax_t x = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t base = GENERATE(take(100, random((uintmax_t)2, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t x = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     auto [expected_floor, expected_ceil] = integer_log(base, x);
 
     auto [result_floor, result_ceil] = arby::ilog(base, x);
