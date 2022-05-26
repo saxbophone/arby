@@ -604,7 +604,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
-                _digits.push_front(rhs._digits.size(), 0); // add leading zeroes
+                _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
             }
             auto it = _digits.begin();
             auto rhs_it = rhs._digits.begin();
@@ -673,7 +673,7 @@ namespace com::saxbophone::arby {
             auto rhs_it = rhs._digits.begin();
             std::size_t l = lhs._digits.size();
             std::size_t r = rhs._digits.size();
-            while (lhs_it != lhs._digits.end() and rhs_it != rhs._digits.end()) {
+            while (lhs_it != lhs._digits.end() or rhs_it != rhs._digits.end()) {
                 if (l > r) {
                     result._digits.push_back(*lhs_it); // XOR with zero = self
                     l--;
@@ -694,6 +694,7 @@ namespace com::saxbophone::arby {
                     rhs_it++;
                 }
             }
+            result._trap_leading_zero(); // XXX: should never trap, TODO: remove
             return result;
         }
         // XXX: unimplemented shift operators commented out until implemented
