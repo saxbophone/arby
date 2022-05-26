@@ -604,34 +604,60 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
-                // add leading zeroes
-                _digits.push_front(rhs._digits.size(), 0);
+                _digits.push_front(rhs._digits.size(), 0); // add leading zeroes
             }
             auto it = _digits.begin();
             auto rhs_it = rhs._digits.begin();
             // if this has more digits than rhs, skip them (OR with implicit 0)
             if (_digits.size() > rhs._digits.size()) {
-                for (std::size_t i = 0; i < _digits.size() - rhs._digits.size(); i++) {
+                for (std::size_t i = 0; i < (_digits.size() - rhs._digits.size()); i++) {
                     it++;
                 }
             }
             for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
                 *it |= *rhs_it;
             }
-            _trap_leading_zero();
+            _trap_leading_zero(); // XXX: should never trap, TODO: remove
             return *this;
         }
         // bitwise OR operator for Nat
         friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
-            return {};
+            lhs |= rhs; // reuse member operator
+            return lhs;
         }
         // bitwise AND-assignment
         constexpr Nat& operator&=(const Nat& rhs) {
+            /*
+             * if rhs has fewer digits than this, we can remove this' leading
+             * digits because they would be AND'ed with implicit zero which is
+             * always zero
+             */
+            if (rhs._digits.size() < _digits.size()) {
+                while (_digits.size() > rhs._digits.size()) {
+                    _digits.pop_front();
+                }
+            }
+            auto it = _digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            // if rhs has more digits than this, skip them (AND with implicit 0)
+            if (rhs._digits.size() > _digits.size()) {
+                for (std::size_t i = 0; i < (rhs._digits.size() - _digits.size()); i++) {
+                    rhs_it++;
+                }
+            }
+            for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
+                *it &= *rhs_it;
+            }
+            // remove any leading zeroes
+            while (_digits.size() > 0 and _digits.front() == 0) {
+                _digits.pop_front();
+            }
             return *this;
         }
         // bitwise AND operator for Nat
         friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
-            return {};
+            lhs &= rhs; // reuse member operator
+            return lhs;
         }
         // bitwise XOR-assignment
         constexpr Nat& operator^=(const Nat& rhs) {
