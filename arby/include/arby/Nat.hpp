@@ -257,16 +257,28 @@ namespace com::saxbophone::arby {
             return this->_cast_to<uintmax_t>();
         }
         /**
-         * @returns Value of this Nat object cast to long long double
+         * @returns Value of this Nat object cast to long double
          */
         explicit constexpr operator long double() const {
             return this->_cast_to<long double>();
         }
         /**
+         * @returns Value of this Nat object cast to float
+         */
+        explicit constexpr operator float() const {
+            return this->_cast_to<float>();
+        }
+        /**
+         * @returns Value of this Nat object cast to double
+         */
+        explicit constexpr operator double() const {
+            return this->_cast_to<double>();
+        }
+        /**
          * @returns Value of this Nat object cast to any numeric type
          * @tparam To The data type to cast to
          */
-        template <typename To> requires std::numeric_limits<To>::is_integer
+        template <typename To>
         explicit constexpr operator To() const {
             // prevent overflow of To if it's a bounded type
             if constexpr (std::numeric_limits<To>::is_bounded) {
