@@ -257,10 +257,42 @@ namespace com::saxbophone::arby {
             return this->_cast_to<uintmax_t>();
         }
         /**
-         * @returns Value of this Nat object cast to long long double
+         * @returns Value of this Nat object cast to long double
          */
         explicit constexpr operator long double() const {
             return this->_cast_to<long double>();
+        }
+        /**
+         * @returns Value of this Nat object cast to float
+         */
+        explicit constexpr operator float() const {
+            return this->_cast_to<float>();
+        }
+        /**
+         * @returns Value of this Nat object cast to double
+         */
+        explicit constexpr operator double() const {
+            return this->_cast_to<double>();
+        }
+        /**
+         * @returns Value of this Nat object cast to any numeric type
+         * @tparam To The data type to cast to
+         */
+        template <typename To>
+        explicit constexpr operator To() const {
+            // prevent overflow of To if it's a bounded type
+            if constexpr (std::numeric_limits<To>::is_bounded) {
+                if (*this > std::numeric_limits<To>::max()) {
+                    throw std::range_error("value too large for destination type");
+                }
+            }
+            // take a short-cut if destination type is bounded and is not bigger than largest digit value
+            if constexpr (std::numeric_limits<To>::is_bounded and std::numeric_limits<To>::max() <= (BASE - 1)) {
+                // at this point, out-of-bounds has already been checked. Just return last digit
+                return _digits.empty() ? (To)0 : (To)_digits.back();
+            } else {
+                return this->_cast_to<To>();
+            }
         }
         /**
          * @brief custom ostream operator that allows class Nat to be printed
