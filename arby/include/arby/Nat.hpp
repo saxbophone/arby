@@ -295,7 +295,7 @@ namespace com::saxbophone::arby {
             return this->_cast_to<To>();
         }
         /**
-         * @brief custom ostream operator that allows this class to be printed
+         * @brief custom ostream operator that allows class Nat to be printed
          * with std::cout and friends
          */
         friend std::ostream& operator<<(std::ostream& os, const Nat& object);
