@@ -600,7 +600,9 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
         }
-        // bitwise OR-assignment
+        /**
+         * @brief bitwise OR-assignment
+         */
         constexpr Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
@@ -620,12 +622,16 @@ namespace com::saxbophone::arby {
             _trap_leading_zero(); // XXX: should never trap, TODO: remove
             return *this;
         }
-        // bitwise OR operator for Nat
+        /**
+         * @brief bitwise OR operator for Nat
+         */
         friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
             lhs |= rhs; // reuse member operator
             return lhs;
         }
-        // bitwise AND-assignment
+        /**
+         * @brief bitwise AND-assignment
+         */
         constexpr Nat& operator&=(const Nat& rhs) {
             /*
              * if rhs has fewer digits than this, we can remove this' leading
@@ -654,19 +660,25 @@ namespace com::saxbophone::arby {
             }
             return *this;
         }
-        // bitwise AND operator for Nat
+        /**
+         * @brief bitwise AND operator for Nat
+         */
         friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
             lhs &= rhs; // reuse member operator
             return lhs;
         }
-        // bitwise XOR-assignment
+        /**
+         * @brief bitwise XOR-assignment
+         */
         constexpr Nat& operator^=(const Nat& rhs) {
             Nat result = *this ^ rhs; // reuse friend function
             // re-assign digits to this
             _digits = result._digits;
             return *this;
         }
-        // bitwise XOR operator for Nat
+        /**
+         * @brief bitwise XOR operator for Nat
+         */
         friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
             Nat result;
             auto lhs_it = lhs._digits.begin();
