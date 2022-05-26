@@ -123,21 +123,6 @@ namespace com::saxbophone::arby {
     // end of PRIVATE
 
     /**
-     * @brief Concept specifying which types Nat can be explicitly cast to
-     * @details Nat has a templated explicit cast operator which can cast to any
-     * data type which satisfies the following requirements:
-     * @details - Type T can be cast to Nat
-     * @details - `T *= Nat::StorageType` is valid and returns T or T&
-     * @details - `T += Nat::StorageType` is valid and returns T or T&
-     */
-    template <typename T, typename N> concept CastableFromNat =
-    requires(T a, typename N::StorageType b) {
-        { (N)a } -> std::convertible_to<N>;
-        { a *= b } -> std::convertible_to<T>;
-        { a += b } -> std::convertible_to<T>;
-    };
-
-    /**
      * @brief Arbitrary-precision unsigned integer type
      * @details This is named after \f$\mathbb{N}\f$, the set of Natural numbers,
      * which this type models
@@ -278,24 +263,21 @@ namespace com::saxbophone::arby {
             return this->_cast_to<long double>();
         }
         /**
+<<<<<<< HEAD
+         * @brief custom ostream operator that allows class Nat to be printed
+=======
          * @returns Value of this Nat object cast to any numeric type
-         * @tparam To The data type to cast to
-         * @note Type T must satisfy certain constraints for this template
+         * @tparam Numeric The data type to cast to
+         * @note Type Numeric must satisfy certain constraints for this template
          * to be valid. These are specified using C++20 concepts/constraints.
-         * @see `CastableFromNat` for details of the constraints for `To`
          */
-        template <CastableFromNat<Nat> To>
-        explicit constexpr operator To() const {
-            // prevent overflow of To if it's a bounded type
-            if constexpr (std::numeric_limits<To>::is_bounded) {
-                if (*this > (Nat)std::numeric_limits<To>::max()) {
-                    throw std::range_error("value too large for uintmax_t");
-                }
-            }
-            return this->_cast_to<To>();
+        template <typename Numeric>
+        explicit constexpr operator Numeric() const {
+            return {};
         }
         /**
          * @brief custom ostream operator that allows this class to be printed
+>>>>>>> Wrote code to make tests compile, although they don't pass
          * with std::cout and friends
          */
         friend std::ostream& operator<<(std::ostream& os, const Nat& object);
