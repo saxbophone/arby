@@ -600,6 +600,34 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
         }
+        // bitwise OR-assignment
+        constexpr Nat& operator|=(const Nat& rhs) {
+            return *this;
+        }
+        // bitwise OR operator for Nat
+        friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
+            return {};
+        }
+        // bitwise AND-assignment
+        constexpr Nat& operator&=(const Nat& rhs) {
+            return *this;
+        }
+        // bitwise AND operator for Nat
+        friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
+            return {};
+        }
+        // bitwise XOR-assignment
+        constexpr Nat& operator^=(const Nat& rhs) {
+            return *this;
+        }
+        // bitwise XOR operator for Nat
+        friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
+            return {};
+        }
+        // complement operator
+        constexpr Nat operator~() {
+            return {};
+        }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
         // constexpr Nat& operator<<=(const Nat& n) {
