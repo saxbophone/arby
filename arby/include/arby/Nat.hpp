@@ -124,7 +124,8 @@ namespace com::saxbophone::arby {
 
     /**
      * @brief Arbitrary-precision unsigned integer type
-     * @details This is named after 𝐍, the set of Natural numbers, which this type models
+     * @details This is named after \f$\mathbb{N}\f$, the set of Natural numbers,
+     * which this type models
      * @note `std::numeric_limits<Nat>` is specialised such that most of the
      * members of that type are implemented to describe the traits of this type.
      * @note Exceptions include any members of std::numeric_limits<> which
