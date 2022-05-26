@@ -40,6 +40,14 @@ TEST_CASE("arby::Nat bitwise OR with large and small value", "[bitwise]") {
     CHECK((uintmax_t)(small_object | large_object) == result);
 }
 
+TEST_CASE("arby::Nat bitwise OR with zero", "[bitwise]") {
+    uintmax_t value = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    arby::Nat object = value;
+
+    // OR with zero should equal self
+    CHECK((object | 0) == object);
+}
+
 TEST_CASE("arby::Nat bitwise assignment-AND", "[bitwise]") {
     uintmax_t value = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     uintmax_t other = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
@@ -70,6 +78,14 @@ TEST_CASE("arby::Nat bitwise AND with large and small value", "[bitwise]") {
 
     CHECK((uintmax_t)(large_object & small_object) == result);
     CHECK((uintmax_t)(small_object & large_object) == result);
+}
+
+TEST_CASE("arby::Nat bitwise AND with zero", "[bitwise]") {
+    uintmax_t value = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    arby::Nat object = value;
+
+    // AND with zero should equal zero
+    CHECK((object & 0) == 0);
 }
 
 TEST_CASE("arby::Nat bitwise assignment-XOR", "[bitwise]") {
@@ -103,4 +119,12 @@ TEST_CASE("arby::Nat bitwise XOR with large and small value", "[bitwise]") {
 
     CHECK((uintmax_t)(large_object ^ small_object) == result);
     CHECK((uintmax_t)(small_object ^ large_object) == result);
+}
+
+TEST_CASE("arby::Nat bitwise XOR with zero", "[bitwise]") {
+    uintmax_t value = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    arby::Nat object = value;
+
+    // XOR with zero should equal self
+    CHECK((object ^ 0) == object);
 }
