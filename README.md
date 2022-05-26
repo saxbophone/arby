@@ -34,11 +34,11 @@ arby is designed with the following goals in mind:
   - All comparisons
   - cast to/from `uintmax_t` and `long double`
   - conversion to/from decimal, octal and hexadecimal string
+  - bitwise operators
 
 ### What will be provided in future?
 
 - Additions to **`Nat`**:
-  - bitwise operators
   - bit-shift operators
 - Arbitrary-precision signed integers (the [Integers](https://en.wikipedia.org/wiki/Integer)) via class **`Int`**
   - All operations supported by **`Nat`** with the exception of bitwise ones

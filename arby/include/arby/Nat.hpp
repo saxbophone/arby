@@ -619,7 +619,6 @@ namespace com::saxbophone::arby {
             for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
                 *it |= *rhs_it;
             }
-            _trap_leading_zero(); // XXX: should never trap, TODO: remove
             return *this;
         }
         /**
@@ -685,6 +684,7 @@ namespace com::saxbophone::arby {
             auto rhs_it = rhs._digits.begin();
             std::size_t l = lhs._digits.size();
             std::size_t r = rhs._digits.size();
+            // consume only one side when it has more unprocessed digits than the other
             while (lhs_it != lhs._digits.end() or rhs_it != rhs._digits.end()) {
                 if (l > r) {
                     result._digits.push_back(*lhs_it); // XOR with zero = self
@@ -694,9 +694,9 @@ namespace com::saxbophone::arby {
                     result._digits.push_back(*rhs_it); // XOR with zero = self
                     r--;
                     rhs_it++;
-                } else {
-                    // if the first digit, avoid pushing if zero to avoid leading zeroes
+                } else { // otherwise, consume both sides
                     auto answer = *lhs_it ^ *rhs_it;
+                    // if the first digit, avoid pushing if zero to avoid leading zeroes
                     if (not result._digits.empty() or answer != 0) {
                         result._digits.push_back(answer);
                     }
@@ -706,7 +706,6 @@ namespace com::saxbophone::arby {
                     rhs_it++;
                 }
             }
-            result._trap_leading_zero(); // XXX: should never trap, TODO: remove
             return result;
         }
         // XXX: unimplemented shift operators commented out until implemented
