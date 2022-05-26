@@ -20,7 +20,13 @@ TEST_CASE("arby::Nat bitwise assignment-OR", "[bitwise]") {
 }
 
 TEST_CASE("arby::Nat bitwise OR") {
-    WARN("No tests");
+    uintmax_t lhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t rhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t result = lhs | rhs;
+    arby::Nat object_lhs = lhs;
+    arby::Nat object_rhs = rhs;
+
+    CHECK((uintmax_t)(object_lhs | object_rhs) == result);
 }
 
 TEST_CASE("arby::Nat bitwise assignment-AND", "[bitwise]") {
@@ -35,9 +41,14 @@ TEST_CASE("arby::Nat bitwise assignment-AND", "[bitwise]") {
 }
 
 TEST_CASE("arby::Nat bitwise AND") {
-    WARN("No tests");
-}
+    uintmax_t lhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t rhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t result = lhs & rhs;
+    arby::Nat object_lhs = lhs;
+    arby::Nat object_rhs = rhs;
 
+    CHECK((uintmax_t)(object_lhs & object_rhs) == result);
+}
 TEST_CASE("arby::Nat bitwise assignment-XOR", "[bitwise]") {
     uintmax_t value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     uintmax_t other = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
@@ -50,9 +61,18 @@ TEST_CASE("arby::Nat bitwise assignment-XOR", "[bitwise]") {
 }
 
 TEST_CASE("arby::Nat bitwise XOR", "[bitwise]") {
-    WARN("No tests");
+    uintmax_t lhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t rhs = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    uintmax_t result = lhs ^ rhs;
+    arby::Nat object_lhs = lhs;
+    arby::Nat object_rhs = rhs;
+
+    CHECK((uintmax_t)(object_lhs ^ object_rhs) == result);
 }
 
 TEST_CASE("arby::Nat bitwise COMPLEMENT", "[bitwise]") {
-    WARN("No tests");
+    uintmax_t value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    arby::Nat object = value;
+
+    CHECK((uintmax_t)(~object) == ~value);
 }
