@@ -53,10 +53,11 @@ TEST_CASE("arby::Nat bitwise assignment-XOR", "[bitwise]") {
     uintmax_t value = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     uintmax_t other = GENERATE(take(200, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     arby::Nat object = value;
+    CAPTURE(value, other);
     value ^= other;
 
     object ^= other;
-
+    CAPTURE(value, other);
     CHECK((uintmax_t)object == value);
 }
 

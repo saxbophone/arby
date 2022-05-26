@@ -661,11 +661,40 @@ namespace com::saxbophone::arby {
         }
         // bitwise XOR-assignment
         constexpr Nat& operator^=(const Nat& rhs) {
+            Nat result = *this ^ rhs; // reuse friend function
+            // re-assign digits to this
+            _digits = result._digits;
             return *this;
         }
         // bitwise XOR operator for Nat
         friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
-            return {};
+            Nat result;
+            auto lhs_it = lhs._digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            std::size_t l = lhs._digits.size();
+            std::size_t r = rhs._digits.size();
+            while (lhs_it != lhs._digits.end() and rhs_it != rhs._digits.end()) {
+                if (l > r) {
+                    result._digits.push_back(*lhs_it); // XOR with zero = self
+                    l--;
+                    lhs_it++;
+                } else if (r > l) {
+                    result._digits.push_back(*rhs_it); // XOR with zero = self
+                    r--;
+                    rhs_it++;
+                } else {
+                    // if the first digit, avoid pushing if zero to avoid leading zeroes
+                    auto answer = *lhs_it ^ *rhs_it;
+                    if (lhs_it != lhs._digits.begin() or answer != 0) {
+                        result._digits.push_back(*lhs_it ^ *rhs_it);
+                    }
+                    l--;
+                    r--;
+                    lhs_it++;
+                    rhs_it++;
+                }
+            }
+            return result;
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
