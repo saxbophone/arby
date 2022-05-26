@@ -24,10 +24,10 @@ TEST_CASE("Casting arby::Nat with value higher than UINT_MAX to uintmax_t throws
 TEMPLATE_TEST_CASE("Casting arby::Nat to various floating-point types", "[casting]", float, double, long double) {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
-    arby::Nat object = (TestType)value;
+    arby::Nat object = static_cast<TestType>(value);
 
     // re-cast value through TestType both sides to iron out errors from great inaccuracy of float type on large values
-    CHECK((TestType)object == (TestType)value);
+    CHECK((TestType)object == static_cast<TestType>(value));
 }
 
 TEMPLATE_TEST_CASE(
