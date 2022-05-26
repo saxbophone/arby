@@ -602,6 +602,23 @@ namespace com::saxbophone::arby {
         }
         // bitwise OR-assignment
         constexpr Nat& operator|=(const Nat& rhs) {
+            // add additional digits to this if fewer than rhs
+            if (_digits.size() < rhs._digits.size()) {
+                // add leading zeroes
+                _digits.push_front(rhs._digits.size(), 0);
+            }
+            auto it = _digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            // if this has more digits than rhs, skip them (OR with implicit 0)
+            if (_digits.size() > rhs._digits.size()) {
+                for (std::size_t i = 0; i < _digits.size() - rhs._digits.size(); i++) {
+                    it++;
+                }
+            }
+            for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
+                *it |= *rhs_it;
+            }
+            _trap_leading_zero();
             return *this;
         }
         // bitwise OR operator for Nat
