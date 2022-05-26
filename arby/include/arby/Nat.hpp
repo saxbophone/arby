@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief This file forms part of arby
+ * @brief Nat class supporting arbitrary-size unsigned (Natural) integers
+ * @note This file forms part of arby
  * @details arby is a C++ library providing arbitrary-precision integer types
  * @warning arby is alpha-quality software
  *
@@ -123,7 +124,8 @@ namespace com::saxbophone::arby {
 
     /**
      * @brief Arbitrary-precision unsigned integer type
-     * @details This is named after 𝐍, the set of Natural numbers, which this type models
+     * @details This is named after \f$\mathbb{N}\f$, the set of Natural numbers,
+     * which this type models
      * @note `std::numeric_limits<Nat>` is specialised such that most of the
      * members of that type are implemented to describe the traits of this type.
      * @note Exceptions include any members of std::numeric_limits<> which
@@ -597,38 +599,6 @@ namespace com::saxbophone::arby {
             Nat remainder;
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
-        }
-        /**
-         * @returns base raised to the power of exponent
-         * @param base,exponent parameters for the base and exponent
-         * @todo This currently uses a divide-and-conquer approach that divides
-         * exponent by 2 each time, for a binary-recursion on the order of
-         * \f$\mathcal{O}(n\log{}n)\f$. This is fine, but it would be nice to
-         * see if we can make incremental improvements to the optimisation by
-         * using factors, logarithms or something else to divide the exponent
-         * into more than 2 chunks at each level of recursion.
-         */
-        static constexpr Nat pow(const Nat& base, const Nat& exponent) {
-            // use divide-and-conquer recursion to break up huge powers into products of smaller powers
-            // exponent = 0 is our base case to terminate the recursion
-            if (exponent == 0) {
-                return 1;
-            } else if (exponent == 1) {
-                // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
-                return base;
-            } else if (exponent == 2) {
-                // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
-                return base * base;
-            }
-            auto [quotient, remainder] = Nat::divmod(exponent, 2);
-            // instead of calculating x^n, do x^(n/2)
-            Nat power = Nat::pow(base, quotient);
-            power *= power;
-            // and multiply by base again if n was odd
-            if (remainder == 1) {
-                power *= base;
-            }
-            return power;
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment

@@ -5,29 +5,34 @@ CPMFindPackage(
     EXCLUDE_FROM_ALL YES
 )
 
-add_executable(tests)
-target_sources(
-    tests PRIVATE
-        main.cpp
-        basic_arithmetic.cpp
-        casting.cpp
-        divmod.cpp
-        misc.cpp
-        multiplication.cpp
-        namespaces.cpp
-        pow.cpp
-        self_assignment.cpp
-        stringification.cpp
-        user_defined_literals.cpp
-)
+# common option-propagating target to use for test suite sub-targets
+add_library(tests-config INTERFACE)
 target_link_libraries(
-    tests
-    PRIVATE
+    tests-config
+    INTERFACE
         arby-compiler-options  # tests use same compiler options as main project
         arby
         Catch2::Catch2  # unit testing framework
 )
-target_precompile_headers(tests PRIVATE <arby/Nat.hpp>)
+
+# every sub-part of the test suite
+add_subdirectory(math_support)
+add_subdirectory(Nat)
+
+# test executable wraps everything together
+add_executable(tests)
+target_sources(
+    tests PRIVATE
+        main.cpp
+        $<TARGET_OBJECTS:math-support>
+        $<TARGET_OBJECTS:Nat>
+)
+target_link_libraries(
+    tests PRIVATE
+        arby-compiler-options  # tests use same compiler options as main project
+        arby
+        Catch2::Catch2  # unit testing framework
+)
 
 enable_testing()
 
@@ -35,4 +40,5 @@ enable_testing()
 include(CTest)
 include(Catch)
 
+# TODO: we might consider having one separate test executable per part, but not for now
 catch_discover_tests(tests WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")

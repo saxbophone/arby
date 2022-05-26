@@ -5,20 +5,21 @@
 
 #include <catch2/catch.hpp>
 
+#include <arby/math.hpp>
 #include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
 
-TEST_CASE("Any arby::Nat raised to the power of zero returns 1", "[pow]") {
+TEST_CASE("Any arby::Nat raised to the power of zero returns 1", "[math-support][pow]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
-    CHECK(arby::Nat::pow(value, 0) == 1);
+    CHECK(arby::pow(arby::Nat(value), arby::Nat(0)) == 1);
 }
 
-TEST_CASE("Zero raised to the power of any non-zero arby::Nat returns 0", "[pow]") {
+TEST_CASE("Zero raised to the power of any non-zero arby::Nat returns 0", "[math-support][pow]") {
     auto value = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
-    CHECK(arby::Nat::pow(0, value) == 0);
+    CHECK(arby::pow(arby::Nat(0), arby::Nat(value)) == 0);
 }
 
 // std::pow() is not accurate for large powers and we need exactness
@@ -34,7 +35,7 @@ static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
     return power;
 }
 
-TEST_CASE("Non-zero arby::Nat raised to the power of non-zero arby::Nat", "[pow]") {
+TEST_CASE("Non-zero arby::Nat raised to the power of non-zero arby::Nat", "[math-support][pow]") {
     // base needs to be severely constrained if we are to have any reasonable prospect of getting some large exponents
     auto base = GENERATE(take(10000, random((uintmax_t)1, (uintmax_t)256)));
     // use log-n to find out the maximmum number exponent we can raise base to to fit in uintmax_t range
@@ -44,5 +45,5 @@ TEST_CASE("Non-zero arby::Nat raised to the power of non-zero arby::Nat", "[pow]
 
     CAPTURE(base, exponent);
 
-    CHECK((uintmax_t)arby::Nat::pow(base, exponent) == integer_pow(base, exponent));
+    CHECK((uintmax_t)arby::pow(arby::Nat(base), arby::Nat(exponent)) == integer_pow(base, exponent));
 }
