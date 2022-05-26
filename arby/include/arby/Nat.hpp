@@ -685,8 +685,8 @@ namespace com::saxbophone::arby {
                 } else {
                     // if the first digit, avoid pushing if zero to avoid leading zeroes
                     auto answer = *lhs_it ^ *rhs_it;
-                    if (lhs_it != lhs._digits.begin() or answer != 0) {
-                        result._digits.push_back(*lhs_it ^ *rhs_it);
+                    if (not result._digits.empty() or answer != 0) {
+                        result._digits.push_back(answer);
                     }
                     l--;
                     r--;
