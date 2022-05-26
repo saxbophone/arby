@@ -286,7 +286,13 @@ namespace com::saxbophone::arby {
                     throw std::range_error("value too large for destination type");
                 }
             }
-            return this->_cast_to<To>();
+            // take a short-cut if destination type is bounded and is not bigger than largest digit value
+            if constexpr (std::numeric_limits<To>::is_bounded and std::numeric_limits<To>::max() <= (BASE - 1)) {
+                // at this point, out-of-bounds has already been checked. Just return last digit
+                return _digits.empty() ? (To)0 : (To)_digits.back();
+            } else {
+                return this->_cast_to<To>();
+            }
         }
         /**
          * @brief custom ostream operator that allows class Nat to be printed
