@@ -25,7 +25,7 @@ TEST_CASE("Casting arby::Nat to float", "[casting]") {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     // float is so imprecise for large values that we need to cast the input too
-    CHECK((float)arby::Nat((float)value) == (float)value);
+    CHECK((float)arby::Nat((long double)(float)value) == (float)value);
 }
 
 TEST_CASE("Casting arby::Nat to double", "[casting]") {
