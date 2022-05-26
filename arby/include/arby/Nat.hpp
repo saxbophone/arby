@@ -624,10 +624,6 @@ namespace com::saxbophone::arby {
         friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
             return {};
         }
-        // complement operator
-        constexpr Nat operator~() {
-            return {};
-        }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
         // constexpr Nat& operator<<=(const Nat& n) {

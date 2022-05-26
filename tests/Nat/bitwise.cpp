@@ -69,10 +69,3 @@ TEST_CASE("arby::Nat bitwise XOR", "[bitwise]") {
 
     CHECK((uintmax_t)(object_lhs ^ object_rhs) == result);
 }
-
-TEST_CASE("arby::Nat bitwise COMPLEMENT", "[bitwise]") {
-    uintmax_t value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Nat object = value;
-
-    CHECK((uintmax_t)(~object) == ~value);
-}
