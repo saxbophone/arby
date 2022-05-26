@@ -600,6 +600,114 @@ namespace com::saxbophone::arby {
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
         }
+        /**
+         * @brief bitwise OR-assignment
+         */
+        constexpr Nat& operator|=(const Nat& rhs) {
+            // add additional digits to this if fewer than rhs
+            if (_digits.size() < rhs._digits.size()) {
+                _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
+            }
+            auto it = _digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            // if this has more digits than rhs, skip them (OR with implicit 0)
+            if (_digits.size() > rhs._digits.size()) {
+                for (std::size_t i = 0; i < (_digits.size() - rhs._digits.size()); i++) {
+                    it++;
+                }
+            }
+            for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
+                *it |= *rhs_it;
+            }
+            return *this;
+        }
+        /**
+         * @brief bitwise OR operator for Nat
+         */
+        friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
+            lhs |= rhs; // reuse member operator
+            return lhs;
+        }
+        /**
+         * @brief bitwise AND-assignment
+         */
+        constexpr Nat& operator&=(const Nat& rhs) {
+            /*
+             * if rhs has fewer digits than this, we can remove this' leading
+             * digits because they would be AND'ed with implicit zero which is
+             * always zero
+             */
+            if (rhs._digits.size() < _digits.size()) {
+                while (_digits.size() > rhs._digits.size()) {
+                    _digits.pop_front();
+                }
+            }
+            auto it = _digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            // if rhs has more digits than this, skip them (AND with implicit 0)
+            if (rhs._digits.size() > _digits.size()) {
+                for (std::size_t i = 0; i < (rhs._digits.size() - _digits.size()); i++) {
+                    rhs_it++;
+                }
+            }
+            for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
+                *it &= *rhs_it;
+            }
+            // remove any leading zeroes
+            while (_digits.size() > 0 and _digits.front() == 0) {
+                _digits.pop_front();
+            }
+            return *this;
+        }
+        /**
+         * @brief bitwise AND operator for Nat
+         */
+        friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
+            lhs &= rhs; // reuse member operator
+            return lhs;
+        }
+        /**
+         * @brief bitwise XOR-assignment
+         */
+        constexpr Nat& operator^=(const Nat& rhs) {
+            Nat result = *this ^ rhs; // reuse friend function
+            // re-assign digits to this
+            _digits = result._digits;
+            return *this;
+        }
+        /**
+         * @brief bitwise XOR operator for Nat
+         */
+        friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
+            Nat result;
+            auto lhs_it = lhs._digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            std::size_t l = lhs._digits.size();
+            std::size_t r = rhs._digits.size();
+            // consume only one side when it has more unprocessed digits than the other
+            while (lhs_it != lhs._digits.end() or rhs_it != rhs._digits.end()) {
+                if (l > r) {
+                    result._digits.push_back(*lhs_it); // XOR with zero = self
+                    l--;
+                    lhs_it++;
+                } else if (r > l) {
+                    result._digits.push_back(*rhs_it); // XOR with zero = self
+                    r--;
+                    rhs_it++;
+                } else { // otherwise, consume both sides
+                    auto answer = *lhs_it ^ *rhs_it;
+                    // if the first digit, avoid pushing if zero to avoid leading zeroes
+                    if (not result._digits.empty() or answer != 0) {
+                        result._digits.push_back(answer);
+                    }
+                    l--;
+                    r--;
+                    lhs_it++;
+                    rhs_it++;
+                }
+            }
+            return result;
+        }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
         // constexpr Nat& operator<<=(const Nat& n) {

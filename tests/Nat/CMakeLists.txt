@@ -1,6 +1,7 @@
 add_library(
     Nat OBJECT
         basic_arithmetic.cpp
+        bitwise.cpp
         casting.cpp
         divmod.cpp
         misc.cpp
