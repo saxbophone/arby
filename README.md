@@ -94,9 +94,9 @@ using namespace com::saxbophone;
 int main() {
     // powers of 11
     for (unsigned int power = 0; power < 20; power++) {
-        std::cout << arby::Nat::pow(11, power) << std::endl;
+        std::cout << arby::pow(11, power) << std::endl;
     }
-    std::cout << arby::Nat::pow(2, 64) << std::endl;
+    std::cout << arby::pow(2, 64) << std::endl;
     // demo of custom literals
     using namespace com::saxbophone::arby::literals;
     arby::Nat foo = 1234567891011121314151617181920_nat * 77378921_nat;

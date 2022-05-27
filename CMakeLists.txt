@@ -111,6 +111,8 @@ else() # GCC/Clang warning option
     enable_cxx_compiler_flag_if_supported("-Wextra")
     # enable sign conversion warnings
     enable_cxx_compiler_flag_if_supported("-Wsign-conversion")
+    # disable unknown-pragma warnings --we have pragmas for some compilers that aren't known by others
+    enable_cxx_compiler_flag_if_supported("-Wno-unknown-pragmas")
     # if tests are enabled, enable converting all warnings to errors too
     if (ENABLE_TESTS)
         enable_cxx_compiler_flag_if_supported("-Werror")
