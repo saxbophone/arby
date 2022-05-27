@@ -43,8 +43,12 @@ namespace com::saxbophone::arby {
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
         std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
-            // XXX: implement binary recursion
-            return "";
+            // use binary divide-and-conquer to recursively generate digit-chunks
+            auto [front_digits, back_digits] = divmod(digits_needed, 2);
+            back_digits += front_digits; // back is basically front+remainder
+            // divide into two Nat instances for front and back, print recursively
+            auto [front, back] = divmod(*this, pow(base, back_digits));
+            return front._stringify_for_base(base) + back._stringify_for_base(base);
         } else {
             digits << std::setw((uintmax_t)digits_needed);
             switch (base) {
