@@ -32,6 +32,8 @@
 
 #include "codlili.hpp"
 
+#include <iostream>
+
 
 /**
  * @brief Main namespace
@@ -594,6 +596,7 @@ namespace com::saxbophone::arby {
                     remainder -= (shifted_rhs);
                     quotient += exponent;
                 }
+                std::cout << "divmod: working" << std::endl;
                 // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
                 // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
                 // terminate.

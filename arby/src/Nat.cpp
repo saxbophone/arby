@@ -34,6 +34,9 @@ namespace com::saxbophone::arby {
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
+        for (auto dig : _digits) {
+            std::cout << dig << ", ";
+        }
         // work out how many base digits are needed to represent this, as well as the max we can get out of uintmax_t
         Nat digits_needed = 1;
         if (not _digits.empty()) { // if > 0
@@ -41,16 +44,32 @@ namespace com::saxbophone::arby {
         }
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
+        std::cout << ": " << (uintmax_t)digits_needed << "/" << (uintmax_t)max_possible << "" << std::endl;
         std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
             // use binary divide-and-conquer to recursively generate digit-chunks
             auto [front_digits, back_digits] = divmod(digits_needed, 2);
             back_digits += front_digits; // back is basically front+remainder
+            std::cout << (uintmax_t)front_digits << ":" << (uintmax_t)back_digits << std::endl;
             // divide into two Nat instances for front and back, print recursively
-            auto [front, back] = divmod(*this, pow(base, back_digits));
-            return front._stringify_for_base(base) + back._stringify_for_base(base);
+            Nat p = pow(base, back_digits);
+            std::cout << "POW" << std::endl;
+            auto [front, back] = divmod(*this, p);
+            std::cout << "DIVIDED" << std::endl;
+            // generate a string for both parts
+            std::string front_str = front._stringify_for_base(base);
+            std::string back_str = back._stringify_for_base(base);
+            // pad either of them with leading zeroes if needed
+            if (front_str.length() < front_digits) {
+                digits << std::string((uintmax_t)front_digits - front_str.length(), '0');
+            }
+            digits << front_str;
+            if (back_str.length() < back_digits) {
+                digits << std::string((uintmax_t)back_digits - back_str.length(), '0');
+            }
+            digits << back_str;
         } else {
-            digits << std::setw((uintmax_t)digits_needed);
+            digits << std::setfill('0') << std::setw((uintmax_t)digits_needed);
             switch (base) {
             case 8:
                 digits << std::oct;
@@ -63,8 +82,8 @@ namespace com::saxbophone::arby {
                 break;
             }
             digits << (uintmax_t)*this;
-            return digits.str();
         }
+        return digits.str();
     }
 
     /**

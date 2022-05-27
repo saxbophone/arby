@@ -6,6 +6,8 @@
 
 #include <arby/Nat.hpp>
 
+#include <iostream>
+
 using namespace com::saxbophone;
 using namespace com::saxbophone::arby::literals;
 
@@ -31,6 +33,8 @@ TEST_CASE("Using std::ostream << arby::Nat generates decimal string of value", "
         )
     );
     std::ostringstream os;
+
+    std::cout << std::get<1>(values) << std::endl;
 
     os << std::get<0>(values);
 
