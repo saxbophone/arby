@@ -342,12 +342,12 @@ namespace com::saxbophone::arby {
          * @brief prefix decrement
          * @returns new value of Nat object after decrementing
          * @throws std::underflow_error when value of Nat is `0`
-         * @note Complexity: @f$ \mathcal{O(n)} @f$
-         * @todo Make more efficient by checking `_digits.empty()` rather than `_digits.size()`
+         * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
+         * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator--() {
             // empty digits vector (means value is zero) is a special case
-            if (_digits.size() == 0) {
+            if (_digits.empty()) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit then borrow from remaining digits as needed
@@ -369,7 +369,8 @@ namespace com::saxbophone::arby {
          * @brief postfix decrement
          * @returns old value of Nat object before decrementing
          * @throws std::underflow_error when value of Nat is `0`
-         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
+         * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat operator--(int) {
             Nat old = *this; // copy old value
@@ -385,7 +386,7 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat& operator+=(Nat rhs) {
             // either arg being a zero is a no-op, guard against this
-            if (_digits.size() != 0 or rhs._digits.size() != 0) {
+            if (not _digits.empty() or not rhs._digits.empty()) { // TODO: De Morgan's optimisation: not (A and B)
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -432,7 +433,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
-            if (rhs._digits.size() != 0) {
+            if (not rhs._digits.empty()) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -457,7 +458,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (_digits.size() > 0 and _digits.front() == 0) {
+            while (not _digits.empty() and _digits.front() == 0) {
                 _digits.pop_front();
             }
             return *this; // return the result by reference
@@ -496,7 +497,7 @@ namespace com::saxbophone::arby {
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
-            if (lhs._digits.size() != 0 and rhs._digits.size() != 0) {
+            if (not lhs._digits.empty() and not rhs._digits.empty()) { // TODO: De Morgan's optimisation: not (A or B)
                 // multiply each digit from lhs with each digit from rhs
                 std::size_t l = 0; // manual indices to track which digit we are on,
                 std::size_t r = 0; // as codlili's iterators are not random-access
@@ -567,7 +568,7 @@ namespace com::saxbophone::arby {
          */
         static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
-            if (rhs._digits.size() == 0) {
+            if (rhs._digits.empty()) {
                 throw std::domain_error("division by zero");
             }
             // this will gradually accumulate the calculated quotient
