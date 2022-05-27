@@ -54,20 +54,21 @@ namespace com::saxbophone::arby {
             // divide into two Nat instances for front and back, print recursively
             Nat p = pow(base, back_digits);
             std::cout << "POW" << std::endl;
-            auto [front, back] = divmod(*this, p);
+            std::cout << p << std::endl;
+            auto [back, front] = divmod(*this, p);
             std::cout << "DIVIDED" << std::endl;
             // generate a string for both parts
             std::string front_str = front._stringify_for_base(base);
             std::string back_str = back._stringify_for_base(base);
             // pad either of them with leading zeroes if needed
-            if (front_str.length() < front_digits) {
-                digits << std::string((uintmax_t)front_digits - front_str.length(), '0');
-            }
-            digits << front_str;
             if (back_str.length() < back_digits) {
                 digits << std::string((uintmax_t)back_digits - back_str.length(), '0');
             }
             digits << back_str;
+            if (front_str.length() < front_digits) {
+                digits << std::string((uintmax_t)front_digits - front_str.length(), '0');
+            }
+            digits << front_str;
         } else {
             digits << std::setfill('0') << std::setw((uintmax_t)digits_needed);
             switch (base) {

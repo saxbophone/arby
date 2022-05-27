@@ -388,7 +388,7 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat& operator+=(Nat rhs) {
             // both args being zero is a no-op, guard against this
-            if (not (_digits.empty() and rhs._digits.empty())) {
+            if (not (rhs._digits.empty())) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -596,7 +596,7 @@ namespace com::saxbophone::arby {
                     remainder -= (shifted_rhs);
                     quotient += exponent;
                 }
-                std::cout << "divmod: working" << std::endl;
+                // std::cout << "divmod: " << counter << std::endl;
                 // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
                 // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
                 // terminate.
