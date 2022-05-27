@@ -15,11 +15,17 @@
 #include <cstdint>
 
 #include <algorithm>
+#include <iomanip>
+#include <limits>
 #include <sstream>
 #include <string>
+#include <tuple>         // tie
 
 #include <arby/Nat.hpp>
+#include <arby/math.hpp> // ilog
 
+
+#include <iostream>
 
 namespace com::saxbophone::arby {
     Nat::Nat(std::string digits)
@@ -28,23 +34,33 @@ namespace com::saxbophone::arby {
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
-        Nat value = *this;
+        // work out how many base digits are needed to represent this, as well as the max we can get out of uintmax_t
+        Nat digits_needed = 1;
+        if (not _digits.empty()) { // if > 0
+            std::tie(digits_needed, std::ignore) = ilog(base, *this);
+        }
+        Nat max_possible;
+        std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
         std::ostringstream digits;
-        do {
-            auto [quotient, remainder] = Nat::divmod(value, base);
-            if (remainder == 0) {
-                digits << '0';
-            } else {
-                // regardless of what base is requested, we can use hex for all
-                // of them as we're only doing one digit at a time
-                digits << std::hex << remainder._digits.front();
+        if (digits_needed > max_possible) { // we can't just print through uintmax_t
+            // XXX: implement binary recursion
+            return "";
+        } else {
+            digits << std::setw((uintmax_t)digits_needed);
+            switch (base) {
+            case 8:
+                digits << std::oct;
+                break;
+            case 16:
+                digits << std::hex;
+                break;
+            default:
+                digits << std::dec;
+                break;
             }
-            value = quotient;
-        } while (value > 0);
-        // output the digits in little-endian order, so we need to reverse them
-        std::string output = digits.str();
-        std::reverse(output.begin(), output.end());
-        return output;
+            digits << (uintmax_t)*this;
+            return digits.str();
+        }
     }
 
     /**
