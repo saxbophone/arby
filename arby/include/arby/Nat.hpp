@@ -578,18 +578,25 @@ namespace com::saxbophone::arby {
             Nat quotient;
             // this will gradually decrement with each subtraction
             Nat remainder = lhs;
-            // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
+                // while we have any chance in subtracting further from it
                 // exponent denotes a raw value describing how many places we can shift rhs up by
                 Nat exponent = Nat::get_max_shift(remainder, rhs);
-                // estimate how many times it goes in and subtract this many of rhs
-                Nat estimate = Nat::estimate_division(remainder, rhs);
                 // we'll actually be subtracting rhs shifted by exponent
                 Nat shifted_rhs = rhs * exponent;
+                // estimate how many times it goes in and subtract this many of rhs
+                Nat estimate = Nat::estimate_division(remainder, rhs);
                 if (remainder >= (estimate * shifted_rhs)) {
                     remainder -= estimate * shifted_rhs;
                     quotient += estimate * exponent;
                 }
+            }
+            while (remainder >= rhs) {
+                // while we have any chance in subtracting further from it
+                // exponent denotes a raw value describing how many places we can shift rhs up by
+                Nat exponent = Nat::get_max_shift(remainder, rhs);
+                // we'll actually be subtracting rhs shifted by exponent
+                Nat shifted_rhs = rhs * exponent;
                 // our estimate deliberately underestimates how many times shifted rhs can go into remainder
                 // here we subtract further rounds of shifted_rhs if possible
                 if (remainder >= (shifted_rhs)) {

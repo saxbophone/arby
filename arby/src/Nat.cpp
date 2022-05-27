@@ -34,30 +34,38 @@ namespace com::saxbophone::arby {
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
-        for (auto dig : _digits) {
-            std::cout << dig << ", ";
-        }
         // work out how many base digits are needed to represent this, as well as the max we can get out of uintmax_t
-        Nat digits_needed = 1;
+        Nat digits_needed;
         if (not _digits.empty()) { // if > 0
             std::tie(digits_needed, std::ignore) = ilog(base, *this);
         }
+        digits_needed += 1;
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
         max_possible -= 1; // the highest of these digits probably can't go all the way, knock one off to be safe
-        std::cout << ": " << (uintmax_t)digits_needed << "/" << (uintmax_t)max_possible << "" << std::endl;
         std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
             // use binary divide-and-conquer to recursively generate digit-chunks
             auto [front_digits, back_digits] = divmod(digits_needed, 2);
             back_digits += front_digits; // back is basically front+remainder
-            std::cout << (uintmax_t)front_digits << ":" << (uintmax_t)back_digits << std::endl;
             // divide into two Nat instances for front and back, print recursively
-            Nat p = pow(base, front_digits);
-            std::cout << "POW" << std::endl;
-            std::cout << p << std::endl;
+            Nat p = pow(base, back_digits);
+            std::cout << "divmod(";
+            if (*this <= std::numeric_limits<uintmax_t>::max()) {
+                std::cout << (uintmax_t)*this;
+            } else {
+                std::cout << "{";
+                for (auto dig : _digits) {
+                    std::cout << dig << ", ";
+                }
+                std::cout << "}";
+            }
+            std::cout << ", ";
+            if (p <= std::numeric_limits<uintmax_t>::max()) {
+                std::cout << (uintmax_t)p;
+            }
+            std::cout << ")" << std::endl;
             auto [front, back] = divmod(*this, p);
-            std::cout << "DIVIDED" << std::endl;
             // generate a string for both parts
             std::string front_str = front._stringify_for_base(base);
             std::string back_str = back._stringify_for_base(base);
