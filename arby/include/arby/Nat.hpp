@@ -686,7 +686,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise AND-assignment
-         * @note Complexity is @f$ \mathcal{O(n^2)} @f$ but should be @f$ \mathcal{O(n)} @f$
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator&=(const Nat& rhs) {
             /*
@@ -694,10 +694,10 @@ namespace com::saxbophone::arby {
              * digits because they would be AND'ed with implicit zero which is
              * always zero
              */
-            if (rhs._digits.size() < _digits.size()) { // XXX: redundant if!?
-                // TODO: just work out how many times to remove, don't keep checking
-                // .size() is O(n)
-                while (_digits.size() > rhs._digits.size()) {
+            std::size_t lhs_size = _digits.size();
+            std::size_t rhs_size = rhs._digits.size();
+            if (lhs_size > rhs_size) {
+                for (std::size_t i = 0; i < lhs_size - rhs_size; i++) {
                     _digits.pop_front();
                 }
             }
@@ -713,14 +713,14 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (_digits.size() > 0 and _digits.front() == 0) {
+            while (not _digits.empty() and _digits.front() == 0) {
                 _digits.pop_front();
             }
             return *this;
         }
         /**
          * @brief bitwise AND operator for Nat
-         * @note Complexity is @f$ \mathcal{O(n^2)} @f$ but should be @f$ \mathcal{O(n)} @f$
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
             lhs &= rhs; // reuse member operator
