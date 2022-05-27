@@ -386,7 +386,7 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat& operator+=(Nat rhs) {
             // either arg being a zero is a no-op, guard against this
-            if (not _digits.empty() or not rhs._digits.empty()) { // TODO: De Morgan's optimisation: not (A and B)
+            if (not (_digits.empty() and rhs._digits.empty())) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -497,7 +497,7 @@ namespace com::saxbophone::arby {
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
-            if (not lhs._digits.empty() and not rhs._digits.empty()) { // TODO: De Morgan's optimisation: not (A or B)
+            if (not (lhs._digits.empty() or rhs._digits.empty())) {
                 // multiply each digit from lhs with each digit from rhs
                 std::size_t l = 0; // manual indices to track which digit we are on,
                 std::size_t r = 0; // as codlili's iterators are not random-access
