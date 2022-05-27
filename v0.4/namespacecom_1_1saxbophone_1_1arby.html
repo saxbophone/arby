@@ -18,7 +18,7 @@
     jax: ["input/TeX","output/HTML-CSS"],
 });
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.1/es5/startup.js/MathJax.js"></script>
+<script type="text/javascript" async="async" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -29,7 +29,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">arby
-   &#160;<span id="projectnumber">v0.4.1</span>
+   &#160;<span id="projectnumber">v0.4.2</span>
    </div>
    <div id="projectbrief">Arbitrary precision arithmetic in C++, even at compile time</div>
   </td>
@@ -102,9 +102,9 @@ Classes</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:afd60ed80e1f2a21631a524a67e3ccdc5"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#afd60ed80e1f2a21631a524a67e3ccdc5">pow</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;exponent)</td></tr>
 <tr class="separator:afd60ed80e1f2a21631a524a67e3ccdc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef0632df77d9ea36228ce5180a2585cd"><td class="memItemLeft" align="right" valign="top">constexpr std::pair&lt; <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>, <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#aef0632df77d9ea36228ce5180a2585cd">ilog</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;x)</td></tr>
-<tr class="memdesc:aef0632df77d9ea36228ce5180a2585cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates integer log of <code>x</code> in <code>base</code>  <a href="namespacecom_1_1saxbophone_1_1arby.html#aef0632df77d9ea36228ce5180a2585cd">More...</a><br /></td></tr>
-<tr class="separator:aef0632df77d9ea36228ce5180a2585cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef35b9982fe81d1d85effeeb31be6e47"><td class="memItemLeft" align="right" valign="top">constexpr std::pair&lt; <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>, <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">ilog</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;x)</td></tr>
+<tr class="memdesc:aef35b9982fe81d1d85effeeb31be6e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates integer log of <code>x</code> in <code>base</code>  <a href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">More...</a><br /></td></tr>
+<tr class="separator:aef35b9982fe81d1d85effeeb31be6e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e3b101f804aad71802339dd80302f0d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#a4e3b101f804aad71802339dd80302f0d">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;object)</td></tr>
 <tr class="separator:a4e3b101f804aad71802339dd80302f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -112,7 +112,7 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Main namespace. </p>
 <p>Usage: </p><div class="fragment"><div class="line"><span class="keyword">using namespace </span>com::saxbophone;</div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a>;</div>
-<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_1_1literals_html"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a></div><div class="ttdoc">Various custom user-defined-literals for creating arby objects.</div><div class="ttdef"><b>Definition:</b> Nat.hpp:789</div></div>
+<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_1_1literals_html"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a></div><div class="ttdoc">Various custom user-defined-literals for creating arby objects.</div><div class="ttdef"><b>Definition:</b> Nat.hpp:820</div></div>
 </div><!-- fragment --><ul>
 <li>Introduces library symbols into scope <code>arby</code></li>
 <li><p class="startli">Introduces literal operators into global scope, allowing them to be used as literals</p>
@@ -122,8 +122,8 @@ Functions</h2></td></tr>
 <li>Introduces all library symbols into global scope, including literals </li>
 </ul>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aef0632df77d9ea36228ce5180a2585cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef0632df77d9ea36228ce5180a2585cd">&#9670;&nbsp;</a></span>ilog()</h2>
+<a id="aef35b9982fe81d1d85effeeb31be6e47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef35b9982fe81d1d85effeeb31be6e47">&#9670;&nbsp;</a></span>ilog()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +132,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr std::pair&lt;<a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>, <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&gt; com::saxbophone::arby::ilog </td>
+          <td class="memname">constexpr std::pair&lt; <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>, <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &gt; ilog </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;&#160;</td>
           <td class="paramname"><em>base</em>, </td>
@@ -172,6 +172,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Work out time-complexity</dd></dl>
 
 </div>
 </div>
@@ -244,7 +245,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>This currently uses a divide-and-conquer approach that divides exponent by 2 each time, for a binary-recursion on the order of \(\mathcal{O}(n\log{}n)\). This is fine, but it would be nice to see if we can make incremental improvements to the optimisation by using factors, logarithms or something else to divide the exponent into more than 2 chunks at each level of recursion.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Work out time-complexity</dd></dl>
 
 <p class="reference">Referenced by <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5">com::saxbophone::arby::Nat::pow()</a>.</p>
 <div class="dynheader">

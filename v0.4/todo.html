@@ -18,7 +18,7 @@
     jax: ["input/TeX","output/HTML-CSS"],
 });
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.1/es5/startup.js/MathJax.js"></script>
+<script type="text/javascript" async="async" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -29,7 +29,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">arby
-   &#160;<span id="projectnumber">v0.4.1</span>
+   &#160;<span id="projectnumber">v0.4.2</span>
    </div>
    <div id="projectbrief">Arbitrary precision arithmetic in C++, even at compile time</div>
   </td>
@@ -75,8 +75,22 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
+<dt>Member <a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">com::saxbophone::arby::ilog</a>  (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;x)</dt>
+<dd><p class="startdd"><a class="anchor" id="_todo000002"></a>Work out time-complexity</p>
+<p class="enddd"></p>
+</dd>
+<dt>Member <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#a0b1220e8ddbbb267963fb6427d572d76">com::saxbophone::arby::Nat::divmod</a>  (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;lhs, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;rhs)</dt>
+<dd><a class="anchor" id="_todo000003"></a>Work out time-complexity  </dd>
+<dt>Member <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#ab941e89ddac87605b7f623f561143e33">com::saxbophone::arby::Nat::operator%</a>  (<a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> lhs, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;rhs)</dt>
+<dd><a class="anchor" id="_todo000007"></a>Work out time-complexity  </dd>
+<dt>Member <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afb7fdbc73d6783cd818508bdad27b52a">com::saxbophone::arby::Nat::operator%=</a>  (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;rhs)</dt>
+<dd><a class="anchor" id="_todo000006"></a>Work out time-complexity  </dd>
+<dt>Member <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#ac5e2130ce3f04884f5713f2cadf66df6">com::saxbophone::arby::Nat::operator/</a>  (<a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> lhs, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;rhs)</dt>
+<dd><a class="anchor" id="_todo000005"></a>Work out time-complexity  </dd>
+<dt>Member <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#a28d7fd0b70a985bb0ece8f139c25ef1a">com::saxbophone::arby::Nat::operator/=</a>  (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;rhs)</dt>
+<dd><a class="anchor" id="_todo000004"></a>Work out time-complexity  </dd>
 <dt>Member <a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#afd60ed80e1f2a21631a524a67e3ccdc5">com::saxbophone::arby::pow</a>  (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html" title="Arbitrary-precision unsigned integer type.">Nat</a> &amp;exponent)</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000001"></a>This currently uses a divide-and-conquer approach that divides exponent by 2 each time, for a binary-recursion on the order of \(\mathcal{O}(n\log{}n)\). This is fine, but it would be nice to see if we can make incremental improvements to the optimisation by using factors, logarithms or something else to divide the exponent into more than 2 chunks at each level of recursion.</p>
+<dd><p class="startdd"><a class="anchor" id="_todo000001"></a>Work out time-complexity</p>
 <p class="enddd"></p>
 </dd>
 </dl>
