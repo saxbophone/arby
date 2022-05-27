@@ -73,7 +73,7 @@ namespace com::saxbophone::arby {
      * - \f$log_b(x)\in\mathbb{N}\f$
      * @remarks Otherwise:
      * - \f$log_b(x)\in\mathbb{R}\f$
-     * @todo Work out time-complexity
+     * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
      * @relatedalso Nat
      */
     constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
