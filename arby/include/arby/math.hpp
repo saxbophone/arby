@@ -28,6 +28,7 @@
 namespace com::saxbophone::arby {
     /**
      * @returns base raised to the power of exponent
+     * i.e. for base as \f$b\f$ and exponent as \f$x\f$: \f$b^x\f$
      * @param base,exponent parameters for the base and exponent
      * @todo Work out time-complexity
      * @relatedalso Nat
@@ -55,13 +56,23 @@ namespace com::saxbophone::arby {
         return power;
     }
     /**
-     * @brief Calculates integer log of `x` in `base`
-     * @returns pair of \f$floor(log_b(x)),\ ceil(log_b(x))\f$ for the given
-     * base \f$b\f$ and \f$x\f$
+     * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
+     * @code
+     * auto [low, high] = ilog(b, x);
+     * @endcode
      * @param base base to use for \f$b\f$
      * @param x value to use for \f$x\f$
-     * @throws std::domain_error when \f$b<2\f$
-     * @throws std::domain_error when \f$x<1\f$
+     * @pre \f$b\geq2\f$
+     * @pre \f$x\geq1\f$
+     * @throws std::domain_error when preconditions are violated
+     * @returns pair of \f$(low, high)\f$ where for \f$\mathbb{R}\ v = log_b(x)\f$:
+     * - \f$low = floor(v)\f$
+     * - \f$high = ceil(v)\f$
+     * @post \f$low \leq high\f$
+     * @remarks When \f$low = high\f$:
+     * - \f$log_b(x)\in\mathbb{N}\f$
+     * @remarks Otherwise:
+     * - \f$log_b(x)\in\mathbb{R}\f$
      * @todo Work out time-complexity
      * @relatedalso Nat
      */

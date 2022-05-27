@@ -794,11 +794,11 @@ namespace com::saxbophone::arby {
         /**
          * @brief contextual conversion to bool (behaves same way as int)
          * @returns `false` when value is `0`, otherwise `true`
-         * @note Complexity is @f$ \mathcal{O(n)} @f$ but should be @f$ \mathcal{O(1)} @f$
+         * @note Complexity: @f$ \mathcal{O(1)} @f$
          */
         explicit constexpr operator bool() const {
             // zero is false --all other values are true
-            return _digits.size() > 0; // zero is encoded as empty digits array
+            return not _digits.empty(); // zero is encoded as empty digits array
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
