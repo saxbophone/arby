@@ -156,12 +156,14 @@ namespace com::saxbophone::arby {
          * @brief Defaulted equality operator for Nat objects
          * @param rhs other Nat object to compare against
          * @returns `true` if objects are equal, otherwise `false`
+         * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr bool operator==(const Nat& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
          * @param rhs other Nat object to compare against
          * @returns std::strong_ordering object for comparison
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr auto operator<=>(const Nat& rhs) const {
             // use size to indicate ordering if they differ
@@ -297,6 +299,7 @@ namespace com::saxbophone::arby {
         /**
          * @brief custom ostream operator that allows class Nat to be printed
          * with std::cout and friends
+         * @note Complexity is @f$ \mathcal{O(terrible)} @f$
          */
         friend std::ostream& operator<<(std::ostream& os, const Nat& object);
         /**
@@ -306,6 +309,8 @@ namespace com::saxbophone::arby {
         /**
          * @brief prefix increment
          * @returns new value of Nat object after incrementing
+         * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
+         * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator++() {
             // increment least significant digit then rollover remaining digits as needed
@@ -325,6 +330,8 @@ namespace com::saxbophone::arby {
         /**
          * @brief postfix increment
          * @returns old value of Nat object before incrementing
+         * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
+         * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat operator++(int) {
             Nat old = *this; // copy old value
@@ -335,6 +342,8 @@ namespace com::saxbophone::arby {
          * @brief prefix decrement
          * @returns new value of Nat object after decrementing
          * @throws std::underflow_error when value of Nat is `0`
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         * @todo Make more efficient by checking `_digits.empty()` rather than `_digits.size()`
          */
         constexpr Nat& operator--() {
             // empty digits vector (means value is zero) is a special case
@@ -360,6 +369,7 @@ namespace com::saxbophone::arby {
          * @brief postfix decrement
          * @returns old value of Nat object before decrementing
          * @throws std::underflow_error when value of Nat is `0`
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat operator--(int) {
             Nat old = *this; // copy old value
@@ -371,6 +381,7 @@ namespace com::saxbophone::arby {
          * @details Adds other value to this Nat and assigns the result to self
          * @param rhs value to add to this Nat
          * @returns resulting object after addition-assignment
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator+=(Nat rhs) {
             // either arg being a zero is a no-op, guard against this
@@ -404,6 +415,7 @@ namespace com::saxbophone::arby {
          * @brief Addition operator for Nat
          * @param lhs,rhs operands for the addition
          * @returns sum of lhs + rhs
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator+(Nat lhs, const Nat& rhs) {
             lhs += rhs; // reuse compound assignment
@@ -415,6 +427,7 @@ namespace com::saxbophone::arby {
          * @param rhs value to subtract from this Nat
          * @returns resulting object after subtraction-assignment
          * @throws std::underflow_error when rhs is bigger than this
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
@@ -454,6 +467,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the subtraction
          * @returns result of lhs - rhs
          * @throws std::underflow_error when rhs is bigger than lhs
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator-(Nat lhs, const Nat& rhs) {
             lhs -= rhs; // reuse compound assignment
@@ -464,6 +478,7 @@ namespace com::saxbophone::arby {
          * @details Multiplies this Nat by other value and assigns the result to self
          * @param rhs value to multiply this Nat by
          * @returns resulting object after multiplication-assignment
+         * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
         constexpr Nat& operator*=(const Nat& rhs) {
             Nat product = *this * rhs; // uses friend *operator
@@ -475,6 +490,7 @@ namespace com::saxbophone::arby {
          * @brief Multiplication operator for Nat
          * @param lhs,rhs operands for the multiplication
          * @returns product of lhs * rhs
+         * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
         friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
             // init product to zero
@@ -547,6 +563,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the division/modulo operation
          * @returns pair of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
+         * @todo Work out time-complexity
          */
         static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
@@ -588,6 +605,7 @@ namespace com::saxbophone::arby {
          * @param rhs value to divide this Nat by
          * @returns resulting object after division-assignment
          * @throws std::domain_error when rhs is zero
+         * @todo Work out time-complexity
          */
         constexpr Nat& operator/=(const Nat& rhs) {
             Nat quotient = *this / rhs; // uses friend /operator
@@ -600,6 +618,7 @@ namespace com::saxbophone::arby {
          * @note This implements floor-division, returning the quotient only
          * @param lhs,rhs operands for the division
          * @returns quotient of lhs / rhs
+         * @todo Work out time-complexity
          */
         friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
             Nat quotient;
@@ -613,6 +632,7 @@ namespace com::saxbophone::arby {
          * @param rhs value to modulo-divide this Nat by
          * @returns resulting object after modulo-assignment
          * @throws std::domain_error when rhs is zero
+         * @todo Work out time-complexity
          */
         constexpr Nat& operator%=(const Nat& rhs) {
             Nat remainder = *this % rhs; // uses friend %operator
@@ -626,6 +646,7 @@ namespace com::saxbophone::arby {
          * @param lhs,rhs operands for the division
          * @returns remainder of lhs / rhs
          * @throws std::domain_error when rhs is zero
+         * @todo Work out time-complexity
          */
         friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
             Nat remainder;
@@ -634,6 +655,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise OR-assignment
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
@@ -655,6 +677,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise OR operator for Nat
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
             lhs |= rhs; // reuse member operator
@@ -662,6 +685,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise AND-assignment
+         * @note Complexity is @f$ \mathcal{O(n^2)} @f$ but should be @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator&=(const Nat& rhs) {
             /*
@@ -669,7 +693,9 @@ namespace com::saxbophone::arby {
              * digits because they would be AND'ed with implicit zero which is
              * always zero
              */
-            if (rhs._digits.size() < _digits.size()) {
+            if (rhs._digits.size() < _digits.size()) { // XXX: redundant if!?
+                // TODO: just work out how many times to remove, don't keep checking
+                // .size() is O(n)
                 while (_digits.size() > rhs._digits.size()) {
                     _digits.pop_front();
                 }
@@ -693,6 +719,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise AND operator for Nat
+         * @note Complexity is @f$ \mathcal{O(n^2)} @f$ but should be @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
             lhs &= rhs; // reuse member operator
@@ -700,6 +727,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise XOR-assignment
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator^=(const Nat& rhs) {
             Nat result = *this ^ rhs; // reuse friend function
@@ -709,6 +737,7 @@ namespace com::saxbophone::arby {
         }
         /**
          * @brief bitwise XOR operator for Nat
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
             Nat result;
@@ -764,6 +793,7 @@ namespace com::saxbophone::arby {
         /**
          * @brief contextual conversion to bool (behaves same way as int)
          * @returns `false` when value is `0`, otherwise `true`
+         * @note Complexity is @f$ \mathcal{O(n)} @f$ but should be @f$ \mathcal{O(1)} @f$
          */
         explicit constexpr operator bool() const {
             // zero is false --all other values are true
