@@ -385,7 +385,7 @@ namespace com::saxbophone::arby {
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator+=(Nat rhs) {
-            // either arg being a zero is a no-op, guard against this
+            // both args being zero is a no-op, guard against this
             if (not (_digits.empty() and rhs._digits.empty())) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
