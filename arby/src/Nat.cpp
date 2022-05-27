@@ -44,6 +44,7 @@ namespace com::saxbophone::arby {
         }
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
+        max_possible -= 1; // the highest of these digits probably can't go all the way, knock one off to be safe
         std::cout << ": " << (uintmax_t)digits_needed << "/" << (uintmax_t)max_possible << "" << std::endl;
         std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
@@ -52,23 +53,23 @@ namespace com::saxbophone::arby {
             back_digits += front_digits; // back is basically front+remainder
             std::cout << (uintmax_t)front_digits << ":" << (uintmax_t)back_digits << std::endl;
             // divide into two Nat instances for front and back, print recursively
-            Nat p = pow(base, back_digits);
+            Nat p = pow(base, front_digits);
             std::cout << "POW" << std::endl;
             std::cout << p << std::endl;
-            auto [back, front] = divmod(*this, p);
+            auto [front, back] = divmod(*this, p);
             std::cout << "DIVIDED" << std::endl;
             // generate a string for both parts
             std::string front_str = front._stringify_for_base(base);
             std::string back_str = back._stringify_for_base(base);
             // pad either of them with leading zeroes if needed
-            if (back_str.length() < back_digits) {
-                digits << std::string((uintmax_t)back_digits - back_str.length(), '0');
-            }
-            digits << back_str;
             if (front_str.length() < front_digits) {
                 digits << std::string((uintmax_t)front_digits - front_str.length(), '0');
             }
             digits << front_str;
+            if (back_str.length() < back_digits) {
+                digits << std::string((uintmax_t)back_digits - back_str.length(), '0');
+            }
+            digits << back_str;
         } else {
             digits << std::setfill('0') << std::setw((uintmax_t)digits_needed);
             switch (base) {
