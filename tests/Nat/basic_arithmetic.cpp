@@ -287,6 +287,21 @@ TEST_CASE("Addition of arby::Nat and much smaller arby::Nat", "[basic-arithmetic
     CHECK((uintmax_t)result == addition);
 }
 
+TEST_CASE("arby::Nat + 0") {
+    arby::Nat value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+
+    CHECK((value + 0) == value);
+}
+
+TEST_CASE("arby::Nat += 0") {
+    uintmax_t value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    arby::Nat object = value;
+
+    object += 0;
+
+    CHECK((uintmax_t)object == value);
+}
+
 TEST_CASE("Assignment-subtraction of arby::Nat from arby::Nat", "[basic-arithmetic]") {
     auto minuend = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     // ensure subtrahend is never bigger than minuend so we don't underflow
@@ -383,4 +398,19 @@ TEST_CASE("Subtraction of arby::Nat(0) from arby::Nat(0)", "[basic-arithmetic]")
     REQUIRE((uintmax_t)rhs == 0);
 
     CHECK((uintmax_t)(lhs - rhs) == 0);
+}
+
+TEST_CASE("arby::Nat - 0") {
+    arby::Nat value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+
+    CHECK((value - 0) == value);
+}
+
+TEST_CASE("arby::Nat -= 0") {
+    uintmax_t value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    arby::Nat object = value;
+
+    object -= 0;
+
+    CHECK((uintmax_t)object == value);
 }
