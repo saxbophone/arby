@@ -37,9 +37,6 @@ jobs:
             cxx: clang++
           - os: windows-2019
             cxx: msvc
-          - os: ubuntu-20.04
-            cxx: g++-10
-            memtest: true # memory-testing on Linux only
 
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +48,7 @@ jobs:
         run: echo "BUILD_TYPE=Release" >> $GITHUB_ENV
 
       - name: Install Valgrind
-        if: ${{ matrix.memtest }}
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
         run: |
           sudo apt-get update
           sudo apt-get install valgrind
@@ -75,7 +72,7 @@ jobs:
         run: cmake --build . --config $BUILD_TYPE
 
       - name: Test
-        if: ${{ !matrix.memtest }}
+        if: ${{ matrix.os != 'ubuntu-20.04' }}
         working-directory: ${{github.workspace}}/build
         shell: bash
         # Execute tests defined by the CMake configuration.  
@@ -83,7 +80,7 @@ jobs:
         run: ctest -C $BUILD_TYPE --no-tests=error
 
       - name: Test with Valgrind
-        if: ${{ matrix.memtest }}
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
         working-directory: ${{github.workspace}}/build
         shell: bash
         # run ctest with memcheck mode to check for memory errors with Valgrind  
