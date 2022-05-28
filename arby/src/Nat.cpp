@@ -40,47 +40,32 @@ namespace com::saxbophone::arby {
         digits_needed += 1;
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
-        if (digits_needed > max_possible) { // we can't just print through uintmax_t
-            std::string digits;
-            Nat value = *this;
-            Nat chunk = pow(base, max_possible);
-            do {
-                auto [quotient, remainder] = Nat::divmod(value, chunk);
-                std::ostringstream oss;
-                oss << std::setfill('0') << std::setw((uintmax_t)max_possible);
-                switch (base) {
-                case 8:
-                    oss << std::oct;
-                    break;
-                case 16:
-                    oss << std::hex;
-                    break;
-                default:
-                    oss << std::dec;
-                    break;
-                }
-                oss << (uintmax_t)remainder;
-                digits = oss.str() + digits;
-                value = quotient;
-            } while (value > 0);
-            return digits;
-        } else {
-            std::ostringstream digits;
-            digits << std::setfill('0') << std::setw((uintmax_t)digits_needed);
+        const Nat chunk = pow(base, max_possible);
+        Nat value = *this;
+        std::string digits;
+        do {
+            std::ostringstream output;
+            auto [quotient, remainder] = Nat::divmod(value, chunk);
+            // only pad to width of chunk if this is not the front chunk
+            if (quotient != 0) {
+                output << std::setfill('0') << std::setw((uintmax_t)max_possible);
+            }
             switch (base) {
             case 8:
-                digits << std::oct;
+                output << std::oct;
                 break;
             case 16:
-                digits << std::hex;
+                output << std::hex;
                 break;
             default:
-                digits << std::dec;
+                output << std::dec;
                 break;
             }
-            digits << (uintmax_t)*this;
-            return digits.str();
-        }
+            output << (uintmax_t)remainder;
+            digits = output.str() + digits;
+            value = quotient;
+        } while (value > 0);
+        return digits;
     }
 
     /**
