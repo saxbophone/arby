@@ -32,8 +32,6 @@
 
 #include "codlili.hpp"
 
-#include <iostream> // XXX: debug
-
 
 /**
  * @brief Main namespace
@@ -570,15 +568,6 @@ namespace com::saxbophone::arby {
          * @todo Work out time-complexity
          */
         static inline std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
-            std::cout << "divmod({";
-            for (auto dig : lhs._digits) {
-                std::cout << dig << ", ";
-            }
-            std::cout << "}, {";
-            for (auto dig : rhs._digits) {
-                std::cout << dig << ", ";
-            }
-            std::cout << "})" << std::endl;
             // division by zero is undefined
             if (rhs._digits.empty()) {
                 throw std::domain_error("division by zero");
@@ -589,52 +578,19 @@ namespace com::saxbophone::arby {
             Nat remainder = lhs;
             // while we have any chance in subtracting further from it
             while (remainder >= rhs) {
-                std::cout << "remainder = {";
-                for (auto dig : remainder._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
-                std::cout << "rhs = {";
-                for (auto dig : rhs._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
-                std::cout << "quotient = {";
-                for (auto dig : quotient._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
                 // exponent denotes a raw value describing how many places we can shift rhs up by
                 Nat exponent = Nat::get_max_shift(remainder, rhs);
-                std::cout << "exponent = {";
-                for (auto dig : exponent._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
                 // estimate how many times it goes in and subtract this many of rhs
                 Nat estimate = Nat::estimate_division(remainder, rhs);
-                std::cout << "estimate = {";
-                for (auto dig : estimate._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
                 // we'll actually be subtracting rhs shifted by exponent
                 Nat shifted_rhs = rhs * exponent;
-                std::cout << "shifted_rhs = {";
-                for (auto dig : shifted_rhs._digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}" << std::endl;
-                std::cin.get();
                 if (remainder >= (estimate * shifted_rhs)) {
-                    std::cout << "SUBTRACT ESTIMATE" << std::endl;
                     remainder -= estimate * shifted_rhs;
                     quotient += estimate * exponent;
                 }
                 // our estimate deliberately underestimates how many times shifted rhs can go into remainder
                 // here we subtract further rounds of shifted_rhs if possible
                 if (remainder >= (shifted_rhs)) {
-                    std::cout << "SUBTRACT EXTRA BIT" << std::endl;
                     remainder -= (shifted_rhs);
                     quotient += exponent;
                 }
