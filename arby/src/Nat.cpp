@@ -25,8 +25,6 @@
 #include <arby/math.hpp> // ilog
 
 
-#include <iostream>
-
 namespace com::saxbophone::arby {
     Nat::Nat(std::string digits)
         // use user-defined-literal to convert the digits in the string
@@ -50,21 +48,6 @@ namespace com::saxbophone::arby {
             back_digits += front_digits; // back is basically front+remainder
             // divide into two Nat instances for front and back, print recursively
             Nat p = pow(base, back_digits);
-            std::cout << "divmod(";
-            if (*this <= std::numeric_limits<uintmax_t>::max()) {
-                std::cout << (uintmax_t)*this;
-            } else {
-                std::cout << "{";
-                for (auto dig : _digits) {
-                    std::cout << dig << ", ";
-                }
-                std::cout << "}";
-            }
-            std::cout << ", ";
-            if (p <= std::numeric_limits<uintmax_t>::max()) {
-                std::cout << (uintmax_t)p;
-            }
-            std::cout << ")" << std::endl;
             auto [front, back] = divmod(*this, p);
             // generate a string for both parts
             std::string front_str = front._stringify_for_base(base);
