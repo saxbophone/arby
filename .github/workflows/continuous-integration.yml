@@ -25,6 +25,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         cxx: [g++-10, clang++]
+        memcheck: [false]
         include:
           # macos has two separate versions for the different compilers because
           # the new macos image needed for clang using a new version of XCode
@@ -37,6 +38,9 @@ jobs:
             cxx: clang++
           - os: windows-2019
             cxx: msvc
+          - os: ubuntu-20.04
+            cxx: g++-10
+            memcheck: true # memory-testing on Linux only
 
     steps:
       - uses: actions/checkout@v2
@@ -48,7 +52,7 @@ jobs:
         run: echo "BUILD_TYPE=Release" >> $GITHUB_ENV
 
       - name: Install Valgrind
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: ${{ matrix.memcheck }}
         run: |
           sudo apt-get update
           sudo apt-get install valgrind
@@ -72,7 +76,7 @@ jobs:
         run: cmake --build . --config $BUILD_TYPE
 
       - name: Test
-        if: ${{ matrix.os != 'ubuntu-20.04' }}
+        if: ${{ !matrix.memcheck }}
         working-directory: ${{github.workspace}}/build
         shell: bash
         # Execute tests defined by the CMake configuration.  
@@ -80,11 +84,11 @@ jobs:
         run: ctest -C $BUILD_TYPE --no-tests=error
 
       - name: Test with Valgrind
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: ${{ matrix.memcheck }}
         working-directory: ${{github.workspace}}/build
         shell: bash
         # run ctest with memcheck mode to check for memory errors with Valgrind  
-        run: ctest -C $BUILD_TYPE -T memcheck --no-tests=error
+        run: ctest -C $BUILD_TYPE -T memcheck -j10 --no-tests=error
 
       - name: Test Install
         working-directory: ${{github.workspace}}/build
