@@ -771,26 +771,26 @@ namespace com::saxbophone::arby {
             return result;
         }
         // XXX: unimplemented shift operators commented out until implemented
-        // // left-shift-assignment
-        // constexpr Nat& operator<<=(const Nat& n) {
-        //     // TODO: implement
-        //     return *this;
-        // }
-        // // left-shift
-        // friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
-        //     lhs <<= rhs; // reuse compound assignment
-        //     return lhs; // return the result by value (uses move constructor)
-        // }
-        // // right-shift-assignment
-        // constexpr Nat& operator>>=(const Nat& n) {
-        //     // TODO: implement
-        //     return *this;
-        // }
-        // // right-shift
-        // friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
-        //     lhs <<= rhs; // reuse compound assignment
-        //     return lhs; // return the result by value (uses move constructor)
-        // }
+        // left-shift-assignment
+        constexpr Nat& operator<<=(const Nat& n) {
+            // TODO: implement
+            return *this;
+        }
+        // left-shift
+        friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
+            lhs <<= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        // right-shift-assignment
+        constexpr Nat& operator>>=(const Nat& n) {
+            // TODO: implement
+            return *this;
+        }
+        // right-shift
+        friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
+            lhs <<= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
         /**
          * @brief contextual conversion to bool (behaves same way as int)
          * @returns `false` when value is `0`, otherwise `true`
