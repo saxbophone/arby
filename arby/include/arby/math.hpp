@@ -33,7 +33,7 @@ namespace com::saxbophone::arby {
      * @todo Work out time-complexity
      * @relatedalso Nat
      */
-    constexpr Nat pow(const Nat& base, const Nat& exponent) {
+    inline Nat pow(const Nat& base, const Nat& exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers
         // exponent = 0 is our base case to terminate the recursion
         if (exponent == 0) {
@@ -76,7 +76,7 @@ namespace com::saxbophone::arby {
      * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
      * @relatedalso Nat
      */
-    constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
+    inline std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
             throw std::domain_error("ilog: base cannot be < 2");
         } else if (x < 1) {

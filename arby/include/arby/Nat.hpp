@@ -97,7 +97,7 @@ namespace com::saxbophone::arby {
         };
 
         // returns ceil(logₐ(n))
-        constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
+        inline std::size_t fit(uintmax_t n, uintmax_t a) {
             // n = 0 is the exception --we don't use any digits at all for 0
             if (n == 0) {
                 return 0;
@@ -112,7 +112,7 @@ namespace com::saxbophone::arby {
             return exponent;
         }
         // returns xⁿ
-        constexpr uintmax_t exp(uintmax_t x, uintmax_t n) {
+        inline uintmax_t exp(uintmax_t x, uintmax_t n) {
             if (n == 0) {
                 return 1;
             } else {
@@ -141,7 +141,7 @@ namespace com::saxbophone::arby {
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         // traps with an exception if there are leading zeroes in the digits array
-        constexpr void _trap_leading_zero() const {
+        inline void _trap_leading_zero() const {
             if (_digits.size() > 0 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
@@ -158,14 +158,14 @@ namespace com::saxbophone::arby {
          * @returns `true` if objects are equal, otherwise `false`
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr bool operator==(const Nat& rhs) const = default;
+        inline bool operator==(const Nat& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
          * @param rhs other Nat object to compare against
          * @returns std::strong_ordering object for comparison
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr auto operator<=>(const Nat& rhs) const {
+        inline auto operator<=>(const Nat& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
@@ -183,12 +183,12 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Nat() {} // uses default ctor of vector to init _digits to zero-size
+        inline Nat() {} // uses default ctor of vector to init _digits to zero-size
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
-        constexpr Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
+        inline Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
             if (_digits.size() > 0) {
                 // fill out digits in big-endian order
                 uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
@@ -236,7 +236,7 @@ namespace com::saxbophone::arby {
     private:
         // private helper method to abstract the common part of the casting op
         template <typename T>
-        constexpr T _cast_to() const {
+        inline T _cast_to() const {
             T accumulator = 0;
             // read digits out in big-endian order, shifting as we go
             for (auto digit : _digits) {
@@ -251,7 +251,7 @@ namespace com::saxbophone::arby {
          * @throws std::range_error when Nat value is out of range for
          * uintmax_t
          */
-        explicit constexpr operator uintmax_t() const {
+        explicit inline operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
                 throw std::range_error("value too large for uintmax_t");
@@ -261,19 +261,19 @@ namespace com::saxbophone::arby {
         /**
          * @returns Value of this Nat object cast to long double
          */
-        explicit constexpr operator long double() const {
+        explicit inline operator long double() const {
             return this->_cast_to<long double>();
         }
         /**
          * @returns Value of this Nat object cast to float
          */
-        explicit constexpr operator float() const {
+        explicit inline operator float() const {
             return this->_cast_to<float>();
         }
         /**
          * @returns Value of this Nat object cast to double
          */
-        explicit constexpr operator double() const {
+        explicit inline operator double() const {
             return this->_cast_to<double>();
         }
         /**
@@ -281,7 +281,7 @@ namespace com::saxbophone::arby {
          * @tparam To The data type to cast to
          */
         template <typename To>
-        explicit constexpr operator To() const {
+        explicit inline operator To() const {
             // prevent overflow of To if it's a bounded type
             if constexpr (std::numeric_limits<To>::is_bounded) {
                 if (*this > std::numeric_limits<To>::max()) {
@@ -312,7 +312,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator++() {
+        inline Nat& operator++() {
             // increment least significant digit then rollover remaining digits as needed
             for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
                 // only contine to next digit if incrementing this one rolls over
@@ -333,7 +333,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat operator++(int) {
+        inline Nat operator++(int) {
             Nat old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
@@ -345,7 +345,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator--() {
+        inline Nat& operator--() {
             // empty digits vector (means value is zero) is a special case
             if (_digits.empty()) {
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
@@ -372,7 +372,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat operator--(int) {
+        inline Nat operator--(int) {
             Nat old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
@@ -384,7 +384,7 @@ namespace com::saxbophone::arby {
          * @returns resulting object after addition-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator+=(Nat rhs) {
+        inline Nat& operator+=(Nat rhs) {
             // both args being zero is a no-op, guard against this
             if (not (_digits.empty() and rhs._digits.empty())) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
@@ -418,7 +418,7 @@ namespace com::saxbophone::arby {
          * @returns sum of lhs + rhs
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator+(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator+(Nat lhs, const Nat& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -430,7 +430,7 @@ namespace com::saxbophone::arby {
          * @throws std::underflow_error when rhs is bigger than this
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator-=(Nat rhs) {
+        inline Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (not rhs._digits.empty()) {
@@ -470,7 +470,7 @@ namespace com::saxbophone::arby {
          * @throws std::underflow_error when rhs is bigger than lhs
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator-(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator-(Nat lhs, const Nat& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -481,7 +481,7 @@ namespace com::saxbophone::arby {
          * @returns resulting object after multiplication-assignment
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
-        constexpr Nat& operator*=(const Nat& rhs) {
+        inline Nat& operator*=(const Nat& rhs) {
             Nat product = *this * rhs; // uses friend *operator
             // assign product's digits back to our digits
             _digits = product._digits;
@@ -493,7 +493,7 @@ namespace com::saxbophone::arby {
          * @returns product of lhs * rhs
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
-        friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
+        friend inline Nat operator*(const Nat& lhs, const Nat& rhs) {
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
@@ -525,7 +525,7 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for Nat::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
-        static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
+        static inline Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
@@ -537,7 +537,7 @@ namespace com::saxbophone::arby {
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
-        static constexpr OverflowType estimate_division(const Nat& lhs, const Nat& rhs) {
+        static inline OverflowType estimate_division(const Nat& lhs, const Nat& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits.front();
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(++rhs._digits.begin(), rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
@@ -566,7 +566,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        static inline std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.empty()) {
                 throw std::domain_error("division by zero");
@@ -608,7 +608,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        constexpr Nat& operator/=(const Nat& rhs) {
+        inline Nat& operator/=(const Nat& rhs) {
             Nat quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
@@ -621,7 +621,7 @@ namespace com::saxbophone::arby {
          * @returns quotient of lhs / rhs
          * @todo Work out time-complexity
          */
-        friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator/(Nat lhs, const Nat& rhs) {
             Nat quotient;
             std::tie(quotient, std::ignore) = Nat::divmod(lhs, rhs);
             return quotient;
@@ -635,7 +635,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        constexpr Nat& operator%=(const Nat& rhs) {
+        inline Nat& operator%=(const Nat& rhs) {
             Nat remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
@@ -649,7 +649,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator%(Nat lhs, const Nat& rhs) {
             Nat remainder;
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
@@ -658,7 +658,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise OR-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator|=(const Nat& rhs) {
+        inline Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
                 _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
@@ -680,7 +680,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise OR operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator|(Nat lhs, const Nat& rhs) {
             lhs |= rhs; // reuse member operator
             return lhs;
         }
@@ -688,7 +688,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise AND-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator&=(const Nat& rhs) {
+        inline Nat& operator&=(const Nat& rhs) {
             /*
              * if rhs has fewer digits than this, we can remove this' leading
              * digits because they would be AND'ed with implicit zero which is
@@ -722,7 +722,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise AND operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator&(Nat lhs, const Nat& rhs) {
             lhs &= rhs; // reuse member operator
             return lhs;
         }
@@ -730,7 +730,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise XOR-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator^=(const Nat& rhs) {
+        inline Nat& operator^=(const Nat& rhs) {
             Nat result = *this ^ rhs; // reuse friend function
             // re-assign digits to this
             _digits = result._digits;
@@ -740,7 +740,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise XOR operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
+        friend inline Nat operator^(Nat lhs, const Nat& rhs) {
             Nat result;
             auto lhs_it = lhs._digits.begin();
             auto rhs_it = rhs._digits.begin();
@@ -772,22 +772,22 @@ namespace com::saxbophone::arby {
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
-        // constexpr Nat& operator<<=(const Nat& n) {
+        // inline Nat& operator<<=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // left-shift
-        // friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
+        // friend inline Nat operator<<(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
         // // right-shift-assignment
-        // constexpr Nat& operator>>=(const Nat& n) {
+        // inline Nat& operator>>=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // right-shift
-        // friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
+        // friend inline Nat operator>>(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
@@ -796,7 +796,7 @@ namespace com::saxbophone::arby {
          * @returns `false` when value is `0`, otherwise `true`
          * @note Complexity: @f$ \mathcal{O(1)} @f$
          */
-        explicit constexpr operator bool() const {
+        explicit inline operator bool() const {
             // zero is false --all other values are true
             return not _digits.empty(); // zero is encoded as empty digits array
         }
@@ -827,7 +827,7 @@ namespace com::saxbophone::arby {
          * or certainly more than can be stored in unsigned long long...
          * @relatedalso com::saxbophone::arby::Nat
          */
-        constexpr Nat operator "" _nat(const char* literal) {
+        inline Nat operator "" _nat(const char* literal) {
             // detect number base
             std::uint8_t base = 10; // base-10 is the fallback base
             if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
@@ -872,39 +872,39 @@ namespace com::saxbophone::arby {
 template <>
 class std::numeric_limits<com::saxbophone::arby::Nat> {
 public:
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = false;
-    static constexpr bool is_integer = true;
-    static constexpr bool is_exact = true;
-    static constexpr bool has_infinity = false; // N/A
-    static constexpr bool has_quiet_NaN = false; // N/A
-    static constexpr bool has_signaling_NaN = false; // N/A
-    static constexpr bool has_denorm = false; // N/A
-    static constexpr bool has_denorm_loss = false; // N/A
-    static constexpr std::float_round_style round_style = std::round_toward_zero;
-    static constexpr bool is_iec559 = false;
-    static constexpr bool is_bounded = false; // an unbounded type!
-    static constexpr bool is_modulo = false; // Nat increases number of digits on overflow. Underflow is undefined.
-    static constexpr int digits = 0; // N/A --no hard limit
-    static constexpr int digits10 = 0; // N/A --no hard limit
-    static constexpr int max_digits10 = 0; // N/A --no hard limit
-    static constexpr int radix = com::saxbophone::arby::Nat::BASE; // NOTE: this is the radix used for each digit, all of which are binary
-    static constexpr int min_exponent = 0; // N/A
-    static constexpr int min_exponent10 = 0; // N/A
-    static constexpr int max_exponent = 0; // N/A
-    static constexpr int max_exponent10 = 0; // N/A
-    static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
-    static constexpr bool tinyness_before = false; // N/A
-    // these methods should be made constexpr when constexpr std::vector is widely supported
-    static constexpr com::saxbophone::arby::Nat min() { return 0; };
-    static constexpr com::saxbophone::arby::Nat lowest() { return 0; };
-    static constexpr com::saxbophone::arby::Nat max() { return 0; }; // N/A --no hard limit on maximum value
-    static constexpr com::saxbophone::arby::Nat epsilon() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat round_error() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat infinity() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat quiet_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat signaling_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat denorm_min() { return 0; } // N/A
+    static inline bool is_specialized = true;
+    static inline bool is_signed = false;
+    static inline bool is_integer = true;
+    static inline bool is_exact = true;
+    static inline bool has_infinity = false; // N/A
+    static inline bool has_quiet_NaN = false; // N/A
+    static inline bool has_signaling_NaN = false; // N/A
+    static inline bool has_denorm = false; // N/A
+    static inline bool has_denorm_loss = false; // N/A
+    static inline std::float_round_style round_style = std::round_toward_zero;
+    static inline bool is_iec559 = false;
+    static inline bool is_bounded = false; // an unbounded type!
+    static inline bool is_modulo = false; // Nat increases number of digits on overflow. Underflow is undefined.
+    static inline int digits = 0; // N/A --no hard limit
+    static inline int digits10 = 0; // N/A --no hard limit
+    static inline int max_digits10 = 0; // N/A --no hard limit
+    static inline int radix = com::saxbophone::arby::Nat::BASE; // NOTE: this is the radix used for each digit, all of which are binary
+    static inline int min_exponent = 0; // N/A
+    static inline int min_exponent10 = 0; // N/A
+    static inline int max_exponent = 0; // N/A
+    static inline int max_exponent10 = 0; // N/A
+    static inline bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
+    static inline bool tinyness_before = false; // N/A
+    // these methods should be made inline when inline std::vector is widely supported
+    static inline com::saxbophone::arby::Nat min() { return 0; };
+    static inline com::saxbophone::arby::Nat lowest() { return 0; };
+    static inline com::saxbophone::arby::Nat max() { return 0; }; // N/A --no hard limit on maximum value
+    static inline com::saxbophone::arby::Nat epsilon() { return 0; } // N/A
+    static inline com::saxbophone::arby::Nat round_error() { return 0; } // N/A
+    static inline com::saxbophone::arby::Nat infinity() { return 0; } // N/A
+    static inline com::saxbophone::arby::Nat quiet_NaN() { return 0; } // N/A
+    static inline com::saxbophone::arby::Nat signaling_NaN() { return 0; } // N/A
+    static inline com::saxbophone::arby::Nat denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard
