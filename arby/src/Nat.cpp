@@ -32,17 +32,14 @@ namespace com::saxbophone::arby {
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
-        // work out how many base digits are needed to represent this, as well as the max we can get out of uintmax_t
-        Nat digits_needed;
-        if (not _digits.empty()) { // if > 0
-            std::tie(digits_needed, std::ignore) = ilog(base, *this);
-        }
-        digits_needed += 1;
+        // find out how many digits of the given base can be squeezed into uintmax_t
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
+        // we will build up the string using digits of this base, for efficiency
         const Nat chunk = pow(base, max_possible);
         Nat value = *this;
         std::string digits;
+        // build the digits up backwards, least-significant-first up to the most
         do {
             std::ostringstream output;
             auto [quotient, remainder] = Nat::divmod(value, chunk);
