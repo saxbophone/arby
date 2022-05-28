@@ -40,7 +40,6 @@ namespace com::saxbophone::arby {
         digits_needed += 1;
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
-        max_possible -= 1; // the highest of these digits probably can't go all the way, knock one off to be safe
         std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
             // use binary divide-and-conquer to recursively generate digit-chunks
