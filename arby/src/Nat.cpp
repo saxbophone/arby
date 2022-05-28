@@ -15,10 +15,14 @@
 #include <cstdint>
 
 #include <algorithm>
+#include <iomanip>
+#include <limits>
 #include <sstream>
 #include <string>
+#include <tuple>         // tie
 
 #include <arby/Nat.hpp>
+#include <arby/math.hpp> // ilog
 
 
 namespace com::saxbophone::arby {
@@ -28,23 +32,37 @@ namespace com::saxbophone::arby {
       {}
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
+        // find out how many digits of the given base can be squeezed into uintmax_t
+        Nat max_possible;
+        std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
+        // we will build up the string using digits of this base, for efficiency
+        const Nat chunk = pow(base, max_possible);
         Nat value = *this;
-        std::ostringstream digits;
+        std::string digits;
+        // build the digits up backwards, least-significant-first up to the most
         do {
-            auto [quotient, remainder] = Nat::divmod(value, base);
-            if (remainder == 0) {
-                digits << '0';
-            } else {
-                // regardless of what base is requested, we can use hex for all
-                // of them as we're only doing one digit at a time
-                digits << std::hex << remainder._digits.front();
+            std::ostringstream output;
+            auto [quotient, remainder] = Nat::divmod(value, chunk);
+            // only pad to width of chunk if this is not the front chunk
+            if (quotient != 0) {
+                output << std::setfill('0') << std::setw((uintmax_t)max_possible);
             }
+            switch (base) {
+            case 8:
+                output << std::oct;
+                break;
+            case 16:
+                output << std::hex;
+                break;
+            default:
+                output << std::dec;
+                break;
+            }
+            output << (uintmax_t)remainder;
+            digits = output.str() + digits;
             value = quotient;
         } while (value > 0);
-        // output the digits in little-endian order, so we need to reverse them
-        std::string output = digits.str();
-        std::reverse(output.begin(), output.end());
-        return output;
+        return digits;
     }
 
     /**
