@@ -40,27 +40,32 @@ namespace com::saxbophone::arby {
         digits_needed += 1;
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
-        std::ostringstream digits;
         if (digits_needed > max_possible) { // we can't just print through uintmax_t
-            // use binary divide-and-conquer to recursively generate digit-chunks
-            auto [front_digits, back_digits] = divmod(digits_needed, 2);
-            back_digits += front_digits; // back is basically front+remainder
-            // divide into two Nat instances for front and back, print recursively
-            Nat p = pow(base, back_digits);
-            auto [front, back] = divmod(*this, p);
-            // generate a string for both parts
-            std::string front_str = front._stringify_for_base(base);
-            std::string back_str = back._stringify_for_base(base);
-            // pad either of them with leading zeroes if needed
-            if (front_str.length() < front_digits) {
-                digits << std::string((uintmax_t)front_digits - front_str.length(), '0');
-            }
-            digits << front_str;
-            if (back_str.length() < back_digits) {
-                digits << std::string((uintmax_t)back_digits - back_str.length(), '0');
-            }
-            digits << back_str;
+            std::string digits;
+            Nat value = *this;
+            Nat chunk = pow(base, max_possible);
+            do {
+                auto [quotient, remainder] = Nat::divmod(value, chunk);
+                std::ostringstream oss;
+                oss << std::setfill('0') << std::setw((uintmax_t)max_possible);
+                switch (base) {
+                case 8:
+                    oss << std::oct;
+                    break;
+                case 16:
+                    oss << std::hex;
+                    break;
+                default:
+                    oss << std::dec;
+                    break;
+                }
+                oss << (uintmax_t)remainder;
+                digits = oss.str() + digits;
+                value = quotient;
+            } while (value > 0);
+            return digits;
         } else {
+            std::ostringstream digits;
             digits << std::setfill('0') << std::setw((uintmax_t)digits_needed);
             switch (base) {
             case 8:
@@ -74,8 +79,8 @@ namespace com::saxbophone::arby {
                 break;
             }
             digits << (uintmax_t)*this;
+            return digits.str();
         }
-        return digits.str();
     }
 
     /**
