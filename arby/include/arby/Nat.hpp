@@ -528,12 +528,13 @@ namespace com::saxbophone::arby {
         static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
-            // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
-            if (wiggle_room > 0 and lhs._digits.front() < rhs._digits.front()) {
-                wiggle_room--;
-            }
+            // provisionally perform the shift up
             Nat shift = 1;
             shift._digits.push_back(wiggle_room, 0);
+            // drag back down wiggle_room while shifted rhs > lhs
+            while (rhs * shift > lhs) {
+                shift._digits.pop_back();
+            }
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
