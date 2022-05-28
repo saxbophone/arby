@@ -140,6 +140,7 @@ namespace com::saxbophone::arby {
     private:
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
+        static constexpr std::size_t BITS_PER_DIGIT = PRIVATE::GetStorageType<int>::BITS_BETWEEN;
         // traps with an exception if there are leading zeroes in the digits array
         constexpr void _trap_leading_zero() const {
             if (_digits.size() > 0 and _digits.front() == 0) {
@@ -770,10 +771,35 @@ namespace com::saxbophone::arby {
             }
             return result;
         }
-        // XXX: unimplemented shift operators commented out until implemented
         // left-shift-assignment
         constexpr Nat& operator<<=(const Nat& n) {
-            // TODO: implement
+            // break the shift up into whole-digit and part-digit shifts
+            // NOTE: we will have to use something other than divmod if it gets
+            // reimplemented in terms of shifting for binary powers!
+            auto [wholes, parts] = Nat::divmod(n, BITS_PER_DIGIT);
+            // shift up by whole number of digits first
+            _digits.push_back((uintmax_t)wholes, 0); // XXX: wholes may overflow but in that case unlikely enough memory
+            // handle the sub-digit shift next
+            if (parts > 0) {
+                // add another digit at the top end to accommodate the shift
+                _digits.push_front(0);
+                // shift up each digit into a bucket twice the size (to not lose top bits)
+                for (auto it = ++_digits.begin(); it != _digits.end(); it++) { // second element
+                    OverflowType bucket = *it;
+                    bucket <<= (uintmax_t)parts; // do the shift into bucket
+                    *it = bucket; // overwrite original value with lower bits in bucket
+                    // write upper part of the bucket
+                    bucket >>= BITS_PER_DIGIT;
+                    it--;
+                    *it |= bucket; // OR is to make sure we preserve any already-written bits
+                    it++;
+                }
+            }
+            // XXX: why do we require this? Shift operation isn't supposed to leave any leading zeroes...
+            if (_digits.front() == 0) {
+                _digits.pop_front();
+            }
+            _trap_leading_zero(); // TODO: remove when satisfied not required
             return *this;
         }
         // left-shift
