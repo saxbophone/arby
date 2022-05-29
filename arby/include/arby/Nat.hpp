@@ -140,9 +140,12 @@ namespace com::saxbophone::arby {
     private:
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
-        // traps with an exception if there are leading zeroes in the digits array
-        constexpr void _trap_leading_zero() const {
-            if (_digits.size() > 0 and _digits.front() == 0) {
+        // validates the digits array
+        constexpr void _validate_digits() const {
+            if (_digits.empty()) {
+                throw std::logic_error("no digits in internal representation");
+            }
+            if (_digits.size() > 1 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
         }
@@ -183,7 +186,9 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Nat() {} // uses default ctor of vector to init _digits to zero-size
+        constexpr Nat() {
+            _validate_digits();
+        } // uses default ctor of vector to init _digits to zero-size
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
@@ -198,7 +203,7 @@ namespace com::saxbophone::arby {
                     power /= Nat::BASE;
                 }
             }
-            _trap_leading_zero();
+            _validate_digits();
         }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
@@ -224,7 +229,7 @@ namespace com::saxbophone::arby {
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
             }
-            output._trap_leading_zero();
+            output._validate_digits();
             return output;
         }
         /**
@@ -324,7 +329,7 @@ namespace com::saxbophone::arby {
             if (_digits.empty() or _digits.front() == 0) {
                 _digits.push_front(1);
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return new value by reference
         }
         /**
@@ -362,7 +367,7 @@ namespace com::saxbophone::arby {
                     _digits.pop_front();
                 }
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return new value by reference
         }
         /**
@@ -409,7 +414,7 @@ namespace com::saxbophone::arby {
                     _digits.push_front(carry);
                 }
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return the result by reference
         }
         /**
@@ -461,6 +466,7 @@ namespace com::saxbophone::arby {
             while (not _digits.empty() and _digits.front() == 0) {
                 _digits.pop_front();
             }
+            _validate_digits();
             return *this; // return the result by reference
         }
         /**
@@ -521,6 +527,7 @@ namespace com::saxbophone::arby {
                     l++;
                 }
             }
+            product._validate_digits();
             return product;
         }
     private: // private helper methods for Nat::divmod()
@@ -598,6 +605,8 @@ namespace com::saxbophone::arby {
                 // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
                 // terminate.
             }
+            quotient._validate_digits();
+            remainder._validate_digits();
             return {quotient, remainder};
         }
         /**
@@ -675,6 +684,7 @@ namespace com::saxbophone::arby {
             for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
                 *it |= *rhs_it;
             }
+            _validate_digits();
             return *this;
         }
         /**
@@ -717,6 +727,7 @@ namespace com::saxbophone::arby {
             while (not _digits.empty() and _digits.front() == 0) {
                 _digits.pop_front();
             }
+            _validate_digits();
             return *this;
         }
         /**
@@ -769,6 +780,7 @@ namespace com::saxbophone::arby {
                     rhs_it++;
                 }
             }
+            result._validate_digits();
             return result;
         }
         // XXX: unimplemented shift operators commented out until implemented
