@@ -764,16 +764,16 @@ namespace com::saxbophone::arby {
                     r--;
                     rhs_it++;
                 } else { // otherwise, consume both sides
-                    auto answer = *lhs_it ^ *rhs_it;
-                    // if the first digit, avoid pushing if zero to avoid leading zeroes
-                    if (not result._digits.empty() or answer != 0) {
-                        result._digits.push_back(answer);
-                    }
+                    result._digits.push_back(*lhs_it ^ *rhs_it);
                     l--;
                     r--;
                     lhs_it++;
                     rhs_it++;
                 }
+            }
+            // remove any leading zeroes
+            while (result._digits.size() > 1 and result._digits.front() == 0) {
+                result._digits.pop_front();
             }
             result._validate_digits();
             return result;
