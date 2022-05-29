@@ -292,7 +292,7 @@ namespace com::saxbophone::arby {
             // take a short-cut if destination type is bounded and is not bigger than largest digit value
             if constexpr (std::numeric_limits<To>::is_bounded and std::numeric_limits<To>::max() <= (BASE - 1)) {
                 // at this point, out-of-bounds has already been checked. Just return last digit
-                return _digits.empty() ? (To)0 : (To)_digits.back();
+                return (To)_digits.back();
             } else {
                 return this->_cast_to<To>();
             }
@@ -322,7 +322,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // if last digit is zero, we need another one
-            if (_digits.empty() or _digits.front() == 0) {
+            if (_digits.front() == 0) {
                 _digits.push_front(1);
             }
             _validate_digits();
@@ -433,7 +433,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
-            if (not rhs._digits.front() == 0) {
+            if (rhs._digits.front() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -806,7 +806,7 @@ namespace com::saxbophone::arby {
          */
         explicit constexpr operator bool() const {
             // zero is false --all other values are true
-            return not _digits.front() == 0; // assuming no leading zeroes
+            return _digits.front() != 0; // assuming no leading zeroes
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
