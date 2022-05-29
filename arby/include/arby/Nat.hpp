@@ -719,7 +719,7 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (not _digits.empty() and _digits.front() == 0) {
+            while (_digits.size() > 1 and _digits.front() == 0) {
                 _digits.pop_front();
             }
             _validate_digits();
