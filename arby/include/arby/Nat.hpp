@@ -138,12 +138,14 @@ namespace com::saxbophone::arby {
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         // validates the digits array
         constexpr void _validate_digits() const {
+            #ifndef NDEBUG // only run checks in debug mode
             if (_digits.empty()) {
                 throw std::logic_error("no digits in internal representation");
             }
             if (_digits.size() > 1 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
+            #endif
         }
     public:
         /**
