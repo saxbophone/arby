@@ -386,7 +386,7 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat& operator+=(Nat rhs) {
             // both args being zero is a no-op, guard against this
-            if (not (_digits.empty() and rhs._digits.empty())) {
+            if (not (_digits.front() == 0 and rhs._digits.front() == 0)) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -433,7 +433,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
-            if (not rhs._digits.empty()) {
+            if (not rhs._digits.front() == 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -458,7 +458,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (not _digits.empty() and _digits.front() == 0) {
+            while (_digits.size() > 1 and _digits.front() == 0) {
                 _digits.pop_front();
             }
             _validate_digits();
