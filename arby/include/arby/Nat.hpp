@@ -216,13 +216,15 @@ namespace com::saxbophone::arby {
                 throw std::domain_error("Nat cannot be Infinite or NaN");
             }
             Nat output;
-            while (value > 1) { // value < 1 is zero which we store implicitly as empty array
+            if (value < 1) { return output; } // output is already zero
+            while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Nat::BASE);
                 output._digits.push_front(digit);
                 value /= Nat::BASE;
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
             }
+            output._digits.pop_back(); // first digit is zero-placeholder, now overwritten
             output._validate_digits();
             return output;
         }
