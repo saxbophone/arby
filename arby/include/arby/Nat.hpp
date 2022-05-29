@@ -98,10 +98,6 @@ namespace com::saxbophone::arby {
 
         // returns ceil(logₐ(n))
         constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
-            // n = 0 is the exception --we don't use any digits at all for 0
-            if (n == 0) {
-                return 0;
-            }
             std::size_t remainder;
             std::size_t exponent = 0;
             do {
@@ -186,22 +182,20 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Nat() {
+        constexpr Nat() : _digits{0} {
             _validate_digits();
-        } // uses default ctor of vector to init _digits to zero-size
+        }
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
         constexpr Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
-            if (_digits.size() > 0) {
-                // fill out digits in big-endian order
-                uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
-                for (auto& digit : _digits) {
-                    digit = (StorageType)(value / power);
-                    value %= power;
-                    power /= Nat::BASE;
-                }
+            // fill out digits in big-endian order
+            uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
+            for (auto& digit : _digits) {
+                digit = (StorageType)(value / power);
+                value %= power;
+                power /= Nat::BASE;
             }
             _validate_digits();
         }
