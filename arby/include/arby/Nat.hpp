@@ -810,6 +810,19 @@ namespace com::saxbophone::arby {
             // zero is false --all other values are true
             return _digits.front() != 0; // assuming no leading zeroes
         }
+        // get size by number of digits
+        constexpr std::size_t digit_length() const {
+            return {};
+        }
+        // get size by number of bytes needed to store the number's digits
+        constexpr std::size_t byte_length() const {
+            return {};
+        }
+        // get size by number of bits needed to store the number's value
+        // NOTE: this can be less than byte_length() * 8
+        constexpr std::size_t bit_length() const {
+            return {};
+        }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
