@@ -826,7 +826,12 @@ namespace com::saxbophone::arby {
         // get size by number of bits needed to store the number's value
         // NOTE: this can be less than byte_length() * 8
         constexpr std::size_t bit_length() const {
-            return {};
+            // this is how many bits are needed to store the digits
+            std::size_t bits_for_digits = _digits.size() * sizeof(StorageType) * 8;
+            // reduce size if leading digit is not full occupancy
+            std::size_t leading_occupancy = PRIVATE::fit(_digits.front(), 2);
+            bits_for_digits -= (sizeof(StorageType) * 8 - leading_occupancy);
+            return bits_for_digits;
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
