@@ -812,7 +812,7 @@ namespace com::saxbophone::arby {
         }
         // get size by number of digits
         constexpr std::size_t digit_length() const {
-            return {};
+            return _digits.size();
         }
         // get size by number of bytes needed to store the number's digits
         constexpr std::size_t byte_length() const {
