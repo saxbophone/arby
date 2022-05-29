@@ -58,7 +58,7 @@ TEMPLATE_TEST_CASE(
     CHECK((TestType)arby::Nat((uintmax_t)value) == (TestType)value);
 }
 
-TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error") {
+TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error", "[casting]") {
     auto value = GENERATE(
         take(1000,
             random(
@@ -71,7 +71,7 @@ TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error"
     CHECK_THROWS_AS(arby::Nat::from_float(value), std::domain_error);
 }
 
-TEST_CASE("arby::Nat::from_float() with non-finite value throws std::domain_error") {
+TEST_CASE("arby::Nat::from_float() with non-finite value throws std::domain_error", "[casting]") {
     // need IEC 559 float to be sure that qNaN, sNan, ±Inf all exist
     if (std::numeric_limits<long double>::is_iec559) {
         auto value = GENERATE(
@@ -87,7 +87,7 @@ TEST_CASE("arby::Nat::from_float() with non-finite value throws std::domain_erro
     }
 }
 
-TEST_CASE("arby::Nat::from_float() with value between 0 and 1") {
+TEST_CASE("arby::Nat::from_float() with value between 0 and 1", "[casting]") {
     // NOTE: top range is the last float value > 1
     long double zero_ish = GENERATE(take(1000, random(0.0L, std::nextafter(1.0L, 0.0L))));
     CAPTURE(zero_ish);
@@ -98,7 +98,7 @@ TEST_CASE("arby::Nat::from_float() with value between 0 and 1") {
     CHECK((long double)object == Approx(std::trunc(zero_ish)));
 }
 
-TEST_CASE("arby::Nat::from_float() with positive value") {
+TEST_CASE("arby::Nat::from_float() with positive value", "[casting]") {
     auto power = GENERATE(0.125, 0.25, 0.5, 1, 2, 4, 8);
     auto value = GENERATE_COPY(
         take(100,
