@@ -810,11 +810,16 @@ namespace com::saxbophone::arby {
             // zero is false --all other values are true
             return _digits.front() != 0; // assuming no leading zeroes
         }
-        // get size by number of digits
+        /**
+         * @returns size by number of digits
+         */
         constexpr std::size_t digit_length() const {
             return _digits.size();
         }
-        // get size by number of bytes needed to store the number's digits
+        /**
+         * @returns size by number of bytes needed to store the number's digits
+         * @note this can be less than \f$ digits \times sizeof(digit) \f$
+         */
         constexpr std::size_t byte_length() const {
             // this is how many bytes are needed to store the digits
             std::size_t bytes_for_digits = _digits.size() * sizeof(StorageType);
@@ -823,8 +828,10 @@ namespace com::saxbophone::arby {
             bytes_for_digits -= (sizeof(StorageType) - leading_occupancy);
             return bytes_for_digits;
         }
-        // get size by number of bits needed to store the number's value
-        // NOTE: this can be less than byte_length() * 8
+        /**
+         * @returns size by number of bits needed to store the number's value
+         * @note this can be less than \f$ bytes \times 8 \f$
+         */
         constexpr std::size_t bit_length() const {
             // this is how many bits are needed to store the digits
             std::size_t bits_for_digits = _digits.size() * sizeof(StorageType) * 8;
