@@ -347,8 +347,7 @@ namespace com::saxbophone::arby {
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator--() {
-            // empty digits vector (means value is zero) is a special case
-            if (_digits.empty()) {
+            if (_digits.front() == 0) { // front = 0 means value is zero since no leading zeroes allowed
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit then borrow from remaining digits as needed
