@@ -806,7 +806,7 @@ namespace com::saxbophone::arby {
          */
         explicit constexpr operator bool() const {
             // zero is false --all other values are true
-            return not _digits.empty(); // zero is encoded as empty digits array
+            return not _digits.front() == 0; // assuming no leading zeroes
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
