@@ -571,7 +571,7 @@ namespace com::saxbophone::arby {
          */
         static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
-            if (rhs._digits.empty()) {
+            if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
             }
             // this will gradually accumulate the calculated quotient
