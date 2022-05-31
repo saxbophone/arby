@@ -79,6 +79,7 @@ TEST_CASE("arby::Nat right bit-shift assignment", "[bit-shifting]") {
             }
         )
     );
+    CAPTURE(lhs, rhs, result);
 
     lhs >>= rhs;
 

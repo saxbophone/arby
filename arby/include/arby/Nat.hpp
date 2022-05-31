@@ -809,7 +809,7 @@ namespace com::saxbophone::arby {
             if (_digits.front() == 0) {
                 _digits.pop_front();
             }
-            _trap_leading_zero(); // TODO: remove when satisfied not required
+            _validate_digits(); // TODO: remove when satisfied not required
             return *this;
         }
         // left-shift
@@ -820,14 +820,20 @@ namespace com::saxbophone::arby {
         // right-shift-assignment
         constexpr Nat& operator>>=(Nat n) {
             // cap n to be no more than total bits in number
-            // if (n > ) XXX: need bit_length()!
+            if (n > this->bit_length()) { n = this->bit_length(); }
             // break the shift up into whole-digit and part-digit shifts
             // NOTE: we will have to use something other than divmod if it gets
             // reimplemented in terms of shifting for binary powers!
             auto [wholes, parts] = Nat::divmod(n, BITS_PER_DIGIT);
             // shift down by whole number of digits first
-            _digits.pop_back((uintmax_t)wholes, 0); // XXX: wholes may overflow but in that case unlikely enough memory
-            _trap_leading_zero(); // TODO: remove when satisfied not required
+            for (Nat i = 0; i < wholes; i++) {
+                _digits.pop_back();
+            }
+            // replace digits array with zero if empty
+            if (_digits.empty()) {
+                _digits = {0};
+            }
+            _validate_digits(); // TODO: remove when satisfied not required
             return *this;
         }
         // right-shift
