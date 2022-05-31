@@ -198,3 +198,12 @@ TEST_CASE("Division of much smaller arby::Nat by much larger arby::Nat", "[divis
     // answer should always be zero
     CHECK((uintmax_t)(lhs / rhs) == 0);
 }
+
+using namespace com::saxbophone::arby::literals;
+
+TEST_CASE("Failing division", "[divmod]") {
+    auto [quotient, remainder] = arby::Nat::divmod(81238891391892371893_nat, 10000000000_nat);
+
+    CHECK(quotient == 8123889139_nat);
+    CHECK(remainder == 1892371893_nat);
+}

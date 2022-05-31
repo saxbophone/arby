@@ -98,10 +98,6 @@ namespace com::saxbophone::arby {
 
         // returns ceil(logₐ(n))
         constexpr std::size_t fit(uintmax_t n, uintmax_t a) {
-            // n = 0 is the exception --we don't use any digits at all for 0
-            if (n == 0) {
-                return 0;
-            }
             std::size_t remainder;
             std::size_t exponent = 0;
             do {
@@ -141,11 +137,16 @@ namespace com::saxbophone::arby {
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         static constexpr std::size_t BITS_PER_DIGIT = PRIVATE::GetStorageType<int>::BITS_BETWEEN;
-        // traps with an exception if there are leading zeroes in the digits array
-        constexpr void _trap_leading_zero() const {
-            if (_digits.size() > 0 and _digits.front() == 0) {
+        // validates the digits array
+        constexpr void _validate_digits() const {
+            #ifndef NDEBUG // only run checks in debug mode
+            if (_digits.empty()) {
+                throw std::logic_error("no digits in internal representation");
+            }
+            if (_digits.size() > 1 and _digits.front() == 0) {
                 throw std::logic_error("leading zeroes in internal representation");
             }
+            #endif
         }
     public:
         /**
@@ -184,22 +185,22 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Nat() {} // uses default ctor of vector to init _digits to zero-size
+        constexpr Nat() : _digits{0} {
+            _validate_digits();
+        }
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
         constexpr Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
-            if (_digits.size() > 0) {
-                // fill out digits in big-endian order
-                uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
-                for (auto& digit : _digits) {
-                    digit = (StorageType)(value / power);
-                    value %= power;
-                    power /= Nat::BASE;
-                }
+            // fill out digits in big-endian order
+            uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
+            for (auto& digit : _digits) {
+                digit = (StorageType)(value / power);
+                value %= power;
+                power /= Nat::BASE;
             }
-            _trap_leading_zero();
+            _validate_digits();
         }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
@@ -218,14 +219,16 @@ namespace com::saxbophone::arby {
                 throw std::domain_error("Nat cannot be Infinite or NaN");
             }
             Nat output;
-            while (value > 1) { // value < 1 is zero which we store implicitly as empty array
+            if (value < 1) { return output; } // output is already zero
+            while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Nat::BASE);
                 output._digits.push_front(digit);
                 value /= Nat::BASE;
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
             }
-            output._trap_leading_zero();
+            output._digits.pop_back(); // first digit is zero-placeholder, now overwritten
+            output._validate_digits();
             return output;
         }
         /**
@@ -292,7 +295,7 @@ namespace com::saxbophone::arby {
             // take a short-cut if destination type is bounded and is not bigger than largest digit value
             if constexpr (std::numeric_limits<To>::is_bounded and std::numeric_limits<To>::max() <= (BASE - 1)) {
                 // at this point, out-of-bounds has already been checked. Just return last digit
-                return _digits.empty() ? (To)0 : (To)_digits.back();
+                return (To)_digits.back();
             } else {
                 return this->_cast_to<To>();
             }
@@ -322,10 +325,10 @@ namespace com::saxbophone::arby {
                 }
             }
             // if last digit is zero, we need another one
-            if (_digits.empty() or _digits.front() == 0) {
+            if (_digits.front() == 0) {
                 _digits.push_front(1);
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return new value by reference
         }
         /**
@@ -347,8 +350,7 @@ namespace com::saxbophone::arby {
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
         constexpr Nat& operator--() {
-            // empty digits vector (means value is zero) is a special case
-            if (_digits.empty()) {
+            if (_digits.front() == 0) { // front = 0 means value is zero since no leading zeroes allowed
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
                 // decrement least significant digit then borrow from remaining digits as needed
@@ -363,7 +365,7 @@ namespace com::saxbophone::arby {
                     _digits.pop_front();
                 }
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return new value by reference
         }
         /**
@@ -387,7 +389,7 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat& operator+=(Nat rhs) {
             // both args being zero is a no-op, guard against this
-            if (not (_digits.empty() and rhs._digits.empty())) {
+            if (not (_digits.front() == 0 and rhs._digits.front() == 0)) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -410,7 +412,7 @@ namespace com::saxbophone::arby {
                     _digits.push_front(carry);
                 }
             }
-            _trap_leading_zero();
+            _validate_digits();
             return *this; // return the result by reference
         }
         /**
@@ -434,7 +436,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
-            if (not rhs._digits.empty()) {
+            if (rhs._digits.front() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
                     _digits.push_front(rhs._digits.size() - _digits.size(), 0);
@@ -459,9 +461,10 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (not _digits.empty() and _digits.front() == 0) {
+            while (_digits.size() > 1 and _digits.front() == 0) {
                 _digits.pop_front();
             }
+            _validate_digits();
             return *this; // return the result by reference
         }
         /**
@@ -498,7 +501,7 @@ namespace com::saxbophone::arby {
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
-            if (not (lhs._digits.empty() or rhs._digits.empty())) {
+            if (not (lhs._digits.front() == 0 or rhs._digits.front() == 0)) {
                 // multiply each digit from lhs with each digit from rhs
                 std::size_t l = 0; // manual indices to track which digit we are on,
                 std::size_t r = 0; // as codlili's iterators are not random-access
@@ -522,6 +525,7 @@ namespace com::saxbophone::arby {
                     l++;
                 }
             }
+            product._validate_digits();
             return product;
         }
     private: // private helper methods for Nat::divmod()
@@ -529,12 +533,13 @@ namespace com::saxbophone::arby {
         static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
-            // drag back down wiggle_room if a shift is requested but lhs[0] < rhs[0]
-            if (wiggle_room > 0 and lhs._digits.front() < rhs._digits.front()) {
-                wiggle_room--;
-            }
+            // provisionally perform the shift up
             Nat shift = 1;
             shift._digits.push_back(wiggle_room, 0);
+            // drag back down wiggle_room while shifted rhs > lhs
+            while (rhs * shift > lhs) {
+                shift._digits.pop_back();
+            }
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
@@ -569,7 +574,7 @@ namespace com::saxbophone::arby {
          */
         static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
-            if (rhs._digits.empty()) {
+            if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
             }
             // this will gradually accumulate the calculated quotient
@@ -598,6 +603,8 @@ namespace com::saxbophone::arby {
                 // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
                 // terminate.
             }
+            quotient._validate_digits();
+            remainder._validate_digits();
             return {quotient, remainder};
         }
         /**
@@ -675,6 +682,7 @@ namespace com::saxbophone::arby {
             for (; it != _digits.end() and rhs_it != rhs._digits.end(); it++, rhs_it++) {
                 *it |= *rhs_it;
             }
+            _validate_digits();
             return *this;
         }
         /**
@@ -714,9 +722,10 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (not _digits.empty() and _digits.front() == 0) {
+            while (_digits.size() > 1 and _digits.front() == 0) {
                 _digits.pop_front();
             }
+            _validate_digits();
             return *this;
         }
         /**
@@ -758,17 +767,18 @@ namespace com::saxbophone::arby {
                     r--;
                     rhs_it++;
                 } else { // otherwise, consume both sides
-                    auto answer = *lhs_it ^ *rhs_it;
-                    // if the first digit, avoid pushing if zero to avoid leading zeroes
-                    if (not result._digits.empty() or answer != 0) {
-                        result._digits.push_back(answer);
-                    }
+                    result._digits.push_back(*lhs_it ^ *rhs_it);
                     l--;
                     r--;
                     lhs_it++;
                     rhs_it++;
                 }
             }
+            // remove any leading zeroes
+            while (result._digits.size() > 1 and result._digits.front() == 0) {
+                result._digits.pop_front();
+            }
+            result._validate_digits();
             return result;
         }
         // left-shift-assignment
@@ -832,7 +842,37 @@ namespace com::saxbophone::arby {
          */
         explicit constexpr operator bool() const {
             // zero is false --all other values are true
-            return not _digits.empty(); // zero is encoded as empty digits array
+            return _digits.front() != 0; // assuming no leading zeroes
+        }
+        /**
+         * @returns size by number of digits
+         */
+        constexpr std::size_t digit_length() const {
+            return _digits.size();
+        }
+        /**
+         * @returns size by number of bytes needed to store the number's digits
+         * @note this can be less than \f$ digits \times sizeof(digit) \f$
+         */
+        constexpr std::size_t byte_length() const {
+            // this is how many bytes are needed to store the digits
+            std::size_t bytes_for_digits = _digits.size() * sizeof(StorageType);
+            // reduce size if leading digit is not full occupancy
+            std::size_t leading_occupancy = PRIVATE::fit(_digits.front(), 256);
+            bytes_for_digits -= (sizeof(StorageType) - leading_occupancy);
+            return bytes_for_digits;
+        }
+        /**
+         * @returns size by number of bits needed to store the number's value
+         * @note this can be less than \f$ bytes \times 8 \f$
+         */
+        constexpr std::size_t bit_length() const {
+            // this is how many bits are needed to store the digits
+            std::size_t bits_for_digits = _digits.size() * sizeof(StorageType) * 8;
+            // reduce size if leading digit is not full occupancy
+            std::size_t leading_occupancy = PRIVATE::fit(_digits.front(), 2);
+            bits_for_digits -= (sizeof(StorageType) * 8 - leading_occupancy);
+            return bits_for_digits;
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
