@@ -808,8 +808,16 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // right-shift-assignment
-        constexpr Nat& operator>>=(const Nat& n) {
-            // TODO: implement
+        constexpr Nat& operator>>=(Nat n) {
+            // cap n to be no more than total bits in number
+            // if (n > ) XXX: need bit_length()!
+            // break the shift up into whole-digit and part-digit shifts
+            // NOTE: we will have to use something other than divmod if it gets
+            // reimplemented in terms of shifting for binary powers!
+            auto [wholes, parts] = Nat::divmod(n, BITS_PER_DIGIT);
+            // shift down by whole number of digits first
+            _digits.pop_back((uintmax_t)wholes, 0); // XXX: wholes may overflow but in that case unlikely enough memory
+            _trap_leading_zero(); // TODO: remove when satisfied not required
             return *this;
         }
         // right-shift
