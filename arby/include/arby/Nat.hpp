@@ -28,6 +28,7 @@
 #include <limits>
 #include <string>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 #include "codlili.hpp"
@@ -50,50 +51,42 @@
  */
 namespace com::saxbophone::arby {
     namespace PRIVATE {
-        /*
-         * these template specialisations are used for selecting the unsigned type
-         * to use for storing the digits of our arbitrary-size numbers
-         *
-         * the template specialisations pick the corresponding unsigned type and the
-         * next-smallest unsigned type for the given signed type, this is to ensure
-         * that the number base is not out of range of int on any given system, and
-         * means we can report it from the radix() method in numeric_limits<>
-         * (which returns int).
-         *
-         * - OverflowType denotes the unsigned equivalent of the given signed type,
-         * this can safely store MAX*MAX of the next-lowest unsigned type, so is
-         * useful to store the intermediate results for multiplication and addition.
-         * - StorageType denotes the next-lowest unsigned type. This is the type
-         * which is used to store the digits of the arbitrary-size number.
-         * - BITS_BETWEEN denotes the number of bits needed to shift StorageType
-         * up to OverflowType
-         */
-        template <typename T>
-        struct GetStorageType {
-            using OverflowType = void;
-            using StorageType = void;
-            static constexpr std::size_t BITS_BETWEEN = 0;
+        template <std::size_t BITS>
+        struct GetTypeForSize {
+            using Type = void;
+        };
+        template <>
+        struct GetTypeForSize<8> {
+            using Type = std::uint8_t;
+        };
+        template <>
+        struct GetTypeForSize<16> {
+            using Type = std::uint16_t;
+        };
+        template <>
+        struct GetTypeForSize<32> {
+            using Type = std::uint32_t;
+        };
+        template <>
+        struct GetTypeForSize<64> {
+            using Type = std::uint64_t;
+        };
+        template <typename T> requires (not std::numeric_limits<T>::is_signed)
+        struct GetNextBiggerType {
+            using Type = GetTypeForSize<std::numeric_limits<T>::digits * 2>::Type;
+        };
+        template <typename T> requires (not std::numeric_limits<T>::is_signed)
+        struct GetNextSmallerType {
+            using Type = GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
         };
 
-        template <>
-        struct GetStorageType<std::int64_t> {
-            using OverflowType = std::uint64_t;
-            using StorageType = std::uint32_t;
-            static constexpr std::size_t BITS_BETWEEN = 32;
-        };
-
-        template <>
-        struct GetStorageType<std::int32_t> {
-            using OverflowType = std::uint32_t;
-            using StorageType = std::uint16_t;
-            static constexpr std::size_t BITS_BETWEEN = 16;
-        };
-
-        template <>
-        struct GetStorageType<std::int16_t> {
-            using OverflowType = std::uint16_t;
-            using StorageType = std::uint8_t;
-            static constexpr std::size_t BITS_BETWEEN = 8;
+        struct StorageTraits {
+            using StorageType = std::conditional<
+                (std::numeric_limits<unsigned int>::digits < std::numeric_limits<uintmax_t>::digits),
+                unsigned int,
+                GetNextSmallerType<unsigned int>::Type
+            >::type;
+            using OverflowType = GetNextBiggerType<StorageType>::Type;
         };
 
         // returns ceil(logₐ(n))
@@ -134,8 +127,9 @@ namespace com::saxbophone::arby {
      */
     class Nat {
     private:
-        using StorageType = PRIVATE::GetStorageType<int>::StorageType;
-        using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
+        using StorageType = PRIVATE::StorageTraits::StorageType;
+        using OverflowType = PRIVATE::StorageTraits::OverflowType;
+        static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
         constexpr void _validate_digits() const {
             #ifndef NDEBUG // only run checks in debug mode
@@ -152,7 +146,7 @@ namespace com::saxbophone::arby {
          * @brief The number base used internally to store the value
          * @details This is the radix that the digits are encoded in
          */
-        static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
+        static constexpr OverflowType BASE = (OverflowType)std::numeric_limits<StorageType>::max() + 1;
         /**
          * @brief Defaulted equality operator for Nat objects
          * @param rhs other Nat object to compare against
@@ -404,7 +398,7 @@ namespace com::saxbophone::arby {
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
                     *it = (StorageType)addition;
                     // update the carry with the value in the top significant bits
-                    carry = (StorageType)(addition >> PRIVATE::GetStorageType<int>::BITS_BETWEEN);
+                    carry = (StorageType)(addition >> BITS_BETWEEN);
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
@@ -928,7 +922,7 @@ public:
     static constexpr int digits = 0; // N/A --no hard limit
     static constexpr int digits10 = 0; // N/A --no hard limit
     static constexpr int max_digits10 = 0; // N/A --no hard limit
-    static constexpr int radix = com::saxbophone::arby::Nat::BASE; // NOTE: this is the radix used for each digit, all of which are binary
+    static constexpr int radix = 2; // NOTE: no longer stores Nat::BASE as radix must be an int, but BASE can overflow int
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A

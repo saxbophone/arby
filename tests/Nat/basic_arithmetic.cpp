@@ -26,8 +26,7 @@ TEST_CASE("std::numeric_limits<arby::Nat>", "[numeric-limits]") {
     CHECK(std::numeric_limits<arby::Nat>::digits == 0); // N/A
     CHECK(std::numeric_limits<arby::Nat>::digits10 == 0); // N/A
     CHECK(std::numeric_limits<arby::Nat>::max_digits10 == 0); // N/A
-    // calculate the bit width of the next-lowest type, its place value is the radix
-    CHECK(std::numeric_limits<arby::Nat>::radix == 1u << ((std::numeric_limits<int>::digits + 1) / 2));
+    CHECK(std::numeric_limits<arby::Nat>::radix == 2);
     CHECK(std::numeric_limits<arby::Nat>::min_exponent == 0); // N/A
     CHECK(std::numeric_limits<arby::Nat>::min_exponent10 == 0); // N/A
     CHECK(std::numeric_limits<arby::Nat>::max_exponent == 0); // N/A
