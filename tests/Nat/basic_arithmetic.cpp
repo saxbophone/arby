@@ -133,6 +133,17 @@ TEST_CASE("arby::Nat postfix increment requiring additional digits", "[basic-ari
     CHECK((uintmax_t)previous == arby::Nat::BASE - 1);
 }
 
+TEST_CASE("arby::Nat decrement 1", "[basic-arithmetic]") {
+    arby::Nat one = 1;
+
+    SECTION("prefix") {
+        CHECK(--one == 0);
+    }
+    SECTION("postfix") {
+        CHECK(one-- == 1);
+    }
+}
+
 TEST_CASE("arby::Nat prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
@@ -288,13 +299,13 @@ TEST_CASE("Addition of arby::Nat and much smaller arby::Nat", "[basic-arithmetic
 }
 
 TEST_CASE("arby::Nat + 0") {
-    arby::Nat value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    arby::Nat value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     CHECK((value + 0) == value);
 }
 
 TEST_CASE("arby::Nat += 0") {
-    uintmax_t value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    uintmax_t value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     arby::Nat object = value;
 
     object += 0;
@@ -401,16 +412,36 @@ TEST_CASE("Subtraction of arby::Nat(0) from arby::Nat(0)", "[basic-arithmetic]")
 }
 
 TEST_CASE("arby::Nat - 0") {
-    arby::Nat value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    arby::Nat value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     CHECK((value - 0) == value);
 }
 
 TEST_CASE("arby::Nat -= 0") {
-    uintmax_t value = GENERATE((uintmax_t)0, std::numeric_limits<uintmax_t>::max());
+    uintmax_t value = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     arby::Nat object = value;
 
     object -= 0;
 
     CHECK((uintmax_t)object == value);
 }
+
+// Clang warns about self-assignments that result in constants (as with sub, div and mod)
+// but we really do want to do those things, so silence those warnings for this test case
+#pragma warning (disable : 4068 ) /* disable unknown pragma warnings for the rest of this file when on MSVC */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+
+TEST_CASE("arby::Nat subtraction resulting in zero") {
+    arby::Nat value = GENERATE(1u, 1000u, std::numeric_limits<uintmax_t>::max());
+
+    SECTION("assignment-subtraction") {
+        value -= value;
+        CHECK(value == 0);
+    }
+    SECTION("subtraction") {
+        CHECK(value - value == 0);
+    }
+}
+
+#pragma clang diagnostic pop
