@@ -207,7 +207,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when `value < 0` or when `value` is not a
          * finite number.
          */
-        static Nat from_float(double value) {
+        static Nat from_float(long double value) {
             // prevent initialising from negative values
             if (value < 0) {
                 throw std::domain_error("Nat cannot be negative");
@@ -259,16 +259,22 @@ namespace com::saxbophone::arby {
             return this->_cast_to<uintmax_t>();
         }
         /**
-         * @returns Value of this Nat object cast to double
+         * @returns Value of this Nat object cast to long double
          */
-        explicit constexpr operator double() const {
-            return this->_cast_to<double>();
+        explicit constexpr operator long double() const {
+            return this->_cast_to<long double>();
         }
         /**
          * @returns Value of this Nat object cast to float
          */
         explicit constexpr operator float() const {
             return this->_cast_to<float>();
+        }
+        /**
+         * @returns Value of this Nat object cast to double
+         */
+        explicit constexpr operator double() const {
+            return this->_cast_to<double>();
         }
         /**
          * @returns Value of this Nat object cast to any numeric type

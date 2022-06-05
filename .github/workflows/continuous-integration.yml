@@ -87,8 +87,10 @@ jobs:
         if: ${{ matrix.memcheck }}
         working-directory: ${{github.workspace}}/build
         shell: bash
-        # run ctest with memcheck mode to check for memory errors with Valgrind  
-        run: ctest -C $BUILD_TYPE -T memcheck -j3 --no-tests=error
+        # run ctest with memcheck mode to check for memory errors with Valgrind
+        # exclude the one test case for arby::Nat::from_float with NaN/Inf because it fails on Valgrind
+        # due to lack of long double support
+        run: ctest -C $BUILD_TYPE -T memcheck -j3 -E "with non-finite value throws" --no-tests=error
 
       - name: Test Install
         working-directory: ${{github.workspace}}/build
