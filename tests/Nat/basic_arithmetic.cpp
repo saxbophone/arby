@@ -133,6 +133,17 @@ TEST_CASE("arby::Nat postfix increment requiring additional digits", "[basic-ari
     CHECK((uintmax_t)previous == arby::Nat::BASE - 1);
 }
 
+TEST_CASE("arby::Nat decrement 1", "[basic-arithmetic]") {
+    arby::Nat one = 1;
+
+    SECTION("prefix") {
+        CHECK(--one == 0);
+    }
+    SECTION("postfix") {
+        CHECK(one-- == 1);
+    }
+}
+
 TEST_CASE("arby::Nat prefix decrement", "[basic-arithmetic]") {
     uintmax_t input = GENERATE(take(1000, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
 
@@ -413,4 +424,16 @@ TEST_CASE("arby::Nat -= 0") {
     object -= 0;
 
     CHECK((uintmax_t)object == value);
+}
+
+TEST_CASE("arby::Nat subtraction resulting in zero") {
+    arby::Nat value = GENERATE(1u, 1000u, std::numeric_limits<uintmax_t>::max());
+
+    SECTION("assignment-subtraction") {
+        value -= value;
+        CHECK(value == 0);
+    }
+    SECTION("subtraction") {
+        CHECK(value - value == 0);
+    }
 }
