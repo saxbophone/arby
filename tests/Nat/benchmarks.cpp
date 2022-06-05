@@ -12,13 +12,11 @@ TEMPLATE_TEST_CASE(
     unsigned short, unsigned int, unsigned long, std::uintmax_t
 ) {
     SECTION("Increment") {
-        TestType w = (TestType)0;
-        TestType x = (TestType)(std::numeric_limits<TestType>::max() / 2);
-        TestType y = (TestType)(std::numeric_limits<TestType>::max() - 1);
-        TestType z = std::numeric_limits<TestType>::max();
-        arby::Nat a = w, b = x, c = y, d = z;
-
         BENCHMARK("Native") {
+            TestType w = 0;
+            TestType x = std::numeric_limits<TestType>::max() / 2;
+            TestType y = std::numeric_limits<TestType>::max() - 1;
+            TestType z = std::numeric_limits<TestType>::max();
             w++;
             x++;
             y++;
@@ -27,6 +25,10 @@ TEMPLATE_TEST_CASE(
         };
 
         BENCHMARK("Arby") {
+            arby::Nat a = 0;
+            arby::Nat b = std::numeric_limits<TestType>::max() / 2;
+            arby::Nat c = std::numeric_limits<TestType>::max() - 1;
+            arby::Nat d = std::numeric_limits<TestType>::max();
             a++;
             b++;
             c++;
@@ -36,13 +38,11 @@ TEMPLATE_TEST_CASE(
     }
 
     SECTION("Decrement") {
-        TestType w = (TestType)1;
-        TestType x = (TestType)(std::numeric_limits<TestType>::max() / 3);
-        TestType y = (TestType)(std::numeric_limits<TestType>::max() / 2);
-        TestType z = std::numeric_limits<TestType>::max();
-        arby::Nat a = w, b = x, c = y, d = z;
-
         BENCHMARK("Native") {
+            TestType w = 1;
+            TestType x = std::numeric_limits<TestType>::max() / 3;
+            TestType y = std::numeric_limits<TestType>::max() / 2;
+            TestType z = std::numeric_limits<TestType>::max();
             w--;
             x--;
             y--;
@@ -51,6 +51,10 @@ TEMPLATE_TEST_CASE(
         };
 
         BENCHMARK("Arby") {
+            arby::Nat a = 1;
+            arby::Nat b = std::numeric_limits<TestType>::max() / 3;
+            arby::Nat c = std::numeric_limits<TestType>::max() / 2;
+            arby::Nat d = std::numeric_limits<TestType>::max();
             a--;
             b--;
             c--;
