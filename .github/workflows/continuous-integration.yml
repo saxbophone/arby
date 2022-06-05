@@ -88,7 +88,7 @@ jobs:
         working-directory: ${{github.workspace}}/build
         shell: bash
         # run ctest with memcheck mode to check for memory errors with Valgrind  
-        run: ctest -C $BUILD_TYPE -T memcheck -j10 --no-tests=error
+        run: ctest -C $BUILD_TYPE -T memcheck -j3 --no-tests=error
 
       - name: Test Install
         working-directory: ${{github.workspace}}/build
