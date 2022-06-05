@@ -426,6 +426,12 @@ TEST_CASE("arby::Nat -= 0") {
     CHECK((uintmax_t)object == value);
 }
 
+// Clang warns about self-assignments that result in constants (as with sub, div and mod)
+// but we really do want to do those things, so silence those warnings for this test case
+#pragma warning (disable : 4068 ) /* disable unknown pragma warnings for the rest of this file when on MSVC */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+
 TEST_CASE("arby::Nat subtraction resulting in zero") {
     arby::Nat value = GENERATE(1u, 1000u, std::numeric_limits<uintmax_t>::max());
 
@@ -437,3 +443,5 @@ TEST_CASE("arby::Nat subtraction resulting in zero") {
         CHECK(value - value == 0);
     }
 }
+
+#pragma clang diagnostic pop
