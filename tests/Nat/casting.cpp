@@ -21,7 +21,7 @@ TEST_CASE("Casting arby::Nat with value higher than UINT_MAX to uintmax_t throws
     CHECK_THROWS_AS((uintmax_t)value, std::range_error);
 }
 
-TEMPLATE_TEST_CASE("Casting arby::Nat to various floating-point types", "[casting]", float, double, long double) {
+TEMPLATE_TEST_CASE("Casting arby::Nat to various floating-point types", "[casting]", float, double) {
     auto value = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
     // float is so imprecise for large values that we need to cast the input too
@@ -62,8 +62,8 @@ TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error"
     auto value = GENERATE(
         take(1000,
             random(
-                std::numeric_limits<long double>::lowest(),
-                -std::numeric_limits<long double>::denorm_min()
+                std::numeric_limits<double>::lowest(),
+                -std::numeric_limits<double>::denorm_min()
             )
         )
     );
@@ -73,29 +73,29 @@ TEST_CASE("arby::Nat::from_float() with negative value throws std::domain_error"
 
 TEST_CASE("arby::Nat::from_float() with non-finite value throws std::domain_error") {
     // need IEC 559 float to be sure that qNaN, sNan, ±Inf all exist
-    if (std::numeric_limits<long double>::is_iec559) {
+    if (std::numeric_limits<double>::is_iec559) {
         auto value = GENERATE(
-            -std::numeric_limits<long double>::infinity(),
-            +std::numeric_limits<long double>::infinity(),
-            std::numeric_limits<long double>::quiet_NaN(),
-            std::numeric_limits<long double>::signaling_NaN()
+            -std::numeric_limits<double>::infinity(),
+            +std::numeric_limits<double>::infinity(),
+            std::numeric_limits<double>::quiet_NaN(),
+            std::numeric_limits<double>::signaling_NaN()
         );
 
         CHECK_THROWS_AS(arby::Nat::from_float(value), std::domain_error);
     } else {
-        WARN("Can't test for non-finite values because long double isn't IEC 559!");
+        WARN("Can't test for non-finite values because double isn't IEC 559!");
     }
 }
 
 TEST_CASE("arby::Nat::from_float() with value between 0 and 1") {
     // NOTE: top range is the last float value > 1
-    long double zero_ish = GENERATE(take(1000, random(0.0L, std::nextafter(1.0L, 0.0L))));
+    double zero_ish = GENERATE(take(1000, random(0.0, std::nextafter(1.0, 0.0))));
     CAPTURE(zero_ish);
 
     arby::Nat object = arby::Nat::from_float(zero_ish);
 
     // value should be correct
-    CHECK((long double)object == Approx(std::trunc(zero_ish)));
+    CHECK((double)object == Approx(std::trunc(zero_ish)));
 }
 
 TEST_CASE("arby::Nat::from_float() with positive value") {
@@ -103,8 +103,8 @@ TEST_CASE("arby::Nat::from_float() with positive value") {
     auto value = GENERATE_COPY(
         take(100,
             random(
-                0.0L,
-                std::pow((long double)std::numeric_limits<uintmax_t>::max(), power)
+                0.0,
+                std::pow((double)std::numeric_limits<uintmax_t>::max(), power)
             )
         )
     );
@@ -113,7 +113,7 @@ TEST_CASE("arby::Nat::from_float() with positive value") {
     arby::Nat object = arby::Nat::from_float(value);
 
     // value should be correct
-    CHECK((long double)object == Approx(std::trunc(value)));
+    CHECK((double)object == Approx(std::trunc(value)));
 }
 
 TEST_CASE("arby::Nat can be constructed from unsigned types smaller than uintmax_t - uint8_t",) {
