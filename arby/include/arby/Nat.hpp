@@ -359,8 +359,8 @@ namespace com::saxbophone::arby {
                         break;
                     }
                 }
-                // if last digit is zero, remove it
-                if (_digits.front() == 0) {
+                // remove leading zeroes
+                if (_digits.size() > 1 and _digits.front() == 0) {
                     _digits.pop_front();
                 }
             }
