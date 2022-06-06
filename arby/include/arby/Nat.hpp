@@ -73,11 +73,11 @@ namespace com::saxbophone::arby {
         };
         template <typename T> requires (not std::numeric_limits<T>::is_signed)
         struct GetNextBiggerType {
-            using Type = GetTypeForSize<std::numeric_limits<T>::digits * 2>::Type;
+            using Type = typename GetTypeForSize<std::numeric_limits<T>::digits * 2>::Type;
         };
         template <typename T> requires (not std::numeric_limits<T>::is_signed)
         struct GetNextSmallerType {
-            using Type = GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
+            using Type = typename GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
         };
 
         struct StorageTraits {
