@@ -27,6 +27,12 @@ TEST_CASE("Nat digits - std::initializer_list", "") {
     }
 }
 
+// Catch2 v2.x has a bug where template product test case triggers
+// -Wsign-conversion: https://github.com/catchorg/Catch2/issues/2348
+#pragma warning (disable : 4068 ) /* disable unknown pragma warnings for this file when on MSVC */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 TEMPLATE_PRODUCT_TEST_CASE(
     "Nat digits", "",
     (codlili::List, std::vector), arby::Nat::StorageType
@@ -39,7 +45,7 @@ TEMPLATE_PRODUCT_TEST_CASE(
             chunk(
                 size,
                 random(
-                    (arby::Nat::StorageType)1,
+                    (arby::Nat::StorageType)1, // not zero to prevent leading zeroes
                     std::numeric_limits<arby::Nat::StorageType>::max()
                 )
             )
@@ -66,3 +72,5 @@ TEMPLATE_PRODUCT_TEST_CASE(
         }
     }
 }
+
+#pragma GCC diagnostic pop
