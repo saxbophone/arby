@@ -1,5 +1,5 @@
 /*
- * codlili v0.2.0
+ * codlili v0.3.0
  *
  * /kɒdliːliː/
  *
@@ -32,7 +32,7 @@
 #include <iterator>          // iterator traits
 
 
-namespace com::saxbophone::codlili {
+namespace com::saxbophone::codlili { // @since v0.3.0 --moved from arby::PRIVATE
     template <typename T>  // the type of elements to store
     class List {
     public:
