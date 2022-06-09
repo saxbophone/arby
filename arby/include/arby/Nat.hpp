@@ -217,6 +217,13 @@ namespace com::saxbophone::arby {
             _validate_digits();
         }
         /**
+         * @brief Digits-constructor, initialises Nat using the given digits
+         * @param digits the digits to initialise the Nat object from, these
+         * should be encoded in base Nat::BASE (this corresponds to max
+         * StorageType value)
+         */
+        constexpr Nat(PRIVATE::codlili::List<StorageType> digits) {}
+        /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
          * @param value Positive floating point value to initialise with
