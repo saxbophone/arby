@@ -3,6 +3,7 @@ add_library(
         basic_arithmetic.cpp
         bitwise.cpp
         casting.cpp
+        digits.cpp
         divmod.cpp
         misc.cpp
         multiplication.cpp
