@@ -222,7 +222,7 @@ namespace com::saxbophone::arby {
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
          */
-        constexpr Nat(codlili::List<StorageType> digits) {}
+        constexpr Nat(codlili::List<StorageType> digits) : _digits(digits) {}
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
@@ -866,8 +866,7 @@ namespace com::saxbophone::arby {
          * @returns a copy of the underlying digits that make up this Nat value
          */
         constexpr codlili::List<StorageType> digits() const {
-            // return _digits;
-            return {};
+            return _digits;
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
