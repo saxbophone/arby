@@ -232,7 +232,11 @@ namespace com::saxbophone::arby {
          * StorageType value)
          */
         template <template<typename...> class Container, typename... Ts>
-        constexpr Nat(const Container<StorageType, Ts...>& digits) {}
+        constexpr Nat(const Container<StorageType, Ts...>& digits) {
+            for (const auto& digit : digits) {
+                _digits.push_back(digit);
+            }
+        }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
