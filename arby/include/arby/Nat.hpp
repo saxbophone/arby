@@ -222,7 +222,17 @@ namespace com::saxbophone::arby {
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
          */
-        constexpr Nat(codlili::List<StorageType> digits) : _digits(digits) {}
+        constexpr Nat(const codlili::List<StorageType>& digits) : _digits(digits) {}
+        /**
+         * @brief Digits-constructor, initialises Nat using the given digits
+         * @tparam Container A container type exposing an STL-like API that
+         * provides begin(), and end(), at a minimum
+         * @param digits the digits to initialise the Nat object from, these
+         * should be encoded in base Nat::BASE (this corresponds to max
+         * StorageType value)
+         */
+        template <template<class> class Container>
+        constexpr Nat(const Container<StorageType>& digits) {}
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
