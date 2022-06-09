@@ -13,11 +13,14 @@ TEST_CASE("Nat digits") {
     // generate digits arrays of size 1..8
     std::size_t size = GENERATE(take(1000, random(1u, 8u)));
     auto raw_digits = GENERATE_COPY(
-        chunk(
-            size,
-            random(
-                (arby::Nat::StorageType)0,
-                std::numeric_limits<arby::Nat::StorageType>::max()
+        take(
+            1,
+            chunk(
+                size,
+                random(
+                    (arby::Nat::StorageType)0,
+                    std::numeric_limits<arby::Nat::StorageType>::max()
+                )
             )
         )
     );
