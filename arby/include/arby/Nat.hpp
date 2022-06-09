@@ -80,6 +80,11 @@ namespace com::saxbophone::arby {
             using Type = typename GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
         };
 
+        /*
+         * uses compile-time template logic to pick StorageType and OverflowType:
+         * - picks unsigned int if its range is less than that of uintmax_t
+         * - otherwise, picks the next type smaller than uintmax_t (very unlikely)
+         */
         struct StorageTraits {
             using StorageType = std::conditional<
                 (std::numeric_limits<unsigned int>::digits < std::numeric_limits<uintmax_t>::digits),
@@ -126,9 +131,15 @@ namespace com::saxbophone::arby {
      * code and should be reported as such.
      */
     class Nat {
-    private:
-        using StorageType = PRIVATE::StorageTraits::StorageType;
     public:
+        /**
+         * @brief The type used to store the digits of this Nat object
+         * @note The exact native type used for this is platform-specific:
+         * - Normally, it is the same as `unsigned int`
+         * - However, in the unlikely event that `unsigned int` is not smaller
+         * than `uintmax_t`, we pick the next smaller type (typically `unsigned short`)
+         */
+        using StorageType = PRIVATE::StorageTraits::StorageType;
         /**
          * @brief This is the smallest type guaranteed to be able to store the
          * result of any product or sum of two values of the type used to store
