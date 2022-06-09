@@ -844,6 +844,13 @@ namespace com::saxbophone::arby {
             bits_for_digits -= (sizeof(StorageType) * 8 - leading_occupancy);
             return bits_for_digits;
         }
+        /**
+         * @returns a copy of the underlying digits that make up this Nat value
+         */
+        constexpr PRIVATE::codlili::List<StorageType> digits() const {
+            // return _digits;
+            return {};
+        }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
