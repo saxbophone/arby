@@ -128,7 +128,17 @@ namespace com::saxbophone::arby {
     class Nat {
     private:
         using StorageType = PRIVATE::StorageTraits::StorageType;
+    public:
+        /**
+         * @brief This is the smallest type guaranteed to be able to store the
+         * result of any product or sum of two values of the type used to store
+         * the number's digits.
+         * @note Consequently, this is the type used to represent Nat::BASE as
+         * that value is +1 beyond the upper bound for the type used to store
+         * the digits.
+         */
         using OverflowType = PRIVATE::StorageTraits::OverflowType;
+    private:
         static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
         constexpr void _validate_digits() const {
