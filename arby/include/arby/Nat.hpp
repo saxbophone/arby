@@ -231,8 +231,8 @@ namespace com::saxbophone::arby {
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
          */
-        template <template<class> class Container>
-        constexpr Nat(const Container<StorageType>& digits) {}
+        template <template<typename...> class Container, typename... Ts>
+        constexpr Nat(const Container<StorageType, Ts...>& digits) {}
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
