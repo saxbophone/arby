@@ -231,8 +231,8 @@ namespace com::saxbophone::arby {
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
          */
-        template <template<typename...> class Container, typename... Ts>
-        constexpr Nat(const Container<StorageType, Ts...>& digits) {
+        template <template<typename...> class Container>
+        constexpr Nat(const Container<StorageType>& digits) {
             for (const auto& digit : digits) {
                 _digits.push_back(digit);
             }
