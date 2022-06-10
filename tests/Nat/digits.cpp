@@ -74,3 +74,12 @@ TEMPLATE_PRODUCT_TEST_CASE(
 }
 
 #pragma GCC diagnostic pop
+
+TEST_CASE("Nat init from digits leading zero elision") {
+    CHECK(arby::Nat({0, 1, 2, 3}).digits() == codlili::List<arby::Nat::StorageType>({1, 2, 3}));
+    CHECK(arby::Nat({1, 2, 3}).digits() == codlili::List<arby::Nat::StorageType>({1, 2, 3}));
+    CHECK(arby::Nat({0}).digits() == codlili::List<arby::Nat::StorageType>({0}));
+    CHECK(arby::Nat({}).digits() == codlili::List<arby::Nat::StorageType>({}));
+    CHECK(arby::Nat({0, 0, 0, 9, 7, 5, 1, 2, 0, 0, 0, 2, 0}).digits() == codlili::List<arby::Nat::StorageType>({9, 7, 5, 1, 2, 0, 0, 0, 2, 0}));
+    CHECK(arby::Nat({0, 0, 0}).digits() == codlili::List<arby::Nat::StorageType>({0}));
+}
