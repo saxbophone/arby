@@ -96,12 +96,3 @@ TEMPLATE_TEST_CASE(
 ) {
     CHECK_THROWS_AS(arby::Nat(TestType()), std::invalid_argument);
 }
-
-TEST_CASE("Nat.digits() returns a copy of the digits and not a reference to the original") {
-    arby::Nat value = 12345678_nat;
-    auto& digits = value.digits();
-
-    digits.front() = 1;
-
-    CHECK(value == 12345678_nat);
-}
