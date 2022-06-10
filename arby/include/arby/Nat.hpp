@@ -224,6 +224,8 @@ namespace com::saxbophone::arby {
          * @param digits the digits to initialise the Nat object from, these
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
+         * @pre `digits` is not empty
+         * @throws std::invalid_argument when `digits` is empty
          */
         template <template<typename...> class Container, typename... Ts>
         constexpr Nat(const Container<StorageType, Ts...>& digits) {
