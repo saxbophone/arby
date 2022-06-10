@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <compare>
+#include <initializer_list>
 #include <limits>
 #include <string>
 #include <stdexcept>
@@ -235,6 +236,11 @@ namespace com::saxbophone::arby {
          * @remarks Overload for constructing from `codlili::List` of digits
          */
         constexpr Nat(const codlili::List<StorageType>& digits) : _digits(digits) {}
+        /**
+         * @overload
+         * @remarks Overload for constructing from `std::initializer_list` of digits
+         */
+        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {}
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
