@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <compare>
 #include <initializer_list>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <stdexcept>
@@ -220,7 +221,7 @@ namespace com::saxbophone::arby {
         /**
          * @brief Digits-constructor, initialises Nat using the given digits
          * @tparam Container A container type exposing an STL-like API that
-         * provides begin(), and end(), at a minimum
+         * provides begin(), end(), and empty() at a minimum
          * @param digits the digits to initialise the Nat object from, these
          * should be encoded in base Nat::BASE (this corresponds to max
          * StorageType value)
@@ -229,6 +230,9 @@ namespace com::saxbophone::arby {
          */
         template <template<typename...> class Container, typename... Ts>
         constexpr Nat(const Container<StorageType, Ts...>& digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
             for (const auto& digit : digits) {
                 _digits.push_back(digit);
             }
@@ -237,12 +241,20 @@ namespace com::saxbophone::arby {
          * @overload
          * @remarks Overload for constructing from `codlili::List` of digits
          */
-        constexpr Nat(const codlili::List<StorageType>& digits) : _digits(digits) {}
+        constexpr Nat(const codlili::List<StorageType>& digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+        }
         /**
          * @overload
          * @remarks Overload for constructing from `std::initializer_list` of digits
          */
-        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {}
+        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+        }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
          * @returns Nat with the value of the given float, with the fractional part truncated off
