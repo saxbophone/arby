@@ -164,6 +164,12 @@ namespace com::saxbophone::arby {
             }
             #endif
         }
+        // removes leading zeroes from the digits array
+        constexpr void _remove_leading_zeroes() {
+            while (_digits.size() > 1 and _digits.front() == 0) {
+                _digits.pop_front();
+            }
+        }
     public:
         /**
          * @brief The number base used internally to store the value
@@ -236,6 +242,7 @@ namespace com::saxbophone::arby {
             for (const auto& digit : digits) {
                 _digits.push_back(digit);
             }
+            _remove_leading_zeroes();
         }
         /**
          * @overload
@@ -245,6 +252,7 @@ namespace com::saxbophone::arby {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
+            _remove_leading_zeroes();
         }
         /**
          * @overload
@@ -254,6 +262,7 @@ namespace com::saxbophone::arby {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
+            _remove_leading_zeroes();
         }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
@@ -514,9 +523,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this; // return the result by reference
         }
@@ -775,9 +782,7 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this;
         }
@@ -828,9 +833,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (result._digits.size() > 1 and result._digits.front() == 0) {
-                result._digits.pop_front();
-            }
+            result._remove_leading_zeroes();
             result._validate_digits();
             return result;
         }
