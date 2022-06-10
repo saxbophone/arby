@@ -25,6 +25,8 @@
 
 #include <algorithm>
 #include <compare>
+#include <initializer_list>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <stdexcept>
@@ -80,6 +82,11 @@ namespace com::saxbophone::arby {
             using Type = typename GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
         };
 
+        /*
+         * uses compile-time template logic to pick StorageType and OverflowType:
+         * - picks unsigned int if its range is less than that of uintmax_t
+         * - otherwise, picks the next type smaller than uintmax_t (very unlikely)
+         */
         struct StorageTraits {
             using StorageType = std::conditional<
                 (std::numeric_limits<unsigned int>::digits < std::numeric_limits<uintmax_t>::digits),
@@ -126,9 +133,15 @@ namespace com::saxbophone::arby {
      * code and should be reported as such.
      */
     class Nat {
-    private:
-        using StorageType = PRIVATE::StorageTraits::StorageType;
     public:
+        /**
+         * @brief The type used to store the digits of this Nat object
+         * @note The exact native type used for this is platform-specific:
+         * - Normally, it is the same as `unsigned int`
+         * - However, in the unlikely event that `unsigned int` is not smaller
+         * than `uintmax_t`, we pick the next smaller type (typically `unsigned short`)
+         */
+        using StorageType = PRIVATE::StorageTraits::StorageType;
         /**
          * @brief This is the smallest type guaranteed to be able to store the
          * result of any product or sum of two values of the type used to store
@@ -150,6 +163,12 @@ namespace com::saxbophone::arby {
                 throw std::logic_error("leading zeroes in internal representation");
             }
             #endif
+        }
+        // removes leading zeroes from the digits array
+        constexpr void _remove_leading_zeroes() {
+            while (_digits.size() > 1 and _digits.front() == 0) {
+                _digits.pop_front();
+            }
         }
     public:
         /**
@@ -204,6 +223,46 @@ namespace com::saxbophone::arby {
                 power /= Nat::BASE;
             }
             _validate_digits();
+        }
+        /**
+         * @brief Digits-constructor, initialises Nat using the given digits
+         * @tparam Container A container type exposing an STL-like API that
+         * provides begin(), end(), and empty() at a minimum
+         * @param digits the digits to initialise the Nat object from, these
+         * should be encoded in base Nat::BASE (this corresponds to max
+         * StorageType value)
+         * @pre `digits` is not empty
+         * @throws std::invalid_argument when `digits` is empty
+         */
+        template <template<typename...> class Container, typename... Ts>
+        constexpr Nat(const Container<StorageType, Ts...>& digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            for (const auto& digit : digits) {
+                _digits.push_back(digit);
+            }
+            _remove_leading_zeroes();
+        }
+        /**
+         * @overload
+         * @remarks Overload for constructing from `codlili::List` of digits
+         */
+        constexpr Nat(const codlili::List<StorageType>& digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            _remove_leading_zeroes();
+        }
+        /**
+         * @overload
+         * @remarks Overload for constructing from `std::initializer_list` of digits
+         */
+        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            _remove_leading_zeroes();
         }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
@@ -464,9 +523,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this; // return the result by reference
         }
@@ -725,9 +782,7 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this;
         }
@@ -778,9 +833,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (result._digits.size() > 1 and result._digits.front() == 0) {
-                result._digits.pop_front();
-            }
+            result._remove_leading_zeroes();
             result._validate_digits();
             return result;
         }
@@ -844,10 +897,16 @@ namespace com::saxbophone::arby {
             bits_for_digits -= (sizeof(StorageType) * 8 - leading_occupancy);
             return bits_for_digits;
         }
+        /**
+         * @returns a copy of the underlying digits that make up this Nat value
+         */
+        constexpr codlili::List<StorageType> digits() const {
+            return _digits;
+        }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
-        PRIVATE::codlili::List<StorageType> _digits;
+        codlili::List<StorageType> _digits;
     };
 
     /**
