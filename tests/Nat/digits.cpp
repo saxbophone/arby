@@ -6,6 +6,7 @@
 #include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
+using namespace com::saxbophone::arby::literals;
 using StorageType = arby::Nat::StorageType;
 
 TEST_CASE("Nat digits - std::initializer_list", "") {
@@ -94,4 +95,13 @@ TEMPLATE_TEST_CASE(
     codlili::List<StorageType>
 ) {
     CHECK_THROWS_AS(arby::Nat(TestType()), std::invalid_argument);
+}
+
+TEST_CASE("Nat.digits() returns a copy of the digits and not a reference to the original") {
+    arby::Nat value = 12345678_nat;
+    auto& digits = value.digits();
+
+    digits.front() = 1;
+
+    CHECK(value == 12345678_nat);
 }

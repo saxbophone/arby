@@ -900,7 +900,7 @@ namespace com::saxbophone::arby {
         /**
          * @returns a copy of the underlying digits that make up this Nat value
          */
-        constexpr codlili::List<StorageType> digits() const {
+        constexpr codlili::List<StorageType>& digits() {
             return _digits;
         }
     private:
