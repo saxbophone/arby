@@ -1,3 +1,4 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
 # arby
 
 ![release build](https://github.com/saxbophone/arby/actions/workflows/build-release.yml/badge.svg) ![continous integration](https://github.com/saxbophone/arby/actions/workflows/continuous-integration.yml/badge.svg)
