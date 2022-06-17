@@ -33,7 +33,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <codlili/list.hpp>
+#include <codlili/sharray.hpp>
 
 
 /**
@@ -246,9 +246,9 @@ namespace com::saxbophone::arby {
         }
         /**
          * @overload
-         * @remarks Overload for constructing from `codlili::list` of digits
+         * @remarks Overload for constructing from `codlili::sharray` of digits
          */
-        constexpr Nat(const codlili::list<StorageType>& digits) : _digits(digits) {
+        constexpr Nat(const codlili::sharray<StorageType>& digits) : _digits(digits) {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
@@ -900,13 +900,13 @@ namespace com::saxbophone::arby {
         /**
          * @returns a copy of the underlying digits that make up this Nat value
          */
-        constexpr codlili::list<StorageType> digits() const {
+        constexpr codlili::sharray<StorageType> digits() const {
             return _digits;
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
-        codlili::list<StorageType> _digits;
+        codlili::sharray<StorageType> _digits;
     };
 
     /**
