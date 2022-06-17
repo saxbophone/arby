@@ -1,5 +1,11 @@
 include(GNUInstallDirs)
 
+CPMFindPackage(
+    NAME Codlili
+    GIT_REPOSITORY https://github.com/saxbophone/codlili.git
+    GIT_TAG master
+)
+
 add_library(arby STATIC)
 # ALIAS target to export a namespaced target even when building in-tree
 add_library(Arby::arby ALIAS arby)
@@ -38,47 +44,46 @@ target_link_libraries(
         PRIVATE
             $<BUILD_INTERFACE:arby-compiler-options>
 )
+# link to codlili, using public linkage as we'll need to install its headers too
+target_link_libraries(arby PUBLIC Codlili::codlili)
 
-# install if we're not being built as a sub-project
-if (NOT ARBY_SUBPROJECT)
-    # library
-    install(
-        TARGETS arby
-        EXPORT ArbyTargets
-        # when a static library
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # when a shared library on UNIX
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # when a DLL on Windows
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-    # public headers
-    install(
-        DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-    # CMake export
-    install(
-        EXPORT ArbyTargets
-        FILE ArbyTargets.cmake
-        NAMESPACE Arby::
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
-    )
-    # CMake package
-    include(CMakePackageConfigHelpers)
-    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-        "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfig.cmake"
-        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
-    )
-    # generate the version file for the config file
-    write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfigVersion.cmake"
-        VERSION "${version}"
-        COMPATIBILITY SameMinorVersion
-    )
-    install(
-        FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfigVersion.cmake"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
-    )
-endif()
+# library
+install(
+    TARGETS arby
+    EXPORT ArbyTargets
+    # when a static library
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    # when a shared library on UNIX
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    # when a DLL on Windows
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+# public headers
+install(
+    DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+# CMake export
+install(
+    EXPORT ArbyTargets
+    FILE ArbyTargets.cmake
+    NAMESPACE Arby::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
+)
+# CMake package
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
+)
+# generate the version file for the config file
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfigVersion.cmake"
+    VERSION "${version}"
+    COMPATIBILITY SameMinorVersion
+)
+install(
+    FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/ArbyConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Arby"
+)
