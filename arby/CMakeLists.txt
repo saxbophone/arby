@@ -3,7 +3,7 @@ include(GNUInstallDirs)
 CPMFindPackage(
     NAME Codlili
     GIT_REPOSITORY https://github.com/saxbophone/codlili.git
-    GIT_TAG master
+    GIT_TAG v0.4.0
 )
 
 add_library(arby STATIC)
