@@ -454,9 +454,9 @@ namespace com::saxbophone::arby {
             if (not (_digits.front() == 0 and rhs._digits.front() == 0)) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    _digits_push_front_multi(rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    rhs._digits_push_front_multi(_digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
@@ -501,9 +501,9 @@ namespace com::saxbophone::arby {
             if (rhs._digits.front() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    _digits_push_front_multi(rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    rhs._digits_push_front_multi(_digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
@@ -576,7 +576,7 @@ namespace com::saxbophone::arby {
                         // we need to remap the indices as the digits are stored big-endian
                         std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
                         // add that many trailing zeroes to intermediate's digits
-                        intermediate._digits.push_back(shift_amount, 0);
+                        intermediate._digits_push_back_multi(shift_amount, 0);
                         // finally, add it to lhs as an accumulator
                         product += intermediate;
                         // increment manual indices
@@ -595,7 +595,7 @@ namespace com::saxbophone::arby {
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // provisionally perform the shift up
             Nat shift = 1;
-            shift._digits.push_back(wiggle_room, 0);
+            shift._digits_push_back_multi(wiggle_room, 0);
             // drag back down wiggle_room while shifted rhs > lhs
             while (rhs * shift > lhs) {
                 shift._digits.pop_back();
@@ -729,7 +729,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
-                _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
+                _digits_push_front_multi(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
             }
             auto it = _digits.begin();
             auto rhs_it = rhs._digits.begin();
@@ -905,6 +905,17 @@ namespace com::saxbophone::arby {
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
+
+        constexpr void _digits_push_front_multi(std::size_t count, StorageType value) {
+            for (std::size_t i = 0; i < count; i++) {
+                _digits.push_front(value);
+            }
+        }
+        constexpr void _digits_push_back_multi(std::size_t count, StorageType value) {
+            for (std::size_t i = 0; i < count; i++) {
+                _digits.push_back(value);
+            }
+        }
 
         codlili::sharray<StorageType> _digits;
     };

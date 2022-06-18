@@ -13,8 +13,8 @@ TEST_CASE("Nat digits - std::initializer_list", "") {
     std::initializer_list<StorageType> digits = {
         1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u
     };
-    // also put those digits into a codlili::list instance so we can compare them
-    codlili::list<StorageType> original(digits);
+    // also put those digits into a codlili::sharray instance so we can compare them
+    codlili::sharray<StorageType> original(digits);
 
     SECTION("Create Nat from digits") {
         arby::Nat from_digits(digits);
@@ -35,7 +35,7 @@ TEST_CASE("Nat digits - std::initializer_list", "") {
 
 TEMPLATE_PRODUCT_TEST_CASE(
     "Nat digits", "",
-    (codlili::list, std::vector), StorageType
+    (codlili::sharray, std::vector), StorageType
 ) {
     // generate digits arrays of size 1..8
     std::size_t size = GENERATE(take(1000, random(1u, 8u)));
@@ -56,8 +56,8 @@ TEMPLATE_PRODUCT_TEST_CASE(
     for (const auto& item : raw_digits) {
         digits.push_back(item);
     }
-    // also read digits out into a codlili::list instance so we can compare them
-    codlili::list<StorageType> original;
+    // also read digits out into a codlili::sharray instance so we can compare them
+    codlili::sharray<StorageType> original;
     for (const auto& item : digits) {
         original.push_back(item);
     }
@@ -79,20 +79,20 @@ TEMPLATE_TEST_CASE(
     "Nat init from digits leading zero elision", "",
     std::initializer_list<StorageType>,
     std::vector<StorageType>,
-    codlili::list<StorageType>
+    codlili::sharray<StorageType>
 ) {
-    CHECK(arby::Nat(TestType({0, 1, 2, 3})).digits() == codlili::list<StorageType>({1, 2, 3}));
-    CHECK(arby::Nat(TestType({1, 2, 3})).digits() == codlili::list<StorageType>({1, 2, 3}));
-    CHECK(arby::Nat(TestType({0})).digits() == codlili::list<StorageType>({0}));
-    CHECK(arby::Nat(TestType({0, 0, 0, 9, 7, 5, 1, 2, 0, 0, 0, 2, 0})).digits() == codlili::list<StorageType>({9, 7, 5, 1, 2, 0, 0, 0, 2, 0}));
-    CHECK(arby::Nat(TestType({0, 0, 0})).digits() == codlili::list<StorageType>({0}));
+    CHECK(arby::Nat(TestType({0, 1, 2, 3})).digits() == codlili::sharray<StorageType>({1, 2, 3}));
+    CHECK(arby::Nat(TestType({1, 2, 3})).digits() == codlili::sharray<StorageType>({1, 2, 3}));
+    CHECK(arby::Nat(TestType({0})).digits() == codlili::sharray<StorageType>({0}));
+    CHECK(arby::Nat(TestType({0, 0, 0, 9, 7, 5, 1, 2, 0, 0, 0, 2, 0})).digits() == codlili::sharray<StorageType>({9, 7, 5, 1, 2, 0, 0, 0, 2, 0}));
+    CHECK(arby::Nat(TestType({0, 0, 0})).digits() == codlili::sharray<StorageType>({0}));
 }
 
 TEMPLATE_TEST_CASE(
     "Creating Nat from empty digits iterable throws std::invalid_argument", "",
     std::initializer_list<StorageType>,
     std::vector<StorageType>,
-    codlili::list<StorageType>
+    codlili::sharray<StorageType>
 ) {
     CHECK_THROWS_AS(arby::Nat(TestType()), std::invalid_argument);
 }
