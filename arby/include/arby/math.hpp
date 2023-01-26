@@ -33,27 +33,13 @@ namespace com::saxbophone::arby {
      * @todo Work out time-complexity
      * @relatedalso Nat
      */
-    constexpr Nat pow(const Nat& base, const Nat& exponent) {
-        // use divide-and-conquer recursion to break up huge powers into products of smaller powers
-        // exponent = 0 is our base case to terminate the recursion
-        if (exponent == 0) {
-            return 1;
-        } else if (exponent == 1) {
-            // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
-            return base;
-        } else if (exponent == 2) {
-            // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
-            return base * base;
+    constexpr Nat pow(const Nat& base, Nat exponent) {
+        Nat result = 1;
+        for (auto y = base; true; y *= y) {
+            if (exponent % 2 == 1) { result *= y; }
+            if ((exponent /= 2) == 0) { break; }
         }
-        auto [quotient, remainder] = Nat::divmod(exponent, 2);
-        // instead of calculating x^n, do x^(n/2)
-        Nat power = pow(base, quotient);
-        power *= power;
-        // and multiply by base again if n was odd
-        if (remainder == 1) {
-            power *= base;
-        }
-        return power;
+        return result;
     }
     /**
      * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
