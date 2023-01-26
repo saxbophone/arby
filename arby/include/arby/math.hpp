@@ -36,8 +36,10 @@ namespace com::saxbophone::arby {
     constexpr Nat pow(const Nat& base, Nat exponent) {
         Nat result = 1;
         for (auto y = base; true; y *= y) {
-            if (exponent % 2 == 1) { result *= y; }
-            if ((exponent /= 2) == 0) { break; }
+            Nat remainder;
+            std::tie(exponent, remainder) = Nat::divmod(exponent, 2);
+            if (remainder == 1) { result *= y; }
+            if (exponent == 0) { break; }
         }
         return result;
     }
