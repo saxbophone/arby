@@ -82,6 +82,11 @@ namespace com::saxbophone::arby {
         } else if (x < 1) {
             throw std::domain_error("ilog: x cannot be < 1");
         }
+        if (x == 1) { return {0, 0}; }
+        if (base == 2) {
+            auto bit_length = x.bit_length();
+            return {x.bit_length() - (pow(2, bit_length) > x), x.bit_length()};
+        }
         // find the smallest power of base that is just >= than x
         Nat power = 1;
         Nat floor = 0;
