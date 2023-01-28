@@ -32,9 +32,15 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
-#include <codlili/list.hpp>
 
+// only define arby::Nat as a constexpr class if there is library support for constexpr std::vector
+#ifdef __cpp_lib_constexpr_vector
+#define constexprvector constexpr
+#else
+#define constexprvector inline
+#endif
 
 /**
  * @brief Main namespace
@@ -154,7 +160,7 @@ namespace com::saxbophone::arby {
     private:
         static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
-        constexpr void _validate_digits() const {
+        constexprvector void _validate_digits() const {
             #ifndef NDEBUG // only run checks in debug mode
             if (_digits.empty()) {
                 throw std::logic_error("no digits in internal representation");
@@ -165,9 +171,10 @@ namespace com::saxbophone::arby {
             #endif
         }
         // removes leading zeroes from the digits array
-        constexpr void _remove_leading_zeroes() {
+        constexprvector void _remove_leading_zeroes() {
             while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
+                // _digits.pop_front();
+                _digits.erase(_digits.begin());
             }
         }
     public:
@@ -182,14 +189,14 @@ namespace com::saxbophone::arby {
          * @returns `true` if objects are equal, otherwise `false`
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr bool operator==(const Nat& rhs) const = default;
+        constexprvector bool operator==(const Nat& rhs) const = default;
         /**
          * @brief three-way-comparison operator defines all relational operators
          * @param rhs other Nat object to compare against
          * @returns std::strong_ordering object for comparison
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr auto operator<=>(const Nat& rhs) const {
+        constexprvector auto operator<=>(const Nat& rhs) const {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
@@ -207,14 +214,14 @@ namespace com::saxbophone::arby {
         /**
          * @brief Default constructor, initialises to numeric value `0`
          */
-        constexpr Nat() : _digits{0} {
+        constexprvector Nat() : _digits{0} {
             _validate_digits();
         }
         /**
          * @brief Integer-constructor, initialises with the given integer value
          * @param value value to initialise with
          */
-        constexpr Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
+        constexprvector Nat(uintmax_t value) : _digits(PRIVATE::fit(value, Nat::BASE)) {
             // fill out digits in big-endian order
             uintmax_t power = PRIVATE::exp(Nat::BASE, _digits.size() - 1);
             for (auto& digit : _digits) {
@@ -235,7 +242,7 @@ namespace com::saxbophone::arby {
          * @throws std::invalid_argument when `digits` is empty
          */
         template <template<typename...> class Container, typename... Ts>
-        constexpr Nat(const Container<StorageType, Ts...>& digits) {
+        constexprvector Nat(const Container<StorageType, Ts...>& digits) {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
@@ -246,9 +253,9 @@ namespace com::saxbophone::arby {
         }
         /**
          * @overload
-         * @remarks Overload for constructing from `codlili::list` of digits
+         * @remarks Overload for constructing from `std::vector` of digits
          */
-        constexpr Nat(const codlili::list<StorageType>& digits) : _digits(digits) {
+        constexprvector Nat(const std::vector<StorageType>& digits) : _digits(digits) {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
@@ -258,7 +265,7 @@ namespace com::saxbophone::arby {
          * @overload
          * @remarks Overload for constructing from `std::initializer_list` of digits
          */
-        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {
+        constexprvector Nat(std::initializer_list<StorageType> digits) : _digits(digits) {
             if (std::empty(digits)) {
                 throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
             }
@@ -284,7 +291,8 @@ namespace com::saxbophone::arby {
             if (value < 1) { return output; } // output is already zero
             while (value > 0) {
                 StorageType digit = (StorageType)std::fmod(value, Nat::BASE);
-                output._digits.push_front(digit);
+                // output._digits.push_front(digit);
+                output._digits.insert(output._digits.begin(), digit);
                 value /= Nat::BASE;
                 // truncate the fractional part of the floating-point value
                 value = std::trunc(value);
@@ -302,7 +310,7 @@ namespace com::saxbophone::arby {
     private:
         // private helper method to abstract the common part of the casting op
         template <typename T>
-        constexpr T _cast_to() const {
+        constexprvector T _cast_to() const {
             T accumulator = 0;
             // read digits out in big-endian order, shifting as we go
             for (auto digit : _digits) {
@@ -317,7 +325,7 @@ namespace com::saxbophone::arby {
          * @throws std::range_error when Nat value is out of range for
          * uintmax_t
          */
-        explicit constexpr operator uintmax_t() const {
+        explicit constexprvector operator uintmax_t() const {
             // prevent overflow of uintmax_t
             if (*this > std::numeric_limits<uintmax_t>::max()) {
                 throw std::range_error("value too large for uintmax_t");
@@ -327,19 +335,19 @@ namespace com::saxbophone::arby {
         /**
          * @returns Value of this Nat object cast to long double
          */
-        explicit constexpr operator long double() const {
+        explicit constexprvector operator long double() const {
             return this->_cast_to<long double>();
         }
         /**
          * @returns Value of this Nat object cast to float
          */
-        explicit constexpr operator float() const {
+        explicit constexprvector operator float() const {
             return this->_cast_to<float>();
         }
         /**
          * @returns Value of this Nat object cast to double
          */
-        explicit constexpr operator double() const {
+        explicit constexprvector operator double() const {
             return this->_cast_to<double>();
         }
         /**
@@ -347,7 +355,7 @@ namespace com::saxbophone::arby {
          * @tparam To The data type to cast to
          */
         template <typename To>
-        explicit constexpr operator To() const {
+        explicit constexprvector operator To() const {
             // prevent overflow of To if it's a bounded type
             if constexpr (std::numeric_limits<To>::is_bounded) {
                 if (*this > std::numeric_limits<To>::max()) {
@@ -378,7 +386,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator++() {
+        constexprvector Nat& operator++() {
             // increment least significant digit then rollover remaining digits as needed
             for (auto it = _digits.rbegin(); it != _digits.rend(); ++it) {
                 // only contine to next digit if incrementing this one rolls over
@@ -388,7 +396,8 @@ namespace com::saxbophone::arby {
             }
             // if last digit is zero, we need another one
             if (_digits.front() == 0) {
-                _digits.push_front(1);
+                // _digits.push_front(1);
+                _digits.insert(_digits.begin(), 1);
             }
             _validate_digits();
             return *this; // return new value by reference
@@ -399,7 +408,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat operator++(int) {
+        constexprvector Nat operator++(int) {
             Nat old = *this; // copy old value
             operator++();  // prefix increment
             return old;    // return old value
@@ -411,7 +420,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator--() {
+        constexprvector Nat& operator--() {
             if (_digits.front() == 0) { // front = 0 means value is zero since no leading zeroes allowed
                 throw std::underflow_error("arithmetic underflow: can't decrement unsigned zero");
             } else {
@@ -424,7 +433,8 @@ namespace com::saxbophone::arby {
                 }
                 // remove leading zeroes
                 if (_digits.size() > 1 and _digits.front() == 0) {
-                    _digits.pop_front();
+                    // _digits.pop_front();
+                    _digits.erase(_digits.begin());
                 }
             }
             _validate_digits();
@@ -437,7 +447,7 @@ namespace com::saxbophone::arby {
          * @note Best-case complexity: @f$ \mathcal{O(1)} @f$
          * @note Worst-case complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat operator--(int) {
+        constexprvector Nat operator--(int) {
             Nat old = *this; // copy old value
             operator--();  // prefix decrement
             return old;    // return old value
@@ -449,14 +459,16 @@ namespace com::saxbophone::arby {
          * @returns resulting object after addition-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator+=(Nat rhs) {
+        constexprvector Nat& operator+=(Nat rhs) {
             // both args being zero is a no-op, guard against this
             if (not (_digits.front() == 0 and rhs._digits.front() == 0)) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    // _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    // rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 StorageType carry = 0; // carries are stored here on overflow
@@ -471,7 +483,8 @@ namespace com::saxbophone::arby {
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
-                    _digits.push_front(carry);
+                    // _digits.push_front(carry);
+                    _digits.insert(_digits.begin(), carry);
                 }
             }
             _validate_digits();
@@ -483,7 +496,7 @@ namespace com::saxbophone::arby {
          * @returns sum of lhs + rhs
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator+(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator+(Nat lhs, const Nat& rhs) {
             lhs += rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -495,15 +508,17 @@ namespace com::saxbophone::arby {
          * @throws std::underflow_error when rhs is bigger than this
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator-=(Nat rhs) {
+        constexprvector Nat& operator-=(Nat rhs) {
             // TODO: detect underflow early?
             // rhs being a zero is a no-op, guard against this
             if (rhs._digits.front() != 0) {
                 // make sure this and rhs are the same size, fill with leading zeroes if needed
                 if (rhs._digits.size() > _digits.size()) {
-                    _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    // _digits.push_front(rhs._digits.size() - _digits.size(), 0);
+                    _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
-                    rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    // rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
+                    rhs._digits.insert(_digits.begin(), _digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
@@ -534,7 +549,7 @@ namespace com::saxbophone::arby {
          * @throws std::underflow_error when rhs is bigger than lhs
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator-(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator-(Nat lhs, const Nat& rhs) {
             lhs -= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -545,7 +560,7 @@ namespace com::saxbophone::arby {
          * @returns resulting object after multiplication-assignment
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
-        constexpr Nat& operator*=(const Nat& rhs) {
+        constexprvector Nat& operator*=(const Nat& rhs) {
             Nat product = *this * rhs; // uses friend *operator
             // assign product's digits back to our digits
             _digits = product._digits;
@@ -557,7 +572,7 @@ namespace com::saxbophone::arby {
          * @returns product of lhs * rhs
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
-        friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
+        friend constexprvector Nat operator*(const Nat& lhs, const Nat& rhs) {
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
@@ -576,7 +591,7 @@ namespace com::saxbophone::arby {
                         // we need to remap the indices as the digits are stored big-endian
                         std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
                         // add that many trailing zeroes to intermediate's digits
-                        intermediate._digits.push_back(shift_amount, 0);
+                        intermediate._digits.insert(intermediate._digits.end(), shift_amount, 0);
                         // finally, add it to lhs as an accumulator
                         product += intermediate;
                         // increment manual indices
@@ -590,12 +605,12 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for Nat::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
-        static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
+        static constexprvector Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
             // provisionally perform the shift up
             Nat shift = 1;
-            shift._digits.push_back(wiggle_room, 0);
+            shift._digits.insert(shift._digits.end(), wiggle_room, 0);
             // drag back down wiggle_room while shifted rhs > lhs
             while (rhs * shift > lhs) {
                 shift._digits.pop_back();
@@ -603,7 +618,7 @@ namespace com::saxbophone::arby {
             return shift;
         }
         // uses leading 1..2 digits of lhs and leading digits of rhs to estimate how many times it goes in
-        static constexpr OverflowType estimate_division(const Nat& lhs, const Nat& rhs) {
+        static constexprvector OverflowType estimate_division(const Nat& lhs, const Nat& rhs) {
             OverflowType denominator = (OverflowType)rhs._digits.front();
             // if any of the other digits of rhs are non-zero...
             if (std::any_of(++rhs._digits.begin(), rhs._digits.end(), [](StorageType digit){ return digit != 0; })) {
@@ -632,7 +647,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        static constexprvector std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
@@ -676,7 +691,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        constexpr Nat& operator/=(const Nat& rhs) {
+        constexprvector Nat& operator/=(const Nat& rhs) {
             Nat quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
             _digits = quotient._digits;
@@ -689,7 +704,7 @@ namespace com::saxbophone::arby {
          * @returns quotient of lhs / rhs
          * @todo Work out time-complexity
          */
-        friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator/(Nat lhs, const Nat& rhs) {
             Nat quotient;
             std::tie(quotient, std::ignore) = Nat::divmod(lhs, rhs);
             return quotient;
@@ -703,7 +718,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        constexpr Nat& operator%=(const Nat& rhs) {
+        constexprvector Nat& operator%=(const Nat& rhs) {
             Nat remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
             _digits = remainder._digits;
@@ -717,7 +732,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator%(Nat lhs, const Nat& rhs) {
             Nat remainder;
             std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
             return remainder;
@@ -726,10 +741,11 @@ namespace com::saxbophone::arby {
          * @brief bitwise OR-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator|=(const Nat& rhs) {
+        constexprvector Nat& operator|=(const Nat& rhs) {
             // add additional digits to this if fewer than rhs
             if (_digits.size() < rhs._digits.size()) {
-                _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
+                // _digits.push_front(rhs._digits.size() - _digits.size(), 0); // add leading zeroes
+                _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
             }
             auto it = _digits.begin();
             auto rhs_it = rhs._digits.begin();
@@ -749,7 +765,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise OR operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator|(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator|(Nat lhs, const Nat& rhs) {
             lhs |= rhs; // reuse member operator
             return lhs;
         }
@@ -757,7 +773,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise AND-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator&=(const Nat& rhs) {
+        constexprvector Nat& operator&=(const Nat& rhs) {
             /*
              * if rhs has fewer digits than this, we can remove this' leading
              * digits because they would be AND'ed with implicit zero which is
@@ -767,7 +783,8 @@ namespace com::saxbophone::arby {
             std::size_t rhs_size = rhs._digits.size();
             if (lhs_size > rhs_size) {
                 for (std::size_t i = 0; i < lhs_size - rhs_size; i++) {
-                    _digits.pop_front();
+                    // _digits.pop_front();
+                    _digits.erase(_digits.begin());
                 }
             }
             auto it = _digits.begin();
@@ -790,7 +807,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise AND operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator&(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator&(Nat lhs, const Nat& rhs) {
             lhs &= rhs; // reuse member operator
             return lhs;
         }
@@ -798,7 +815,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise XOR-assignment
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        constexpr Nat& operator^=(const Nat& rhs) {
+        constexprvector Nat& operator^=(const Nat& rhs) {
             Nat result = *this ^ rhs; // reuse friend function
             // re-assign digits to this
             _digits = result._digits;
@@ -808,7 +825,7 @@ namespace com::saxbophone::arby {
          * @brief bitwise XOR operator for Nat
          * @note Complexity: @f$ \mathcal{O(n)} @f$
          */
-        friend constexpr Nat operator^(Nat lhs, const Nat& rhs) {
+        friend constexprvector Nat operator^(Nat lhs, const Nat& rhs) {
             Nat result;
             auto lhs_it = lhs._digits.begin();
             auto rhs_it = rhs._digits.begin();
@@ -839,22 +856,22 @@ namespace com::saxbophone::arby {
         }
         // XXX: unimplemented shift operators commented out until implemented
         // // left-shift-assignment
-        // constexpr Nat& operator<<=(const Nat& n) {
+        // constexprvector Nat& operator<<=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // left-shift
-        // friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
+        // friend constexprvector Nat operator<<(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
         // // right-shift-assignment
-        // constexpr Nat& operator>>=(const Nat& n) {
+        // constexprvector Nat& operator>>=(const Nat& n) {
         //     // TODO: implement
         //     return *this;
         // }
         // // right-shift
-        // friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
+        // friend constexprvector Nat operator>>(Nat lhs, const Nat& rhs) {
         //     lhs <<= rhs; // reuse compound assignment
         //     return lhs; // return the result by value (uses move constructor)
         // }
@@ -863,21 +880,21 @@ namespace com::saxbophone::arby {
          * @returns `false` when value is `0`, otherwise `true`
          * @note Complexity: @f$ \mathcal{O(1)} @f$
          */
-        explicit constexpr operator bool() const {
+        explicit constexprvector operator bool() const {
             // zero is false --all other values are true
             return _digits.front() != 0; // assuming no leading zeroes
         }
         /**
          * @returns size by number of digits
          */
-        constexpr std::size_t digit_length() const {
+        constexprvector std::size_t digit_length() const {
             return _digits.size();
         }
         /**
          * @returns size by number of bytes needed to store the number's digits
          * @note this can be less than \f$ digits \times sizeof(digit) \f$
          */
-        constexpr std::size_t byte_length() const {
+        constexprvector std::size_t byte_length() const {
             // this is how many bytes are needed to store the digits
             std::size_t bytes_for_digits = _digits.size() * sizeof(StorageType);
             // reduce size if leading digit is not full occupancy
@@ -889,7 +906,7 @@ namespace com::saxbophone::arby {
          * @returns size by number of bits needed to store the number's value
          * @note this can be less than \f$ bytes \times 8 \f$
          */
-        constexpr std::size_t bit_length() const {
+        constexprvector std::size_t bit_length() const {
             // this is how many bits are needed to store the digits
             std::size_t bits_for_digits = _digits.size() * sizeof(StorageType) * 8;
             // reduce size if leading digit is not full occupancy
@@ -900,13 +917,13 @@ namespace com::saxbophone::arby {
         /**
          * @returns a copy of the underlying digits that make up this Nat value
          */
-        constexpr codlili::list<StorageType> digits() const {
+        constexprvector std::vector<StorageType> digits() const {
             return _digits;
         }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
-        codlili::list<StorageType> _digits;
+        std::vector<StorageType> _digits;
     };
 
     /**
@@ -930,7 +947,7 @@ namespace com::saxbophone::arby {
          * or certainly more than can be stored in unsigned long long...
          * @relatedalso com::saxbophone::arby::Nat
          */
-        constexpr Nat operator "" _nat(const char* literal) {
+        constexprvector Nat operator "" _nat(const char* literal) {
             // detect number base
             std::uint8_t base = 10; // base-10 is the fallback base
             if (literal[0] == '0' and literal[1] != 0) { // first digit 0, second non-null, maybe a 0x/0b prefix?
@@ -999,15 +1016,15 @@ public:
     static constexpr bool traps = true; // we haven't yet implemented division, but there are no plans to specially handle division by zero
     static constexpr bool tinyness_before = false; // N/A
     // these methods should be made constexpr when constexpr std::vector is widely supported
-    static constexpr com::saxbophone::arby::Nat min() { return 0; };
-    static constexpr com::saxbophone::arby::Nat lowest() { return 0; };
-    static constexpr com::saxbophone::arby::Nat max() { return 0; }; // N/A --no hard limit on maximum value
-    static constexpr com::saxbophone::arby::Nat epsilon() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat round_error() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat infinity() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat quiet_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat signaling_NaN() { return 0; } // N/A
-    static constexpr com::saxbophone::arby::Nat denorm_min() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat min() { return 0; };
+    static constexprvector com::saxbophone::arby::Nat lowest() { return 0; };
+    static constexprvector com::saxbophone::arby::Nat max() { return 0; }; // N/A --no hard limit on maximum value
+    static constexprvector com::saxbophone::arby::Nat epsilon() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat round_error() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat infinity() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat quiet_NaN() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat signaling_NaN() { return 0; } // N/A
+    static constexprvector com::saxbophone::arby::Nat denorm_min() { return 0; } // N/A
 };
 
 #endif // include guard

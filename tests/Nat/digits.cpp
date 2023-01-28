@@ -1,5 +1,6 @@
 #include <limits>
 #include <stdexcept>
+#include <vector>
 
 #include <catch2/catch.hpp>
 
@@ -13,8 +14,8 @@ TEST_CASE("Nat digits - std::initializer_list", "") {
     std::initializer_list<StorageType> digits = {
         1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u
     };
-    // also put those digits into a codlili::list instance so we can compare them
-    codlili::list<StorageType> original(digits);
+    // also put those digits into a std::vector instance so we can compare them
+    std::vector<StorageType> original(digits);
 
     SECTION("Create Nat from digits") {
         arby::Nat from_digits(digits);
@@ -33,10 +34,7 @@ TEST_CASE("Nat digits - std::initializer_list", "") {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 
-TEMPLATE_PRODUCT_TEST_CASE(
-    "Nat digits", "",
-    (codlili::list, std::vector), StorageType
-) {
+TEST_CASE("Nat digits - std::vector", "",) {
     // generate digits arrays of size 1..8
     std::size_t size = GENERATE(take(1000, random(1u, 8u)));
     auto raw_digits = GENERATE_COPY(
@@ -51,15 +49,10 @@ TEMPLATE_PRODUCT_TEST_CASE(
             )
         )
     );
-    // copy raw_digits into a container of TestType
-    TestType digits;
+    // copy raw_digits into a container of std::vector
+    std::vector<StorageType> digits;
     for (const auto& item : raw_digits) {
         digits.push_back(item);
-    }
-    // also read digits out into a codlili::list instance so we can compare them
-    codlili::list<StorageType> original;
-    for (const auto& item : digits) {
-        original.push_back(item);
     }
 
     SECTION("Create Nat from digits") {
@@ -68,7 +61,7 @@ TEMPLATE_PRODUCT_TEST_CASE(
         SECTION("Get digits back out of Nat") {
             auto digits_back = from_digits.digits();
 
-            CHECK(digits_back == original);
+            CHECK(digits_back == digits);
         }
     }
 }
@@ -78,21 +71,19 @@ TEMPLATE_PRODUCT_TEST_CASE(
 TEMPLATE_TEST_CASE(
     "Nat init from digits leading zero elision", "",
     std::initializer_list<StorageType>,
-    std::vector<StorageType>,
-    codlili::list<StorageType>
+    std::vector<StorageType>
 ) {
-    CHECK(arby::Nat(TestType({0, 1, 2, 3})).digits() == codlili::list<StorageType>({1, 2, 3}));
-    CHECK(arby::Nat(TestType({1, 2, 3})).digits() == codlili::list<StorageType>({1, 2, 3}));
-    CHECK(arby::Nat(TestType({0})).digits() == codlili::list<StorageType>({0}));
-    CHECK(arby::Nat(TestType({0, 0, 0, 9, 7, 5, 1, 2, 0, 0, 0, 2, 0})).digits() == codlili::list<StorageType>({9, 7, 5, 1, 2, 0, 0, 0, 2, 0}));
-    CHECK(arby::Nat(TestType({0, 0, 0})).digits() == codlili::list<StorageType>({0}));
+    CHECK(arby::Nat(TestType({0, 1, 2, 3})).digits() == std::vector<StorageType>({1, 2, 3}));
+    CHECK(arby::Nat(TestType({1, 2, 3})).digits() == std::vector<StorageType>({1, 2, 3}));
+    CHECK(arby::Nat(TestType({0})).digits() == std::vector<StorageType>({0}));
+    CHECK(arby::Nat(TestType({0, 0, 0, 9, 7, 5, 1, 2, 0, 0, 0, 2, 0})).digits() == std::vector<StorageType>({9, 7, 5, 1, 2, 0, 0, 0, 2, 0}));
+    CHECK(arby::Nat(TestType({0, 0, 0})).digits() == std::vector<StorageType>({0}));
 }
 
 TEMPLATE_TEST_CASE(
     "Creating Nat from empty digits iterable throws std::invalid_argument", "",
     std::initializer_list<StorageType>,
-    std::vector<StorageType>,
-    codlili::list<StorageType>
+    std::vector<StorageType>
 ) {
     CHECK_THROWS_AS(arby::Nat(TestType()), std::invalid_argument);
 }
