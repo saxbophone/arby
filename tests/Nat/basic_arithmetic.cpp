@@ -74,8 +74,15 @@ TEST_CASE("arby::Nat(std::string)", "[ctor]") {
     CHECK((uintmax_t)object == value);
 }
 
+constexpr uintmax_t runnable_at_compile_time() {
+    arby::Nat source = 10000000000;
+    return (uintmax_t)source;
+}
+
 TEST_CASE("constexpr arby::Nat", "[constexpr]") {
-    constexpr uintmax_t VALUE = (uintmax_t)arby::Nat(10000000000);
+    WARN("No constexpr tests written yet");
+    // TODO: Change to STATIC_CHECK when we upgrade to Catch v3
+    STATIC_REQUIRE(runnable_at_compile_time() == 10000000000);
 }
 
 TEST_CASE("arby::Nat prefix increment 0", "[basic-arithmetic]") {
