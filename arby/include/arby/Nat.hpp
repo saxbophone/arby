@@ -518,7 +518,7 @@ namespace com::saxbophone::arby {
                     _digits.insert(_digits.begin(), rhs._digits.size() - _digits.size(), 0);
                 } else if (_digits.size() > rhs._digits.size()) {
                     // rhs._digits.push_front(_digits.size() - rhs._digits.size(), 0);
-                    rhs._digits.insert(_digits.begin(), _digits.size() - rhs._digits.size(), 0);
+                    rhs._digits.insert(rhs._digits.begin(), _digits.size() - rhs._digits.size(), 0);
                 }
                 // work backwards up the digits vector of the rhs
                 bool borrow = false; // transfers borrows up when triggered
