@@ -81,7 +81,8 @@ constexpr uintmax_t runnable_at_compile_time() {
 }
 
 TEST_CASE("constexpr arby::Nat", "[constexpr]") {
-    STATIC_CHECK(runnable_at_compile_time() == 10000000000);
+    // TODO: Change to STATIC_CHECK when we upgrade to Catch v3
+    STATIC_REQUIRE(runnable_at_compile_time() == 10000000000);
 }
 #endif
 

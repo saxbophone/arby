@@ -1,10 +1,10 @@
 include(GNUInstallDirs)
 
-CPMFindPackage(
-    NAME Codlili
-    GIT_REPOSITORY https://github.com/saxbophone/codlili.git
-    GIT_TAG v0.4.0
-)
+# CPMFindPackage(
+#     NAME Codlili
+#     GIT_REPOSITORY https://github.com/saxbophone/codlili.git
+#     GIT_TAG v0.4.0
+# )
 
 add_library(arby STATIC)
 # ALIAS target to export a namespaced target even when building in-tree
@@ -45,7 +45,7 @@ target_link_libraries(
             $<BUILD_INTERFACE:arby-compiler-options>
 )
 # link to codlili, using public linkage as we'll need to install its headers too
-target_link_libraries(arby PUBLIC Codlili::codlili)
+# target_link_libraries(arby PUBLIC Codlili::codlili)
 
 # library
 install(
