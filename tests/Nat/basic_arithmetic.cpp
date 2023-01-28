@@ -74,16 +74,16 @@ TEST_CASE("arby::Nat(std::string)", "[ctor]") {
     CHECK((uintmax_t)object == value);
 }
 
-TEST_CASE("constexpr arby::Nat", "[constexpr]") {
-    #ifndef __cpp_lib_constexpr_vector
-    WARN("No constexpr std::vector");
-    #else
-    // constexpr uintmax_t VALUE = (uintmax_t)arby::Nat(10000000000);
+#ifdef __cpp_lib_constexpr_vector
+constexpr uintmax_t runnable_at_compile_time() {
     arby::Nat source = 10000000000;
-
-    constexpr uintmax_t destination = (uintmax_t)source;
-    #endif
+    return (uintmax_t)source;
 }
+
+TEST_CASE("constexpr arby::Nat", "[constexpr]") {
+    STATIC_CHECK(runnable_at_compile_time() == 10000000000);
+}
+#endif
 
 TEST_CASE("arby::Nat prefix increment 0", "[basic-arithmetic]") {
     arby::Nat original;
