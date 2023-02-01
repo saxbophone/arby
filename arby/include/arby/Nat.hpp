@@ -838,7 +838,12 @@ namespace com::saxbophone::arby {
             result._validate_digits();
             return result;
         }
-        // left-shift-assignment
+        /**
+         * @brief bitwise left-shift assignment
+         * @details Bits are never shifted out, instead the object is enlargened
+         * to make them fit.
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
         constexpr Nat& operator<<=(uintmax_t n) {
             // break the shift up into whole-digit and part-digit shifts
             auto wholes = n / BITS_PER_DIGIT;
@@ -868,12 +873,21 @@ namespace com::saxbophone::arby {
             _validate_digits(); // TODO: remove when satisfied not required
             return *this;
         }
-        // left-shift
+        /**
+         * @brief bitwise left-shift for Nat
+         * @details Bits are never shifted out, instead the object is enlargened
+         * to make them fit.
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
         friend constexpr Nat operator<<(Nat lhs, uintmax_t rhs) {
             lhs <<= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
-        // right-shift-assignment
+        /**
+         * @brief bitwise right-shift assignment
+         * @details Bits are shifted out rightwards and the object may be shrunk
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
         constexpr Nat& operator>>=(uintmax_t n) {
             // cap n to be no more than total bits in number
             if (n > this->bit_length()) { n = this->bit_length(); }
@@ -901,7 +915,11 @@ namespace com::saxbophone::arby {
             _validate_digits(); // TODO: remove when satisfied not required
             return *this;
         }
-        // right-shift
+        /**
+         * @brief bitwise right-shift for Nat
+         * @details Bits are shifted out rightwards and the object may be shrunk
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
         friend constexpr Nat operator>>(Nat lhs, uintmax_t rhs) {
             lhs >>= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
