@@ -85,7 +85,7 @@ namespace com::saxbophone::arby {
         /*
          * uses compile-time template logic to pick StorageType and OverflowType:
          * - picks unsigned int if its range is less than that of uintmax_t
-         * - otherwise, picks the next type smaller than uintmax_t (very unlikely)
+         * - otherwise, picks the next type smaller than unsigned int/uintmax_t (very unlikely)
          */
         struct StorageTraits {
             using StorageType = std::conditional<
@@ -152,9 +152,7 @@ namespace com::saxbophone::arby {
          */
         using OverflowType = PRIVATE::StorageTraits::OverflowType;
     private:
-        using StorageType = PRIVATE::GetStorageType<int>::StorageType;
-        using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
-        static constexpr std::size_t BITS_PER_DIGIT = PRIVATE::GetStorageType<int>::BITS_BETWEEN;
+        static constexpr std::size_t BITS_PER_DIGIT = std::numeric_limits<StorageType>::digits;
         static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
         constexpr void _validate_digits() const {
