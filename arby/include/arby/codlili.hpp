@@ -1,21 +1,5 @@
 /*
- * codlili v0.2.0
- *
- * /kɒdliːliː/
- *
- * - COnstexpr
- * - Doubly
- * - LInked
- * - LIst
- *
- * This file forms part of arby
- * arby is a C++ library providing arbitrary-precision integer types
- *
- * Warning: codlili is currently bundled with arby but is planned to be moved
- * to its own separate project/package at a later date.
- *
- * Created by Joshua Saxby <joshua.a.saxby@gmail.com>, May 2022
- *
+ * Created by Joshua Saxby <joshua.a.saxby@gmail.com>, June 2022
  * Copyright Joshua Saxby <joshua.a.saxby@gmail.com> 2022
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,10 +15,13 @@
 #include <initializer_list>  // initializer_list
 #include <iterator>          // iterator traits
 
+#include <iostream>
 
-namespace com::saxbophone::arby::PRIVATE::codlili {
+
+namespace com::saxbophone::codlili {
+    // TODO: rearrange the list of method prototypes to follow those of std::list
     template <typename T>  // the type of elements to store
-    class List {
+    class list {
     public:
         // simple record type for the doubly-linked-list nodes
         struct ListNode {
@@ -82,30 +69,30 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
         using reference = T&;
         using const_reference = const T&;
         // initialises size to zero, an empty list
-        constexpr List() noexcept {}
+        constexpr list() noexcept {}
         // initialises list with the specified number of default-constructed elements
-        constexpr List(std::size_t size) : List(size, T{}) {} // reuse (size,value) ctor
+        constexpr list(std::size_t size) : list(size, T{}) {} // reuse (size,value) ctor
         // initialises list with the given elements
-        constexpr List(std::initializer_list<T> elements) {
+        constexpr list(std::initializer_list<T> elements) {
             for (auto element : elements) {
                 push_back(element);
             }
         }
         // initialises list with the specified number of this element value-copied
-        constexpr List(std::size_t size, const_reference value) {
+        constexpr list(std::size_t size, const_reference value) {
             for (std::size_t i = 0; i < size; i++) {
                 push_back(value);
             }
         }
         /* rule of three: */
         // copy constructor
-        constexpr List(const List& other) {
+        constexpr list(const list& other) {
             for (auto element : other) {
                 push_back(element);
             }
         }
         // destructor, needed because there is manual memory management
-        constexpr ~List() {
+        constexpr ~list() {
             // delete the entire chain of ListNode pointers
             auto cursor = _back;
             while (cursor != nullptr) {
@@ -117,7 +104,7 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
             _back = nullptr;
         }
         // copy assignment operator
-        constexpr List& operator=(const List& other) noexcept {
+        constexpr list& operator=(const list& other) noexcept {
             clear();
             for (auto element : other) {
                 push_back(element);
@@ -125,7 +112,7 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
             return *this;
         }
         /* element access */
-        // TODO: make these trap when accessed on an empty List
+        // TODO: make these trap when accessed on an empty list
         // get reference to first element
         constexpr reference front() { return this->_front->value; }
         // get read-only reference to first element
@@ -212,13 +199,25 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
         }
         // removes the last element from the list
         constexpr void pop_back() {
-            // remove back-1
-            auto behind = _back->prev;
-            // create the backlink from back to whatever was behind behind
-            _back->prev = behind->prev;
-            // if there is something behind behind, link it forward to back
-            if (behind->prev != nullptr) { behind->prev->next = _back; }
-            delete behind;
+            auto old_back = _back;
+            _back = old_back->prev;
+            if (_front == _back) { // if front is now back marker, list is now empty, so set front->next
+                _front->next = nullptr;
+            } else { // otherwise, just clear next pointer of new back node
+                _back->next = nullptr;
+            }
+            delete old_back;
+            // // remove back-1
+            // auto behind = _back->prev;
+            // std::cout << "remove back-1" << std::endl;
+            // // create the backlink from back to whatever was behind behind
+            // _back->prev = behind->prev;
+            // std::cout << "create backlink" << std::endl;
+            // // if there is something behind behind, link it forward to back
+            // if (behind->prev != nullptr) { behind->prev->next = _back; }
+            // std::cout << "link forward if needed" << std::endl;
+            // std::cout << _front << " " << _back << std::endl;
+            // delete behind;
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
         // new default-constructed elements at the end if it is greater
@@ -238,13 +237,13 @@ namespace com::saxbophone::arby::PRIVATE::codlili {
             }
         }
         // exchanges this list's contents with that of the other
-        constexpr void swap(List& other) noexcept {
+        constexpr void swap(list& other) noexcept {
             // swapping the front and back pointers should be enough to exchange contents
             std::swap(_front, other._front);
             std::swap(_back, other._back);
         }
         /* comparison */
-        constexpr bool operator==(const List& other) const {
+        constexpr bool operator==(const list& other) const {
             return std::equal(begin(), end(), other.begin(), other.end());
         }
     private:

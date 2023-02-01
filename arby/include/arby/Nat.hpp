@@ -817,16 +817,25 @@ namespace com::saxbophone::arby {
             return lhs; // return the result by value (uses move constructor)
         }
         // right-shift-assignment
-        constexpr Nat& operator>>=(Nat n) {
+        constexpr Nat& operator>>=(uintmax_t n) {
             // cap n to be no more than total bits in number
             if (n > this->bit_length()) { n = this->bit_length(); }
             // break the shift up into whole-digit and part-digit shifts
-            // NOTE: we will have to use something other than divmod if it gets
-            // reimplemented in terms of shifting for binary powers!
-            auto [wholes, parts] = Nat::divmod(n, BITS_PER_DIGIT);
+            auto wholes = n / BITS_PER_DIGIT;
+            auto parts = n % BITS_PER_DIGIT;
             // shift down by whole number of digits first
-            for (Nat i = 0; i < wholes; i++) {
+            for (uintmax_t i = 0; i < wholes; i++) {
                 _digits.pop_back();
+            }
+            // handle the sub-digit shift next
+            if (parts > 0) {
+                for (auto it = _digits.rbegin(); it != _digits.rend(); ) {
+                    (*it) >>= parts;
+                    auto prev = it++;
+                    if (it != _digits.rend()) {
+                        (*prev) |= ((*it) << (BITS_PER_DIGIT - parts));
+                    }
+                }
             }
             // replace digits array with zero if empty
             if (_digits.empty()) {
@@ -836,7 +845,7 @@ namespace com::saxbophone::arby {
             return *this;
         }
         // right-shift
-        friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
+        friend constexpr Nat operator>>(Nat lhs, uintmax_t rhs) {
             lhs >>= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -882,7 +891,7 @@ namespace com::saxbophone::arby {
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
-        PRIVATE::codlili::List<StorageType> _digits;
+        codlili::list<StorageType> _digits;
     };
 
     /**

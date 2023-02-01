@@ -49,7 +49,7 @@ TEST_CASE("arby::Nat left bit-shift assignment", "[bit-shifting]") {
 
 TEST_CASE("arby::Nat right bit-shift", "[bit-shifting]") {
     auto [lhs, rhs, result] = GENERATE(
-        table<arby::Nat, arby::Nat, arby::Nat>(
+        table<arby::Nat, uintmax_t, arby::Nat>(
             {
                 {0b10001101_nat, 3, 0b10001_nat},
                 {0b111011001001001010101110101010_nat, 19, 0b11101100100_nat},
@@ -60,6 +60,7 @@ TEST_CASE("arby::Nat right bit-shift", "[bit-shifting]") {
             }
         )
     );
+    CAPTURE(lhs, rhs, result);
 
     arby::Nat shifted = lhs >> rhs;
 
@@ -68,7 +69,7 @@ TEST_CASE("arby::Nat right bit-shift", "[bit-shifting]") {
 
 TEST_CASE("arby::Nat right bit-shift assignment", "[bit-shifting]") {
     auto [lhs, rhs, result] = GENERATE(
-        table<arby::Nat, arby::Nat, arby::Nat>(
+        table<arby::Nat, uintmax_t, arby::Nat>(
             {
                 {0b10001101_nat, 3, 0b10001_nat},
                 {0b111011001001001010101110101010_nat, 19, 0b11101100100_nat},
