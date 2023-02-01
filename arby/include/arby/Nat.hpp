@@ -85,7 +85,7 @@ namespace com::saxbophone::arby {
         /*
          * uses compile-time template logic to pick StorageType and OverflowType:
          * - picks unsigned int if its range is less than that of uintmax_t
-         * - otherwise, picks the next type smaller than uintmax_t (very unlikely)
+         * - otherwise, picks the next type smaller than unsigned int/uintmax_t (very unlikely)
          */
         struct StorageTraits {
             using StorageType = std::conditional<
@@ -152,6 +152,7 @@ namespace com::saxbophone::arby {
          */
         using OverflowType = PRIVATE::StorageTraits::OverflowType;
     private:
+        static constexpr std::size_t BITS_PER_DIGIT = std::numeric_limits<StorageType>::digits;
         static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
         constexpr void _validate_digits() const {
@@ -837,27 +838,92 @@ namespace com::saxbophone::arby {
             result._validate_digits();
             return result;
         }
-        // XXX: unimplemented shift operators commented out until implemented
-        // // left-shift-assignment
-        // constexpr Nat& operator<<=(const Nat& n) {
-        //     // TODO: implement
-        //     return *this;
-        // }
-        // // left-shift
-        // friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
-        //     lhs <<= rhs; // reuse compound assignment
-        //     return lhs; // return the result by value (uses move constructor)
-        // }
-        // // right-shift-assignment
-        // constexpr Nat& operator>>=(const Nat& n) {
-        //     // TODO: implement
-        //     return *this;
-        // }
-        // // right-shift
-        // friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
-        //     lhs <<= rhs; // reuse compound assignment
-        //     return lhs; // return the result by value (uses move constructor)
-        // }
+        /**
+         * @brief bitwise left-shift assignment
+         * @details Bits are never shifted out, instead the object is enlargened
+         * to make them fit.
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
+        constexpr Nat& operator<<=(uintmax_t n) {
+            // break the shift up into whole-digit and part-digit shifts
+            auto wholes = n / BITS_PER_DIGIT;
+            auto parts = n % BITS_PER_DIGIT;
+            // shift up by whole number of digits first
+            _digits.push_back(wholes, 0);
+            // handle the sub-digit shift next
+            if (parts > 0) {
+                // add another digit at the top end to accommodate the shift
+                _digits.push_front(0);
+                // shift up each digit into a bucket twice the size (to not lose top bits)
+                for (auto it = ++_digits.begin(); it != _digits.end(); it++) { // second element
+                    OverflowType bucket = *it;
+                    bucket <<= parts; // do the shift into bucket
+                    *it = (StorageType)bucket; // overwrite original value with lower bits in bucket
+                    // write upper part of the bucket
+                    bucket >>= BITS_PER_DIGIT;
+                    it--;
+                    *it |= bucket; // OR is to make sure we preserve any already-written bits
+                    it++;
+                }
+            }
+            // XXX: why do we require this? Shift operation isn't supposed to leave any leading zeroes...
+            if (_digits.front() == 0) {
+                _digits.pop_front();
+            }
+            _validate_digits(); // TODO: remove when satisfied not required
+            return *this;
+        }
+        /**
+         * @brief bitwise left-shift for Nat
+         * @details Bits are never shifted out, instead the object is enlargened
+         * to make them fit.
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
+        friend constexpr Nat operator<<(Nat lhs, uintmax_t rhs) {
+            lhs <<= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
+        /**
+         * @brief bitwise right-shift assignment
+         * @details Bits are shifted out rightwards and the object may be shrunk
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
+        constexpr Nat& operator>>=(uintmax_t n) {
+            // cap n to be no more than total bits in number
+            if (n > this->bit_length()) { n = this->bit_length(); }
+            // break the shift up into whole-digit and part-digit shifts
+            auto wholes = n / BITS_PER_DIGIT;
+            auto parts = n % BITS_PER_DIGIT;
+            // shift down by whole number of digits first
+            for (uintmax_t i = 0; i < wholes; i++) {
+                _digits.pop_back();
+            }
+            // handle the sub-digit shift next
+            if (parts > 0) {
+                for (auto it = _digits.rbegin(); it != _digits.rend(); ) {
+                    *it >>= parts;
+                    auto prev = it++;
+                    if (it != _digits.rend()) {
+                        *prev |= (*it << (BITS_PER_DIGIT - parts));
+                    }
+                }
+            }
+            // replace digits array with zero if empty
+            if (_digits.empty()) {
+                _digits = {0};
+            }
+            _validate_digits(); // TODO: remove when satisfied not required
+            return *this;
+        }
+        /**
+         * @brief bitwise right-shift for Nat
+         * @details Bits are shifted out rightwards and the object may be shrunk
+         * @note Complexity: @f$ \mathcal{O(n)} @f$
+         */
+        friend constexpr Nat operator>>(Nat lhs, uintmax_t rhs) {
+            lhs >>= rhs; // reuse compound assignment
+            return lhs; // return the result by value (uses move constructor)
+        }
         /**
          * @brief contextual conversion to bool (behaves same way as int)
          * @returns `false` when value is `0`, otherwise `true`
