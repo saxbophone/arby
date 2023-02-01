@@ -36,7 +36,7 @@ namespace com::saxbophone::arby {
         Nat max_possible;
         std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
         // we will build up the string using digits of this base, for efficiency
-        const Nat chunk = pow(base, max_possible);
+        const Nat chunk = ipow(base, max_possible);
         Nat value = *this;
         std::string digits;
         // build the digits up backwards, least-significant-first up to the most
