@@ -4,6 +4,7 @@ add_library(
         bit_shifting.cpp
         bitwise.cpp
         casting.cpp
+        digits.cpp
         divmod.cpp
         misc.cpp
         multiplication.cpp

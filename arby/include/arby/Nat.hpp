@@ -25,12 +25,15 @@
 
 #include <algorithm>
 #include <compare>
+#include <initializer_list>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
-#include "codlili.hpp"
+#include <codlili/list.hpp>
 
 
 /**
@@ -50,50 +53,47 @@
  */
 namespace com::saxbophone::arby {
     namespace PRIVATE {
+        template <std::size_t BITS>
+        struct GetTypeForSize {
+            using Type = void;
+        };
+        template <>
+        struct GetTypeForSize<8> {
+            using Type = std::uint8_t;
+        };
+        template <>
+        struct GetTypeForSize<16> {
+            using Type = std::uint16_t;
+        };
+        template <>
+        struct GetTypeForSize<32> {
+            using Type = std::uint32_t;
+        };
+        template <>
+        struct GetTypeForSize<64> {
+            using Type = std::uint64_t;
+        };
+        template <typename T> requires (not std::numeric_limits<T>::is_signed)
+        struct GetNextBiggerType {
+            using Type = typename GetTypeForSize<std::numeric_limits<T>::digits * 2>::Type;
+        };
+        template <typename T> requires (not std::numeric_limits<T>::is_signed)
+        struct GetNextSmallerType {
+            using Type = typename GetTypeForSize<std::numeric_limits<T>::digits / 2>::Type;
+        };
+
         /*
-         * these template specialisations are used for selecting the unsigned type
-         * to use for storing the digits of our arbitrary-size numbers
-         *
-         * the template specialisations pick the corresponding unsigned type and the
-         * next-smallest unsigned type for the given signed type, this is to ensure
-         * that the number base is not out of range of int on any given system, and
-         * means we can report it from the radix() method in numeric_limits<>
-         * (which returns int).
-         *
-         * - OverflowType denotes the unsigned equivalent of the given signed type,
-         * this can safely store MAX*MAX of the next-lowest unsigned type, so is
-         * useful to store the intermediate results for multiplication and addition.
-         * - StorageType denotes the next-lowest unsigned type. This is the type
-         * which is used to store the digits of the arbitrary-size number.
-         * - BITS_BETWEEN denotes the number of bits needed to shift StorageType
-         * up to OverflowType
+         * uses compile-time template logic to pick StorageType and OverflowType:
+         * - picks unsigned int if its range is less than that of uintmax_t
+         * - otherwise, picks the next type smaller than uintmax_t (very unlikely)
          */
-        template <typename T>
-        struct GetStorageType {
-            using OverflowType = void;
-            using StorageType = void;
-            static constexpr std::size_t BITS_BETWEEN = 0;
-        };
-
-        template <>
-        struct GetStorageType<std::int64_t> {
-            using OverflowType = std::uint64_t;
-            using StorageType = std::uint32_t;
-            static constexpr std::size_t BITS_BETWEEN = 32;
-        };
-
-        template <>
-        struct GetStorageType<std::int32_t> {
-            using OverflowType = std::uint32_t;
-            using StorageType = std::uint16_t;
-            static constexpr std::size_t BITS_BETWEEN = 16;
-        };
-
-        template <>
-        struct GetStorageType<std::int16_t> {
-            using OverflowType = std::uint16_t;
-            using StorageType = std::uint8_t;
-            static constexpr std::size_t BITS_BETWEEN = 8;
+        struct StorageTraits {
+            using StorageType = std::conditional<
+                (std::numeric_limits<unsigned int>::digits < std::numeric_limits<uintmax_t>::digits),
+                unsigned int,
+                GetNextSmallerType<unsigned int>::Type
+            >::type;
+            using OverflowType = GetNextBiggerType<StorageType>::Type;
         };
 
         // returns ceil(logₐ(n))
@@ -133,10 +133,29 @@ namespace com::saxbophone::arby {
      * code and should be reported as such.
      */
     class Nat {
+    public:
+        /**
+         * @brief The type used to store the digits of this Nat object
+         * @note The exact native type used for this is platform-specific:
+         * - Normally, it is the same as `unsigned int`
+         * - However, in the unlikely event that `unsigned int` is not smaller
+         * than `uintmax_t`, we pick the next smaller type (typically `unsigned short`)
+         */
+        using StorageType = PRIVATE::StorageTraits::StorageType;
+        /**
+         * @brief This is the smallest type guaranteed to be able to store the
+         * result of any product or sum of two values of the type used to store
+         * the number's digits.
+         * @note Consequently, this is the type used to represent Nat::BASE as
+         * that value is +1 beyond the upper bound for the type used to store
+         * the digits.
+         */
+        using OverflowType = PRIVATE::StorageTraits::OverflowType;
     private:
         using StorageType = PRIVATE::GetStorageType<int>::StorageType;
         using OverflowType = PRIVATE::GetStorageType<int>::OverflowType;
         static constexpr std::size_t BITS_PER_DIGIT = PRIVATE::GetStorageType<int>::BITS_BETWEEN;
+        static constexpr std::size_t BITS_BETWEEN = std::numeric_limits<OverflowType>::digits - std::numeric_limits<StorageType>::digits;
         // validates the digits array
         constexpr void _validate_digits() const {
             #ifndef NDEBUG // only run checks in debug mode
@@ -148,12 +167,18 @@ namespace com::saxbophone::arby {
             }
             #endif
         }
+        // removes leading zeroes from the digits array
+        constexpr void _remove_leading_zeroes() {
+            while (_digits.size() > 1 and _digits.front() == 0) {
+                _digits.pop_front();
+            }
+        }
     public:
         /**
          * @brief The number base used internally to store the value
          * @details This is the radix that the digits are encoded in
          */
-        static constexpr int BASE = (int)std::numeric_limits<StorageType>::max() + 1;
+        static constexpr OverflowType BASE = (OverflowType)std::numeric_limits<StorageType>::max() + 1;
         /**
          * @brief Defaulted equality operator for Nat objects
          * @param rhs other Nat object to compare against
@@ -201,6 +226,46 @@ namespace com::saxbophone::arby {
                 power /= Nat::BASE;
             }
             _validate_digits();
+        }
+        /**
+         * @brief Digits-constructor, initialises Nat using the given digits
+         * @tparam Container A container type exposing an STL-like API that
+         * provides begin(), end(), and empty() at a minimum
+         * @param digits the digits to initialise the Nat object from, these
+         * should be encoded in base Nat::BASE (this corresponds to max
+         * StorageType value)
+         * @pre `digits` is not empty
+         * @throws std::invalid_argument when `digits` is empty
+         */
+        template <template<typename...> class Container, typename... Ts>
+        constexpr Nat(const Container<StorageType, Ts...>& digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            for (const auto& digit : digits) {
+                _digits.push_back(digit);
+            }
+            _remove_leading_zeroes();
+        }
+        /**
+         * @overload
+         * @remarks Overload for constructing from `codlili::list` of digits
+         */
+        constexpr Nat(const codlili::list<StorageType>& digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            _remove_leading_zeroes();
+        }
+        /**
+         * @overload
+         * @remarks Overload for constructing from `std::initializer_list` of digits
+         */
+        constexpr Nat(std::initializer_list<StorageType> digits) : _digits(digits) {
+            if (std::empty(digits)) {
+                throw std::invalid_argument("cannot construct Nat object with empty digits sequence");
+            }
+            _remove_leading_zeroes();
         }
         /**
          * @brief Constructor-like static method, creates Nat from floating point value
@@ -360,8 +425,8 @@ namespace com::saxbophone::arby {
                         break;
                     }
                 }
-                // if last digit is zero, remove it
-                if (_digits.front() == 0) {
+                // remove leading zeroes
+                if (_digits.size() > 1 and _digits.front() == 0) {
                     _digits.pop_front();
                 }
             }
@@ -405,7 +470,7 @@ namespace com::saxbophone::arby {
                     // (effectively cheap modulo because we know OverflowType is twice the width of StorageType)
                     *it = (StorageType)addition;
                     // update the carry with the value in the top significant bits
-                    carry = (StorageType)(addition >> PRIVATE::GetStorageType<int>::BITS_BETWEEN);
+                    carry = (StorageType)(addition >> BITS_BETWEEN);
                 }
                 // if carry is non-zero, then add it to the next most significant digit, expanding size of this if needed
                 if (carry != 0) {
@@ -461,9 +526,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this; // return the result by reference
         }
@@ -722,9 +785,7 @@ namespace com::saxbophone::arby {
                 *it &= *rhs_it;
             }
             // remove any leading zeroes
-            while (_digits.size() > 1 and _digits.front() == 0) {
-                _digits.pop_front();
-            }
+            _remove_leading_zeroes();
             _validate_digits();
             return *this;
         }
@@ -775,9 +836,7 @@ namespace com::saxbophone::arby {
                 }
             }
             // remove any leading zeroes
-            while (result._digits.size() > 1 and result._digits.front() == 0) {
-                result._digits.pop_front();
-            }
+            result._remove_leading_zeroes();
             result._validate_digits();
             return result;
         }
@@ -888,6 +947,12 @@ namespace com::saxbophone::arby {
             bits_for_digits -= (sizeof(StorageType) * 8 - leading_occupancy);
             return bits_for_digits;
         }
+        /**
+         * @returns a copy of the underlying digits that make up this Nat value
+         */
+        constexpr codlili::list<StorageType> digits() const {
+            return _digits;
+        }
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
@@ -976,7 +1041,7 @@ public:
     static constexpr int digits = 0; // N/A --no hard limit
     static constexpr int digits10 = 0; // N/A --no hard limit
     static constexpr int max_digits10 = 0; // N/A --no hard limit
-    static constexpr int radix = com::saxbophone::arby::Nat::BASE; // NOTE: this is the radix used for each digit, all of which are binary
+    static constexpr int radix = 2; // NOTE: no longer stores Nat::BASE as radix must be an int, but BASE can overflow int
     static constexpr int min_exponent = 0; // N/A
     static constexpr int min_exponent10 = 0; // N/A
     static constexpr int max_exponent = 0; // N/A

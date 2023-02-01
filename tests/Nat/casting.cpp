@@ -37,13 +37,13 @@ TEMPLATE_TEST_CASE(
     CHECK_THROWS_AS((TestType)value, std::range_error);
 }
 
-TEST_CASE("Casting arby::Nat to other type - uint8_t", "[casting]",) {
+TEST_CASE("Casting arby::Nat to other type - uint8_t", "[casting]") {
     auto value = GENERATE(take(1000, random((std::uint16_t)0, (std::uint16_t)std::numeric_limits<std::uint8_t>::max())));
 
     CHECK((std::uint8_t)arby::Nat((uintmax_t)value) == (std::uint8_t)value);
 }
 
-TEST_CASE("Casting arby::Nat to other type - int8_t", "[casting]",) {
+TEST_CASE("Casting arby::Nat to other type - int8_t", "[casting]") {
     auto value = GENERATE(take(1000, random((std::int16_t)0, (std::int16_t)std::numeric_limits<std::int8_t>::max())));
 
     CHECK((std::int8_t)arby::Nat((uintmax_t)value) == (std::int8_t)value);
@@ -116,7 +116,7 @@ TEST_CASE("arby::Nat::from_float() with positive value", "[casting]") {
     CHECK((long double)object == Approx(std::trunc(value)));
 }
 
-TEST_CASE("arby::Nat can be constructed from unsigned types smaller than uintmax_t - uint8_t",) {
+TEST_CASE("arby::Nat can be constructed from unsigned types smaller than uintmax_t - uint8_t", "[casting]") {
     // workaround for Catch bug: https://github.com/catchorg/Catch2/issues/2433
     std::uint16_t input = GENERATE(take(1000, random((std::uint16_t)0x00, (std::uint16_t)0xFF)));
 
@@ -127,7 +127,7 @@ TEST_CASE("arby::Nat can be constructed from unsigned types smaller than uintmax
 
 TEMPLATE_TEST_CASE(
     "arby::Nat can be constructed from unsigned types smaller than uintmax_t",
-    "",
+    "[casting]",
     std::uint16_t, std::uint32_t, std::uint64_t
 ) {
     TestType input = GENERATE(take(1000, random((TestType)0, std::numeric_limits<TestType>::max())));
