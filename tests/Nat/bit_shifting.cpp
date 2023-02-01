@@ -11,7 +11,7 @@ using namespace com::saxbophone::arby::literals;
 
 TEST_CASE("arby::Nat left bit-shift", "[bit-shifting]") {
     auto [lhs, rhs, result] = GENERATE(
-        table<arby::Nat, arby::Nat, arby::Nat>(
+        table<arby::Nat, uintmax_t, arby::Nat>(
             {
                 {0b1110101_nat, 23, 0b111010100000000000000000000000_nat},
                 {0b0_nat, 13, 0b0_nat},
@@ -30,7 +30,7 @@ TEST_CASE("arby::Nat left bit-shift", "[bit-shifting]") {
 
 TEST_CASE("arby::Nat left bit-shift assignment", "[bit-shifting]") {
     auto [lhs, rhs, result] = GENERATE(
-        table<arby::Nat, arby::Nat, arby::Nat>(
+        table<arby::Nat, uintmax_t, arby::Nat>(
             {
                 {0b1110101_nat, 23, 0b111010100000000000000000000000_nat},
                 {0b0_nat, 13, 0b0_nat},

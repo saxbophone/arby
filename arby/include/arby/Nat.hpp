@@ -782,13 +782,12 @@ namespace com::saxbophone::arby {
             return result;
         }
         // left-shift-assignment
-        constexpr Nat& operator<<=(const Nat& n) {
+        constexpr Nat& operator<<=(uintmax_t n) {
             // break the shift up into whole-digit and part-digit shifts
-            // NOTE: we will have to use something other than divmod if it gets
-            // reimplemented in terms of shifting for binary powers!
-            auto [wholes, parts] = Nat::divmod(n, BITS_PER_DIGIT);
+            auto wholes = n / BITS_PER_DIGIT;
+            auto parts = n % BITS_PER_DIGIT;
             // shift up by whole number of digits first
-            _digits.push_back((uintmax_t)wholes, 0); // XXX: wholes may overflow but in that case unlikely enough memory
+            _digits.push_back(wholes, 0);
             // handle the sub-digit shift next
             if (parts > 0) {
                 // add another digit at the top end to accommodate the shift
@@ -796,7 +795,7 @@ namespace com::saxbophone::arby {
                 // shift up each digit into a bucket twice the size (to not lose top bits)
                 for (auto it = ++_digits.begin(); it != _digits.end(); it++) { // second element
                     OverflowType bucket = *it;
-                    bucket <<= (uintmax_t)parts; // do the shift into bucket
+                    bucket <<= parts; // do the shift into bucket
                     *it = bucket; // overwrite original value with lower bits in bucket
                     // write upper part of the bucket
                     bucket >>= BITS_PER_DIGIT;
@@ -813,7 +812,7 @@ namespace com::saxbophone::arby {
             return *this;
         }
         // left-shift
-        friend constexpr Nat operator<<(Nat lhs, const Nat& rhs) {
+        friend constexpr Nat operator<<(Nat lhs, uintmax_t rhs) {
             lhs <<= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
@@ -838,7 +837,7 @@ namespace com::saxbophone::arby {
         }
         // right-shift
         friend constexpr Nat operator>>(Nat lhs, const Nat& rhs) {
-            lhs <<= rhs; // reuse compound assignment
+            lhs >>= rhs; // reuse compound assignment
             return lhs; // return the result by value (uses move constructor)
         }
         /**
