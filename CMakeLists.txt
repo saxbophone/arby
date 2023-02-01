@@ -126,6 +126,8 @@ else() # GCC/Clang warning option
         enable_cxx_compiler_flag_if_supported("-Wno-error=unused-parameter")
         enable_cxx_compiler_flag_if_supported("-Wno-error=unused-private-field")
         enable_cxx_compiler_flag_if_supported("-Wno-error=unused-but-set-variable")
+        # Clang's now introduced a "helpful" analysis of for-loops that increment a variable twice
+        enable_cxx_compiler_flag_if_supported("-Wno-error=for-loop-analysis")
     endif()
 endif()
 
