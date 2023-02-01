@@ -858,7 +858,7 @@ namespace com::saxbophone::arby {
                 for (auto it = ++_digits.begin(); it != _digits.end(); it++) { // second element
                     OverflowType bucket = *it;
                     bucket <<= parts; // do the shift into bucket
-                    *it = bucket; // overwrite original value with lower bits in bucket
+                    *it = (StorageType)bucket; // overwrite original value with lower bits in bucket
                     // write upper part of the bucket
                     bucket >>= BITS_PER_DIGIT;
                     it--;
