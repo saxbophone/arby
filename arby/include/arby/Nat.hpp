@@ -830,10 +830,10 @@ namespace com::saxbophone::arby {
             // handle the sub-digit shift next
             if (parts > 0) {
                 for (auto it = _digits.rbegin(); it != _digits.rend(); ) {
-                    (*it) >>= parts;
+                    *it >>= parts;
                     auto prev = it++;
                     if (it != _digits.rend()) {
-                        (*prev) |= ((*it) << (BITS_PER_DIGIT - parts));
+                        *prev |= (*it << (BITS_PER_DIGIT - parts));
                     }
                 }
             }
