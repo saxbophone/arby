@@ -207,17 +207,6 @@ namespace com::saxbophone::codlili {
                 _back->next = nullptr;
             }
             delete old_back;
-            // // remove back-1
-            // auto behind = _back->prev;
-            // std::cout << "remove back-1" << std::endl;
-            // // create the backlink from back to whatever was behind behind
-            // _back->prev = behind->prev;
-            // std::cout << "create backlink" << std::endl;
-            // // if there is something behind behind, link it forward to back
-            // if (behind->prev != nullptr) { behind->prev->next = _back; }
-            // std::cout << "link forward if needed" << std::endl;
-            // std::cout << _front << " " << _back << std::endl;
-            // delete behind;
         }
         // resizes the list to hold count elements, removing excess elements if count less than current size, or adding
         // new default-constructed elements at the end if it is greater
