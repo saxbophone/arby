@@ -226,7 +226,7 @@ static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
 }
 
 TEST_CASE("divmod of arby::Nat by a power of two", "[divmod") {
-    uintmax_t power = GENERATE(range((uintmax_t)0, (uintmax_t)63));
+    uintmax_t power = GENERATE(range((uintmax_t)0, (uintmax_t)std::numeric_limits<uintmax_t>::digits));
     uintmax_t denominator = integer_pow(2, power);
     uintmax_t numerator = GENERATE_COPY(take(100, random(denominator, std::numeric_limits<uintmax_t>::max())));
 
