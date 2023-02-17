@@ -226,15 +226,14 @@ static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
 }
 
 TEST_CASE("divmod of arby::Nat by a power of two", "[divmod") {
-    uintmax_t power = GENERATE(take(100, random((uintmax_t)0, (uintmax_t)534))); // 2**534 is the max power macOS calc will do
-    arby::Nat denominator = arby::pow(2, power);
-    // control variables for shifting the numerator for a bit of deviation from plain multiples
-    uintmax_t multiple = GENERATE(take(1, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
-    uintmax_t offset = GENERATE(take(1, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    arby::Nat numerator = denominator * multiple + offset;
+    uintmax_t power = GENERATE(range((uintmax_t)0, (uintmax_t)63));
+    uintmax_t denominator = integer_pow(2, power);
+    uintmax_t numerator = GENERATE_COPY(take(100, random(denominator, std::numeric_limits<uintmax_t>::max())));
 
     auto [quotient, remainder] = arby::Nat::divmod(numerator, denominator);
 
-    CHECK(quotient == multiple);
-    CHECK(remainder == offset);
+    CAPTURE(numerator, denominator, quotient, remainder);
+
+    CHECK(quotient == numerator / denominator);
+    CHECK(remainder == numerator % denominator);
 }
