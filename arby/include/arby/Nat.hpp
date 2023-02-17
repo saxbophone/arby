@@ -549,7 +549,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator*=(const Nat& rhs) {
             Nat product = *this * rhs; // uses friend *operator
             // assign product's digits back to our digits
-            _digits = product._digits;
+            _digits = product._digits; // TODO: std::move() ?
             return *this; // return the result by reference
         }
         /**
@@ -680,7 +680,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator/=(const Nat& rhs) {
             Nat quotient = *this / rhs; // uses friend /operator
             // assign quotient's digits back to our digits
-            _digits = quotient._digits;
+            _digits = quotient._digits; // TODO: std::move() ?
             return *this; // return the result by reference
         }
         /**
@@ -707,7 +707,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator%=(const Nat& rhs) {
             Nat remainder = *this % rhs; // uses friend %operator
             // assign remainder's digits back to our digits
-            _digits = remainder._digits;
+            _digits = remainder._digits; // TODO: std::move() ?
             return *this; // return the result by reference
         }
         /**
@@ -802,7 +802,7 @@ namespace com::saxbophone::arby {
         constexpr Nat& operator^=(const Nat& rhs) {
             Nat result = *this ^ rhs; // reuse friend function
             // re-assign digits to this
-            _digits = result._digits;
+            _digits = result._digits; // TODO: std::move() ?
             return *this;
         }
         /**
