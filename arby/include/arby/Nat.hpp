@@ -559,6 +559,8 @@ namespace com::saxbophone::arby {
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
         friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
+            // TODO: optimise this using bitshifts when either operand is a binary power
+            // NOTE: you will need a "is a power of two?" private method to do it: check if this == 1 << (bitlength - 1)
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
