@@ -33,7 +33,7 @@ namespace com::saxbophone::arby {
      * @todo Work out time-complexity
      * @relatedalso Nat
      */
-    constexpr Nat pow(const Nat& base, const Nat& exponent) {
+    constexpr Nat ipow(const Nat& base, uintmax_t exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers
         // exponent = 0 is our base case to terminate the recursion
         if (exponent == 0) {
@@ -45,9 +45,10 @@ namespace com::saxbophone::arby {
             // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
             return base * base;
         }
-        auto [quotient, remainder] = Nat::divmod(exponent, 2);
+        auto quotient = exponent / 2;
+        auto remainder = exponent % 2;
         // instead of calculating x^n, do x^(n/2)
-        Nat power = pow(base, quotient);
+        Nat power = ipow(base, quotient);
         power *= power;
         // and multiply by base again if n was odd
         if (remainder == 1) {
