@@ -46,5 +46,5 @@ TEST_CASE("Non-zero arby::Nat raised to the power of non-zero arby::Nat", "[math
 
     CAPTURE(base, exponent);
 
-    CHECK((uintmax_t)arby::ipow(arby::Nat(base), exponent) == ipow(base, exponent));
+    CHECK((uintmax_t)arby::ipow(arby::Nat(base), exponent) == integer_pow(base, exponent));
 }
