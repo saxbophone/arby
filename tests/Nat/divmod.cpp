@@ -230,6 +230,8 @@ TEST_CASE("divmod of arby::Nat by a power of two", "[divmod]") {
     uintmax_t denominator = integer_pow(2, power);
     uintmax_t numerator = GENERATE_COPY(take(100, random(denominator, std::numeric_limits<uintmax_t>::max())));
 
+    CAPTURE(numerator, denominator);
+
     auto [quotient, remainder] = arby::Nat::divmod(numerator, denominator);
 
     CAPTURE(numerator, denominator, quotient, remainder);

@@ -554,7 +554,7 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for multiplication operator
         constexpr bool is_power_of_2() const {
-            return *this == arby::Nat(1) << (bit_length() - 1);
+            return *this == Nat(1) << (bit_length() - 1);
         }
     public:
         /**
@@ -570,8 +570,7 @@ namespace com::saxbophone::arby {
             if (lhs._digits.front() == 0 or rhs._digits.front() == 0) {
                 return product;
             }
-            // TODO: optimise this using bitshifts when either operand is a binary power
-            // NOTE: you will need a "is a power of two?" private method to do it: check if this == 1 << (bitlength - 1)
+            // optimisation using bitshifting when multiplying by binary powers
             if (rhs.is_power_of_2()) {
                 return lhs << (rhs.bit_length() - 1);
             } else if (lhs.is_power_of_2()) {
@@ -604,6 +603,7 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for Nat::divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
+        // TODO: rewrite this to use bit-shifting for speed
         static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
             // how many places can we shift rhs left until it's the same width as lhs?
             std::size_t wiggle_room = lhs._digits.size() - rhs._digits.size();
@@ -650,6 +650,18 @@ namespace com::saxbophone::arby {
             // division by zero is undefined
             if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
+            }
+            if (lhs._digits.front() == 0) { return {lhs, lhs}; } // zero shortcut
+            // optimisation using bitshifting when dividing by binary powers
+            if (rhs.is_power_of_2()) {
+                auto width = rhs.bit_length();
+                // the remainder is the digits that are shifted out, so bitmask for them
+                auto bitmask = (Nat(1) << (width - 1)) - 1;
+                Nat quotient = lhs >> (width - 1);
+                Nat remainder = lhs & bitmask;
+                quotient._validate_digits();
+                remainder._validate_digits();
+                return {quotient, remainder};
             }
             // this will gradually accumulate the calculated quotient
             Nat quotient;
@@ -925,7 +937,9 @@ namespace com::saxbophone::arby {
             if (_digits.empty()) {
                 _digits = {0};
             }
-            _validate_digits(); // TODO: remove when satisfied not required
+            // needed in some cases, probably when the intial whole-digit shift leaves a small value which then turns 0
+            _remove_leading_zeroes();
+            _validate_digits();
             return *this;
         }
         /**
