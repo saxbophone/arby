@@ -23,7 +23,8 @@ TEST_CASE("Zero raised to the power of any non-zero arby::Nat returns 0", "[math
 }
 
 // std::pow() is not accurate for large powers and we need exactness
-static uintmax_t ipow(uintmax_t base, uintmax_t exponent) {
+// TODO: put this in a helper function accessible to all tests
+static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
     // 1 to the power of anything is always 1
     if (base == 1) {
         return 1;

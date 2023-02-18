@@ -40,9 +40,8 @@ arby is designed with the following goals in mind:
 
 ### What will be provided in future?
 
-- Additions to **`Nat`**:
 - Arbitrary-precision signed integers (the [Integers](https://en.wikipedia.org/wiki/Integer)) via class **`Int`**
-  - All operations supported by **`Nat`** with the exception of bitwise ones
+  - All operations supported by **`Nat`** with the exception of bitwise ones (but including bit-shifting)
   - sign change
   - absolute value
 

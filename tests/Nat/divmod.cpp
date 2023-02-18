@@ -4,6 +4,7 @@
 
 #include <catch2/catch.hpp>
 
+#include <arby/math.hpp>
 #include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
@@ -206,4 +207,35 @@ TEST_CASE("Failing division", "[divmod]") {
 
     CHECK(quotient == 8123889139_nat);
     CHECK(remainder == 1892371893_nat);
+}
+
+// regression tests for dividing by powers of two
+
+// std::pow() is not accurate for large powers and we need exactness
+// TODO: put this in a helper function accessible to all tests
+static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
+    // 1 to the power of anything is always 1
+    if (base == 1) {
+        return 1;
+    }
+    uintmax_t power = 1;
+    for (uintmax_t i = 0; i < exponent; i++) {
+        power *= base;
+    }
+    return power;
+}
+
+TEST_CASE("divmod of arby::Nat by a power of two", "[divmod]") {
+    uintmax_t power = GENERATE(range((uintmax_t)0, (uintmax_t)std::numeric_limits<uintmax_t>::digits));
+    uintmax_t denominator = integer_pow(2, power);
+    uintmax_t numerator = GENERATE_COPY(take(100, random(denominator, std::numeric_limits<uintmax_t>::max())));
+
+    CAPTURE(numerator, denominator);
+
+    auto [quotient, remainder] = arby::Nat::divmod(numerator, denominator);
+
+    CAPTURE(numerator, denominator, quotient, remainder);
+
+    CHECK(quotient == numerator / denominator);
+    CHECK(remainder == numerator % denominator);
 }
