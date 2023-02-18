@@ -552,6 +552,11 @@ namespace com::saxbophone::arby {
             _digits = product._digits;
             return *this; // return the result by reference
         }
+    private: // private helper methods for multiplication operator
+        constexpr bool is_power_of_2() const {
+            return *this == arby::Nat(1) << (bit_length() - 1);
+        }
+    public:
         /**
          * @brief Multiplication operator for Nat
          * @param lhs,rhs operands for the multiplication
@@ -559,34 +564,40 @@ namespace com::saxbophone::arby {
          * @note Complexity: @f$ \mathcal{O(n^2)} @f$
          */
         friend constexpr Nat operator*(const Nat& lhs, const Nat& rhs) {
-            // TODO: optimise this using bitshifts when either operand is a binary power
-            // NOTE: you will need a "is a power of two?" private method to do it: check if this == 1 << (bitlength - 1)
             // init product to zero
             Nat product;
             // either operand being zero always results in zero, so only run the algorithm if they're both non-zero
-            if (not (lhs._digits.front() == 0 or rhs._digits.front() == 0)) {
-                // multiply each digit from lhs with each digit from rhs
-                std::size_t l = 0; // manual indices to track which digit we are on,
-                std::size_t r = 0; // as codlili's iterators are not random-access
-                for (auto lhs_digit : lhs._digits) {
-                    // reset r index as it cycles through multiple times
-                    r = 0;
-                    for (auto rhs_digit : rhs._digits) {
-                        // cast lhs to OverflowType to make sure both operands get promoted to avoid wrap-around overflow
-                        OverflowType multiplication = (OverflowType)lhs_digit * rhs_digit;
-                        // create a new Nat with this intermediate result and add trailing places as needed
-                        Nat intermediate = multiplication;
-                        // we need to remap the indices as the digits are stored big-endian
-                        std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
-                        // add that many trailing zeroes to intermediate's digits
-                        intermediate._digits.push_back(shift_amount, 0);
-                        // finally, add it to lhs as an accumulator
-                        product += intermediate;
-                        // increment manual indices
-                        r++;
-                    }
-                    l++;
+            if (lhs._digits.front() == 0 or rhs._digits.front() == 0) {
+                return product;
+            }
+            // TODO: optimise this using bitshifts when either operand is a binary power
+            // NOTE: you will need a "is a power of two?" private method to do it: check if this == 1 << (bitlength - 1)
+            if (rhs.is_power_of_2()) {
+                return lhs << (rhs.bit_length() - 1);
+            } else if (lhs.is_power_of_2()) {
+                return rhs * lhs;
+            }
+            // multiply each digit from lhs with each digit from rhs
+            std::size_t l = 0; // manual indices to track which digit we are on,
+            std::size_t r = 0; // as codlili's iterators are not random-access
+            for (auto lhs_digit : lhs._digits) {
+                // reset r index as it cycles through multiple times
+                r = 0;
+                for (auto rhs_digit : rhs._digits) {
+                    // cast lhs to OverflowType to make sure both operands get promoted to avoid wrap-around overflow
+                    OverflowType multiplication = (OverflowType)lhs_digit * rhs_digit;
+                    // create a new Nat with this intermediate result and add trailing places as needed
+                    Nat intermediate = multiplication;
+                    // we need to remap the indices as the digits are stored big-endian
+                    std::size_t shift_amount = (lhs._digits.size() - 1 - l) + (rhs._digits.size() - 1 - r);
+                    // add that many trailing zeroes to intermediate's digits
+                    intermediate._digits.push_back(shift_amount, 0);
+                    // finally, add it to lhs as an accumulator
+                    product += intermediate;
+                    // increment manual indices
+                    r++;
                 }
+                l++;
             }
             product._validate_digits();
             return product;
