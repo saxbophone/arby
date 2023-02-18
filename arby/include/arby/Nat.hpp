@@ -580,9 +580,9 @@ namespace com::saxbophone::arby {
                 // recursive implementation
                 auto big = lhs > rhs ? lhs : rhs;
                 auto small = lhs < rhs ? lhs : rhs;
-                auto current_power = arby::Nat(1) << (big.bit_length() - 1);
-                auto left_over = big - current_power;
-                return small * current_power + small * left_over;
+                auto current_power = arby::Nat(1) << (small.bit_length() - 1);
+                auto left_over = small - current_power;
+                return big * current_power + big * left_over;
             }
             // multiply each digit from lhs with each digit from rhs
             std::size_t l = 0; // manual indices to track which digit we are on,
