@@ -29,7 +29,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">arby
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.5.1</span>
    </div>
    <div id="projectbrief">Arbitrary precision arithmetic in C++, even at compile time</div>
   </td>
@@ -100,8 +100,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:afd60ed80e1f2a21631a524a67e3ccdc5"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#afd60ed80e1f2a21631a524a67e3ccdc5">pow</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;exponent)</td></tr>
-<tr class="separator:afd60ed80e1f2a21631a524a67e3ccdc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af02ea8b73f61d073543e3865d7f8bf22"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#af02ea8b73f61d073543e3865d7f8bf22">ipow</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, uintmax_t exponent)</td></tr>
+<tr class="separator:af02ea8b73f61d073543e3865d7f8bf22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef35b9982fe81d1d85effeeb31be6e47"><td class="memItemLeft" align="right" valign="top">constexpr std::pair&lt; <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>, <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">ilog</a> (const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;base, const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;x)</td></tr>
 <tr class="memdesc:aef35b9982fe81d1d85effeeb31be6e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates integer log of <code>x</code> in <code>base</code> as bounds of \(log_b(x)\).  <a href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">More...</a><br /></td></tr>
 <tr class="separator:aef35b9982fe81d1d85effeeb31be6e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,7 +112,7 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Main namespace. </p>
 <p>Usage: </p><div class="fragment"><div class="line"><span class="keyword">using namespace </span>com::saxbophone;</div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a>;</div>
-<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_1_1literals_html"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a></div><div class="ttdoc">Various custom user-defined-literals for creating arby objects.</div><div class="ttdef"><b>Definition:</b> Nat.hpp:923</div></div>
+<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_1_1literals_html"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby_1_1literals.html">com::saxbophone::arby::literals</a></div><div class="ttdoc">Various custom user-defined-literals for creating arby objects.</div><div class="ttdef"><b>Definition:</b> Nat.hpp:1016</div></div>
 </div><!-- fragment --><ul>
 <li>Introduces library symbols into scope <code>arby</code></li>
 <li><p class="startli">Introduces literal operators into global scope, allowing them to be used as literals</p>
@@ -158,7 +158,7 @@ Functions</h2></td></tr>
 
 <p>Calculates integer log of <code>x</code> in <code>base</code> as bounds of \(log_b(x)\). </p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> [low, high] = <a class="code" href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">ilog</a>(b, x);</div>
-<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_html_aef35b9982fe81d1d85effeeb31be6e47"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">com::saxbophone::arby::ilog</a></div><div class="ttdeci">constexpr std::pair&lt; Nat, Nat &gt; ilog(const Nat &amp;base, const Nat &amp;x)</div><div class="ttdoc">Calculates integer log of x in base as bounds of .</div><div class="ttdef"><b>Definition:</b> math.hpp:79</div></div>
+<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_html_aef35b9982fe81d1d85effeeb31be6e47"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby.html#aef35b9982fe81d1d85effeeb31be6e47">com::saxbophone::arby::ilog</a></div><div class="ttdeci">constexpr std::pair&lt; Nat, Nat &gt; ilog(const Nat &amp;base, const Nat &amp;x)</div><div class="ttdoc">Calculates integer log of x in base as bounds of .</div><div class="ttdef"><b>Definition:</b> math.hpp:80</div></div>
 </div><!-- fragment --> <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">base</td><td>base to use for \(b\) </td></tr>
@@ -194,6 +194,61 @@ Otherwise:<ul>
 
 </div>
 </div>
+<a id="af02ea8b73f61d073543e3865d7f8bf22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af02ea8b73f61d073543e3865d7f8bf22">&#9670;&nbsp;</a></span>ipow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> ipow </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uintmax_t&#160;</td>
+          <td class="paramname"><em>exponent</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>base raised to the power of exponent i.e. for base as \(b\) and exponent as \(x\): \(b^x\) </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base,exponent</td><td>parameters for the base and exponent </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Work out time-complexity</dd></dl>
+
+<p class="reference">Referenced by <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#af02ea8b73f61d073543e3865d7f8bf22">com::saxbophone::arby::Nat::ipow()</a>.</p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacecom_1_1saxbophone_1_1arby_af02ea8b73f61d073543e3865d7f8bf22_icgraph.png" border="0" usemap="#anamespacecom_1_1saxbophone_1_1arby_af02ea8b73f61d073543e3865d7f8bf22_icgraph" alt=""/></div>
+<map name="anamespacecom_1_1saxbophone_1_1arby_af02ea8b73f61d073543e3865d7f8bf22_icgraph" id="anamespacecom_1_1saxbophone_1_1arby_af02ea8b73f61d073543e3865d7f8bf22_icgraph">
+<area shape="rect" title=" " alt="" coords="205,5,357,47"/>
+<area shape="rect" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#af02ea8b73f61d073543e3865d7f8bf22" title=" " alt="" coords="5,5,157,47"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="a4e3b101f804aad71802339dd80302f0d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e3b101f804aad71802339dd80302f0d">&#9670;&nbsp;</a></span>operator&lt;&lt;()</h2>
 
@@ -220,61 +275,6 @@ Otherwise:<ul>
       </table>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>std::ostream&amp; <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#a8d3201fdde0e6327ca92b8f60642827b" title="custom ostream operator that allows class Nat to be printed with std::cout and friends">Nat::operator&lt;&lt;(std::ostream&amp; os, const Nat&amp; object)</a> </dd></dl>
-
-</div>
-</div>
-<a id="afd60ed80e1f2a21631a524a67e3ccdc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd60ed80e1f2a21631a524a67e3ccdc5">&#9670;&nbsp;</a></span>pow()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> pow </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;&#160;</td>
-          <td class="paramname"><em>base</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> &amp;&#160;</td>
-          <td class="paramname"><em>exponent</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>base raised to the power of exponent i.e. for base as \(b\) and exponent as \(x\): \(b^x\) </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">base,exponent</td><td>parameters for the base and exponent </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Work out time-complexity</dd></dl>
-
-<p class="reference">Referenced by <a class="el" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5">com::saxbophone::arby::Nat::pow()</a>.</p>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacecom_1_1saxbophone_1_1arby_afd60ed80e1f2a21631a524a67e3ccdc5_icgraph.png" border="0" usemap="#anamespacecom_1_1saxbophone_1_1arby_afd60ed80e1f2a21631a524a67e3ccdc5_icgraph" alt=""/></div>
-<map name="anamespacecom_1_1saxbophone_1_1arby_afd60ed80e1f2a21631a524a67e3ccdc5_icgraph" id="anamespacecom_1_1saxbophone_1_1arby_afd60ed80e1f2a21631a524a67e3ccdc5_icgraph">
-<area shape="rect" title=" " alt="" coords="205,13,388,39"/>
-<area shape="rect" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5" title=" " alt="" coords="5,5,157,47"/>
-</map>
-</div>
 
 </div>
 </div>

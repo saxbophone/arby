@@ -1,0 +1,5 @@
+<map id="com::saxbophone::arby::Nat::divmod" name="com::saxbophone::arby::Nat::divmod">
+<area shape="rect" id="node1" title="division and modulo all&#45;in&#45;one, equivalent to C/C++ div() and Python divmod()" alt="" coords="5,39,157,80"/>
+<area shape="rect" id="node2" href="$classcom_1_1saxbophone_1_1arby_1_1Nat.html#a23bf7f561305f0d4cc20affe2b7a9bac" title=" " alt="" coords="205,5,357,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1saxbophone_1_1arby_1_1Nat.html#ae6c7bb5ae31df191fb80c24993a927b9" title="Default constructor, initialises to numeric value 0" alt="" coords="205,71,357,112"/>
+</map>

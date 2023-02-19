@@ -1,0 +1,5 @@
+<map id="com::saxbophone::arby::Nat::bit_length" name="com::saxbophone::arby::Nat::bit_length">
+<area shape="rect" id="node1" title=" " alt="" coords="205,39,357,80"/>
+<area shape="rect" id="node2" href="$classcom_1_1saxbophone_1_1arby_1_1Nat.html#a0b1220e8ddbbb267963fb6427d572d76" title="division and modulo all&#45;in&#45;one, equivalent to C/C++ div() and Python divmod()" alt="" coords="5,5,157,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1saxbophone_1_1arby_1_1Nat.html#adc393622bbc7b06976ad2816e6dcfc6e" title="bitwise right&#45;shift assignment" alt="" coords="5,71,157,112"/>
+</map>

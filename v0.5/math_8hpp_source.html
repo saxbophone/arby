@@ -29,7 +29,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">arby
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.5.1</span>
    </div>
    <div id="projectbrief">Arbitrary precision arithmetic in C++, even at compile time</div>
   </td>
@@ -89,7 +89,7 @@ $(function() {
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="namespacecom_1_1saxbophone_1_1arby.html">   28</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacecom_1_1saxbophone_1_1arby.html">com::saxbophone::arby</a> {</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5">   36</a></span>&#160;    constexpr <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5">pow</a>(<span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; base, <span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; exponent) {</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#af02ea8b73f61d073543e3865d7f8bf22">   36</a></span>&#160;    constexpr <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#af02ea8b73f61d073543e3865d7f8bf22">ipow</a>(<span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; base, uintmax_t exponent) {</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="comment">// use divide-and-conquer recursion to break up huge powers into products of smaller powers</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="comment">// exponent = 0 is our base case to terminate the recursion</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordflow">if</span> (exponent == 0) {</div>
@@ -101,43 +101,43 @@ $(function() {
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="comment">// exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            <span class="keywordflow">return</span> base * base;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">auto</span> [quotient, remainder] = <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#a0b1220e8ddbbb267963fb6427d572d76">Nat::divmod</a>(exponent, 2);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="comment">// instead of calculating x^n, do x^(n/2)</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> power = <a class="code" href="namespacecom_1_1saxbophone_1_1arby.html#afd60ed80e1f2a21631a524a67e3ccdc5">pow</a>(base, quotient);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        power *= power;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="comment">// and multiply by base again if n was odd</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">if</span> (remainder == 1) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            power *= base;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">return</span> power;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">   79</a></span>&#160;    constexpr std::pair&lt;Nat, Nat&gt; <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">ilog</a>(<span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; base, <span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; x) {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">if</span> (base &lt; 2) {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">throw</span> std::domain_error(<span class="stringliteral">&quot;ilog: base cannot be &lt; 2&quot;</span>);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &lt; 1) {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            <span class="keywordflow">throw</span> std::domain_error(<span class="stringliteral">&quot;ilog: x cannot be &lt; 1&quot;</span>);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        }</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="comment">// find the smallest power of base that is just &gt;= than x</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> power = 1;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> floor = 0;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> exponent = 0;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">while</span> (power &lt; x) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            power *= base;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            floor = exponent++; <span class="comment">// increment and store old value in floor</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        }</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="comment">// floor = ceil when power = x</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keywordflow">return</span> {power == x ? exponent : floor, exponent};</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    }</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// include guard</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">auto</span> quotient = exponent / 2;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">auto</span> remainder = exponent % 2;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="comment">// instead of calculating x^n, do x^(n/2)</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> power = <a class="code" href="namespacecom_1_1saxbophone_1_1arby.html#af02ea8b73f61d073543e3865d7f8bf22">ipow</a>(base, quotient);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        power *= power;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="comment">// and multiply by base again if n was odd</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">if</span> (remainder == 1) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            power *= base;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> power;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">   80</a></span>&#160;    constexpr std::pair&lt;Nat, Nat&gt; <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">ilog</a>(<span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; base, <span class="keyword">const</span> <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a>&amp; x) {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keywordflow">if</span> (base &lt; 2) {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            <span class="keywordflow">throw</span> std::domain_error(<span class="stringliteral">&quot;ilog: base cannot be &lt; 2&quot;</span>);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &lt; 1) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keywordflow">throw</span> std::domain_error(<span class="stringliteral">&quot;ilog: x cannot be &lt; 1&quot;</span>);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="comment">// find the smallest power of base that is just &gt;= than x</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> power = 1;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> floor = 0;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <a class="code" href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">Nat</a> exponent = 0;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">while</span> (power &lt; x) {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            power *= base;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            floor = exponent++; <span class="comment">// increment and store old value in floor</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="comment">// floor = ceil when power = x</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordflow">return</span> {power == x ? exponent : floor, exponent};</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;}</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// include guard</span></div>
 <div class="ttc" id="aNat_8hpp_html"><div class="ttname"><a href="Nat_8hpp.html">Nat.hpp</a></div><div class="ttdoc">Nat class supporting arbitrary-size unsigned (Natural) integers.</div></div>
 <div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html">com::saxbophone::arby::Nat</a></div><div class="ttdoc">Arbitrary-precision unsigned integer type.</div><div class="ttdef"><b>Definition:</b> Nat.hpp:135</div></div>
-<div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html_a0b1220e8ddbbb267963fb6427d572d76"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#a0b1220e8ddbbb267963fb6427d572d76">com::saxbophone::arby::Nat::divmod</a></div><div class="ttdeci">static constexpr std::pair&lt; Nat, Nat &gt; divmod(const Nat &amp;lhs, const Nat &amp;rhs)</div><div class="ttdoc">division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()</div><div class="ttdef"><b>Definition:</b> Nat.hpp:635</div></div>
-<div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html_aef35b9982fe81d1d85effeeb31be6e47"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">com::saxbophone::arby::Nat::ilog</a></div><div class="ttdeci">constexpr std::pair&lt; Nat, Nat &gt; ilog(const Nat &amp;base, const Nat &amp;x)</div><div class="ttdoc">Calculates integer log of x in base as bounds of .</div><div class="ttdef"><b>Definition:</b> math.hpp:79</div></div>
-<div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html_afd60ed80e1f2a21631a524a67e3ccdc5"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#afd60ed80e1f2a21631a524a67e3ccdc5">com::saxbophone::arby::Nat::pow</a></div><div class="ttdeci">constexpr Nat pow(const Nat &amp;base, const Nat &amp;exponent)</div><div class="ttdef"><b>Definition:</b> math.hpp:36</div></div>
+<div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html_aef35b9982fe81d1d85effeeb31be6e47"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#aef35b9982fe81d1d85effeeb31be6e47">com::saxbophone::arby::Nat::ilog</a></div><div class="ttdeci">constexpr std::pair&lt; Nat, Nat &gt; ilog(const Nat &amp;base, const Nat &amp;x)</div><div class="ttdoc">Calculates integer log of x in base as bounds of .</div><div class="ttdef"><b>Definition:</b> math.hpp:80</div></div>
+<div class="ttc" id="aclasscom_1_1saxbophone_1_1arby_1_1Nat_html_af02ea8b73f61d073543e3865d7f8bf22"><div class="ttname"><a href="classcom_1_1saxbophone_1_1arby_1_1Nat.html#af02ea8b73f61d073543e3865d7f8bf22">com::saxbophone::arby::Nat::ipow</a></div><div class="ttdeci">constexpr Nat ipow(const Nat &amp;base, uintmax_t exponent)</div><div class="ttdef"><b>Definition:</b> math.hpp:36</div></div>
 <div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_html"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby.html">com::saxbophone::arby</a></div><div class="ttdoc">Main namespace.</div><div class="ttdef"><b>Definition:</b> math.hpp:28</div></div>
-<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_html_afd60ed80e1f2a21631a524a67e3ccdc5"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby.html#afd60ed80e1f2a21631a524a67e3ccdc5">com::saxbophone::arby::pow</a></div><div class="ttdeci">constexpr Nat pow(const Nat &amp;base, const Nat &amp;exponent)</div><div class="ttdef"><b>Definition:</b> math.hpp:36</div></div>
+<div class="ttc" id="anamespacecom_1_1saxbophone_1_1arby_html_af02ea8b73f61d073543e3865d7f8bf22"><div class="ttname"><a href="namespacecom_1_1saxbophone_1_1arby.html#af02ea8b73f61d073543e3865d7f8bf22">com::saxbophone::arby::ipow</a></div><div class="ttdeci">constexpr Nat ipow(const Nat &amp;base, uintmax_t exponent)</div><div class="ttdef"><b>Definition:</b> math.hpp:36</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
