@@ -9,7 +9,7 @@ else()
     set(ARBY_SUBPROJECT ON)
 endif()
 
-project(arby VERSION 0.5.0 LANGUAGES CXX)
+project(arby VERSION 0.5.1 LANGUAGES CXX)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
