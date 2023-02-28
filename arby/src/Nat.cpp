@@ -41,7 +41,7 @@ namespace com::saxbophone::arby {
         // build the digits up backwards, least-significant-first up to the most
         do {
             std::ostringstream output;
-            auto [quotient, remainder] = Nat::divmod(value, chunk);
+            auto [quotient, remainder] = divmod(value, chunk);
             // only pad to width of chunk if this is not the front chunk
             if (quotient != 0) {
                 output << std::setfill('0') << std::setw((uintmax_t)max_possible);

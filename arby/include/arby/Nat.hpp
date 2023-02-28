@@ -601,7 +601,7 @@ namespace com::saxbophone::arby {
             product._validate_digits();
             return product;
         }
-    private: // private helper methods for Nat::divmod()
+    private: // private helper methods for divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
         // TODO: rewrite this to use bit-shifting for speed
         static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
@@ -646,7 +646,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        static constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        friend constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
@@ -717,7 +717,7 @@ namespace com::saxbophone::arby {
          */
         friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
             Nat quotient;
-            std::tie(quotient, std::ignore) = Nat::divmod(lhs, rhs);
+            std::tie(quotient, std::ignore) = divmod(lhs, rhs);
             return quotient;
         }
         /**
@@ -745,7 +745,7 @@ namespace com::saxbophone::arby {
          */
         friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
             Nat remainder;
-            std::tie(std::ignore, remainder) = Nat::divmod(lhs, rhs);
+            std::tie(std::ignore, remainder) = divmod(lhs, rhs);
             return remainder;
         }
         /**
@@ -1072,6 +1072,9 @@ namespace com::saxbophone::arby {
         // floor = ceil when power = x
         return {power == x ? exponent : floor, exponent};
     }
+
+    // lift scope of divmod() friend from ADL into arby's scope
+    constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs);
 
     /** @section Custom Literals */
 
