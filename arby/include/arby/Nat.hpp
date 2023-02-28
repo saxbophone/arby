@@ -1002,10 +1002,13 @@ namespace com::saxbophone::arby {
         codlili::list<StorageType> _digits;
     };
 
+    /**
+     * @addtogroup math-support Math Support Functions
+     * @{
+     */
+
     // lift scope of divmod() friend from ADL into arby's scope
     constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs);
-
-    /** @section Math Support Functions */
 
     /**
      * @returns base raised to the power of exponent
@@ -1076,7 +1079,7 @@ namespace com::saxbophone::arby {
         return {power == x ? exponent : floor, exponent};
     }
 
-    /** @section Custom Literals */
+    /** @} */
 
     /**
      * @brief Various custom user-defined-literals for creating arby objects
