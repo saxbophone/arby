@@ -16,7 +16,6 @@ target_link_libraries(
 )
 
 # every sub-part of the test suite
-add_subdirectory(math_support)
 add_subdirectory(Nat)
 
 # test executable wraps everything together
@@ -24,7 +23,6 @@ add_executable(tests)
 target_sources(
     tests PRIVATE
         main.cpp
-        $<TARGET_OBJECTS:math-support>
         $<TARGET_OBJECTS:Nat>
 )
 target_link_libraries(

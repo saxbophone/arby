@@ -22,7 +22,6 @@
 #include <tuple>         // tie
 
 #include <arby/Nat.hpp>
-#include <arby/math.hpp> // ilog
 
 
 namespace com::saxbophone::arby {
