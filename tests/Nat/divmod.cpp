@@ -36,7 +36,7 @@ TEST_CASE("Modulo of arby::Nat by zero raises domain_error", "[modulo]") {
 TEST_CASE("divmod of arby::Nat by zero raises domain_error", "[divmod]") {
     arby::Nat numerator = GENERATE(take(1000, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
 
-    CHECK_THROWS_AS(arby::Nat::divmod(numerator, arby::Nat(0)), std::domain_error);
+    CHECK_THROWS_AS(arby::divmod(numerator, arby::Nat(0)), std::domain_error);
 }
 
 TEST_CASE("Assignment-division of zero by any non-zero arby::Nat returns zero", "[division]") {
@@ -73,7 +73,7 @@ TEST_CASE("divmod of zero by any non-zero arby::Nat returns zero quotient and re
     arby::Nat numerator = arby::Nat(0);
     uintmax_t denominator = GENERATE(take(1000, random((uintmax_t)1, (uintmax_t)arby::Nat::BASE)));
 
-    auto [quotient, remainder] = arby::Nat::divmod(numerator, denominator);
+    auto [quotient, remainder] = arby::divmod(numerator, denominator);
 
     CHECK((uintmax_t)quotient == 0);
     CHECK((uintmax_t)remainder == 0);
@@ -127,7 +127,7 @@ TEST_CASE("divmod of non-zero arby::Nat by small non-zero arby::Nat", "[divmod]"
     arby::Nat lhs = numerator;
     arby::Nat rhs = denominator;
 
-    auto [quotient, remainder] = arby::Nat::divmod(lhs, rhs);
+    auto [quotient, remainder] = arby::divmod(lhs, rhs);
 
     CHECK((uintmax_t)quotient == numerator / denominator);
     CHECK((uintmax_t)remainder == numerator % denominator);
@@ -181,7 +181,7 @@ TEST_CASE("divmod of non-zero arby::Nat by non-zero arby::Nat", "[divmod]") {
     arby::Nat lhs = numerator;
     arby::Nat rhs = denominator;
 
-    auto [quotient, remainder] = arby::Nat::divmod(lhs, rhs);
+    auto [quotient, remainder] = arby::divmod(lhs, rhs);
 
     CHECK((uintmax_t)quotient == numerator / denominator);
     CHECK((uintmax_t)remainder == numerator % denominator);
@@ -203,7 +203,7 @@ TEST_CASE("Division of much smaller arby::Nat by much larger arby::Nat", "[divis
 using namespace com::saxbophone::arby::literals;
 
 TEST_CASE("Failing division", "[divmod]") {
-    auto [quotient, remainder] = arby::Nat::divmod(81238891391892371893_nat, 10000000000_nat);
+    auto [quotient, remainder] = arby::divmod(81238891391892371893_nat, 10000000000_nat);
 
     CHECK(quotient == 8123889139_nat);
     CHECK(remainder == 1892371893_nat);
@@ -232,7 +232,7 @@ TEST_CASE("divmod of arby::Nat by a power of two", "[divmod]") {
 
     CAPTURE(numerator, denominator);
 
-    auto [quotient, remainder] = arby::Nat::divmod(numerator, denominator);
+    auto [quotient, remainder] = arby::divmod(numerator, denominator);
 
     CAPTURE(numerator, denominator, quotient, remainder);
 
