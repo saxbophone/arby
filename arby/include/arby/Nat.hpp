@@ -1061,7 +1061,7 @@ namespace com::saxbophone::arby {
      * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
      * @relatedalso Nat
      */
-    constexpr std::pair<Nat, Nat> ilog(const Nat& base, const Nat& x) {
+    constexpr std::pair<uintmax_t, uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
             throw std::domain_error("ilog: base cannot be < 2");
         } else if (x < 1) {
@@ -1069,8 +1069,8 @@ namespace com::saxbophone::arby {
         }
         // find the smallest power of base that is just >= than x
         Nat power = 1;
-        Nat floor = 0;
-        Nat exponent = 0;
+        uintmax_t floor = 0;
+        uintmax_t exponent = 0;
         while (power < x) {
             power *= base;
             floor = exponent++; // increment and store old value in floor
