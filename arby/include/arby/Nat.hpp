@@ -1015,7 +1015,7 @@ namespace com::saxbophone::arby {
      * i.e. for base as \f$b\f$ and exponent as \f$x\f$: \f$b^x\f$
      * @param base,exponent parameters for the base and exponent
      * @todo Work out time-complexity
-     * @relatedalso Nat
+     * @relates com::saxbophone::arby::Nat
      */
     constexpr Nat ipow(const Nat& base, uintmax_t exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers
@@ -1059,7 +1059,7 @@ namespace com::saxbophone::arby {
      * @remarks Otherwise:
      * - \f$log_b(x)\in\mathbb{R}\f$
      * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
-     * @relatedalso Nat
+     * @relates com::saxbophone::arby::Nat
      */
     constexpr std::pair<uintmax_t, uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
@@ -1100,7 +1100,7 @@ namespace com::saxbophone::arby {
          * @note we use a raw literal in this case because as the Nat type is
          * unbounded, we want to support a potentially infinite number of digits,
          * or certainly more than can be stored in unsigned long long...
-         * @relatedalso com::saxbophone::arby::Nat
+         * @relates com::saxbophone::arby::Nat
          */
         constexpr Nat operator "" _nat(const char* literal) {
             // detect number base
