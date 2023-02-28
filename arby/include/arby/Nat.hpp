@@ -1002,6 +1002,9 @@ namespace com::saxbophone::arby {
         codlili::list<StorageType> _digits;
     };
 
+    // lift scope of divmod() friend from ADL into arby's scope
+    constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs);
+
     /** @section Math Support Functions */
 
     /**
@@ -1072,9 +1075,6 @@ namespace com::saxbophone::arby {
         // floor = ceil when power = x
         return {power == x ? exponent : floor, exponent};
     }
-
-    // lift scope of divmod() friend from ADL into arby's scope
-    constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs);
 
     /** @section Custom Literals */
 
