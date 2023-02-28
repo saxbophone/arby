@@ -6,6 +6,8 @@ add_library(
         casting.cpp
         digits.cpp
         divmod.cpp
+        ilog.cpp
+        ipow.cpp
         misc.cpp
         multiplication.cpp
         namespaces.cpp

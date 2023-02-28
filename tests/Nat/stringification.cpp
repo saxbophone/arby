@@ -5,7 +5,6 @@
 #include <catch2/catch.hpp>
 
 #include <arby/Nat.hpp>
-#include <arby/math.hpp>
 
 using namespace com::saxbophone;
 using namespace com::saxbophone::arby::literals;
