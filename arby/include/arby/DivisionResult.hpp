@@ -36,7 +36,7 @@ namespace com::saxbophone::arby {
      * @code
      * auto [quotient, remainder] = DivisionResult();
      * @endcode
-     * @warn You shouldn't create a DivisionResult<> with a remainder larger than its
+     * @warning You shouldn't create a DivisionResult<> with a remainder larger than its
      * quotient (this doesn't make any sense, at least not for positive number
      * division), but this isn't checked or enforced in any way by this struct.
      * Likewise, a DivisionResult with a zero quotient AND a zero remainder also makes
