@@ -37,7 +37,7 @@ namespace com::saxbophone::arby {
 
         // for structured binding support
         template <std::size_t N>
-        decltype(auto) get() const {
+        constexpr decltype(auto) get() const {
             if constexpr (N == 0) return floor;
             else if constexpr (N == 1) return ceil;
         }
