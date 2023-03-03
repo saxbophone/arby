@@ -16,6 +16,7 @@ target_link_libraries(
 )
 
 # every sub-part of the test suite
+add_subdirectory(Interval)
 add_subdirectory(Nat)
 
 # test executable wraps everything together
@@ -23,6 +24,7 @@ add_executable(tests)
 target_sources(
     tests PRIVATE
         main.cpp
+        $<TARGET_OBJECTS:Interval>
         $<TARGET_OBJECTS:Nat>
 )
 target_link_libraries(
