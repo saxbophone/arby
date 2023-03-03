@@ -29,3 +29,5 @@ TEMPLATE_TEST_CASE("Structured binding from Interval", "[interval]", int, unsign
     CHECK(floor == 99);
     CHECK(ceil == 133);
 }
+
+// NOTE: at this stage there is no support guaranteed for binding references
