@@ -31,6 +31,8 @@ namespace com::saxbophone::arby {
     public:
         constexpr Interval() {}
 
+        constexpr Interval(T value) : Interval(value, value) {}
+
         constexpr Interval(T floor, T ceil) : floor(floor), ceil(ceil) {}
 
         // for structured binding support

@@ -30,4 +30,11 @@ TEMPLATE_TEST_CASE("Structured binding from Interval", "[interval]", int, unsign
     CHECK(ceil == 133);
 }
 
+TEMPLATE_TEST_CASE("Interval with same floor and ceil", "[interval]", int, unsigned long, arby::Nat) {
+    arby::Interval<TestType> input(999);
+
+    CHECK(input.floor == 999);
+    CHECK(input.ceil == 999);
+}
+
 // NOTE: at this stage there is no support guaranteed for binding references
