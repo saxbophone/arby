@@ -27,41 +27,69 @@
 
 
 namespace com::saxbophone::arby {
+    /**
+     * @brief Represents a closed mathematical interval of type T
+     * @details AKA an interval over \f$[floor, ceil]\f$
+     * @note Interval supports being used in structured bindings, i.e. the
+     * following code is valid:
+     * @code
+     * auto [floor, ceil] = Interval();
+     * @endcode
+     */
     template <typename T>
     struct Interval {
+        /**
+         * @brief Default-initialises both floor and ceil
+         */
         constexpr Interval() {}
 
+        /**
+         * @brief Initialises both floor and ceil to given value
+         */
         constexpr Interval(T value) : Interval(value, value) {}
 
+        /**
+         * @brief Initialises both floor and ceil to separate values
+         */
         constexpr Interval(T floor, T ceil) : floor(floor), ceil(ceil) {}
 
-        // for structured binding support
+        /**
+         * @note for structured binding support
+         */
         template <std::size_t N>
         constexpr decltype(auto) get() const {
             if constexpr (N == 0) return floor;
             else if constexpr (N == 1) return ceil;
         }
 
-        // cast to other template of self
+        /**
+         * @brief cast to other template of self
+         * @pre `(U)T{}` must be well-defined
+         */
         template <typename U> requires std::convertible_to<T, U>
         constexpr operator Interval<U>() const {
             return {(U)floor, (U)ceil};
         }
 
-        T floor = {};
-        T ceil = {};
+        T floor = {}; /**< The minimum bound of this Interval, inclusive */
+        T ceil = {}; /**< The maximum bound of this Interval, inclusive */
     };
 
     // TODO: provide floor()/ceil() free function overloads?
 }
 
-// for structured binding support
+/**
+ * @note for structured binding support
+ */
 template <typename T>
 struct std::tuple_size<com::saxbophone::arby::Interval<T>> : std::integral_constant<std::size_t, 2> {};
 
+/**
+ * @note for structured binding support
+ */
 template <std::size_t N, typename T>
 struct std::tuple_element<N, com::saxbophone::arby::Interval<T>> {
-    using type = T;
+    using type = T; /**< required for structured binding support */
 };
 
 #endif // include guard
