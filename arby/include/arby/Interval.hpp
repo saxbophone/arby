@@ -54,10 +54,11 @@ namespace com::saxbophone::arby {
         constexpr Interval(T floor, T ceil) : floor(floor), ceil(ceil) {}
 
         /**
-         * @note for structured binding support
+         * @brief Provides support for structured bindings
+         * @note We only provide access as a copy
          */
         template <std::size_t N>
-        constexpr decltype(auto) get() const {
+        constexpr std::tuple_element<N, Interval>::type get() const {
             if constexpr (N == 0) return floor;
             else if constexpr (N == 1) return ceil;
         }
