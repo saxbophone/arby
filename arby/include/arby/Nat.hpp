@@ -35,6 +35,7 @@
 
 #include <codlili/list.hpp>
 
+#include <arby/DivisionResult.hpp>
 #include <arby/Interval.hpp>
 
 
@@ -644,11 +645,11 @@ namespace com::saxbophone::arby {
         /**
          * @brief division and modulo all-in-one, equivalent to C/C++ div() and Python divmod()
          * @param lhs,rhs operands for the division/modulo operation
-         * @returns pair of {quotient, remainder}
+         * @returns DivisionResult of {quotient, remainder}
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        friend constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        friend constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs) {
             // division by zero is undefined
             if (rhs._digits.front() == 0) {
                 throw std::domain_error("division by zero");
@@ -718,8 +719,7 @@ namespace com::saxbophone::arby {
          * @todo Work out time-complexity
          */
         friend constexpr Nat operator/(Nat lhs, const Nat& rhs) {
-            Nat quotient;
-            std::tie(quotient, std::ignore) = divmod(lhs, rhs);
+            auto [quotient, discard] = divmod(lhs, rhs);
             return quotient;
         }
         /**
@@ -746,8 +746,7 @@ namespace com::saxbophone::arby {
          * @todo Work out time-complexity
          */
         friend constexpr Nat operator%(Nat lhs, const Nat& rhs) {
-            Nat remainder;
-            std::tie(std::ignore, remainder) = divmod(lhs, rhs);
+            auto [discard, remainder] = divmod(lhs, rhs);
             return remainder;
         }
         /**
@@ -1010,7 +1009,7 @@ namespace com::saxbophone::arby {
      */
 
     // lift scope of divmod() friend from ADL into arby's scope
-    constexpr std::pair<Nat, Nat> divmod(const Nat& lhs, const Nat& rhs);
+    constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs);
 
     /**
      * @returns base raised to the power of exponent
