@@ -58,7 +58,7 @@ namespace com::saxbophone::arby {
          * @note We only provide access as a copy
          */
         template <std::size_t N>
-        constexpr std::tuple_element<N, Interval>::type get() const {
+        constexpr typename std::tuple_element<N, Interval>::type get() const {
             if constexpr (N == 0) return floor;
             else if constexpr (N == 1) return ceil;
         }
