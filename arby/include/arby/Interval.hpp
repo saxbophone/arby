@@ -19,7 +19,10 @@
 #ifndef COM_SAXBOPHONE_ARBY_INTERVAL_HPP
 #define COM_SAXBOPHONE_ARBY_INTERVAL_HPP
 
+#include <type_traits>
 #include <utility> // pair
+
+#include <cstddef> // size_t
 
 
 namespace com::saxbophone::arby {
@@ -36,6 +39,13 @@ namespace com::saxbophone::arby {
             return _bounds;
         }
 
+        // for structured binding support
+        template <std::size_t N>
+        decltype(auto) get() const {
+            if constexpr (N == 0) return floor;
+            else if constexpr (N == 1) return ceil;
+        }
+
         T& floor = _bounds.first;
         T& ceil = _bounds.second;
     private:
@@ -44,5 +54,14 @@ namespace com::saxbophone::arby {
 
     // TODO: provide floor()/ceil() free function overloads?
 }
+
+// for structured binding support
+template <typename T>
+struct std::tuple_size<com::saxbophone::arby::Interval<T>> : std::integral_constant<std::size_t, 2> {};
+
+template <std::size_t N, typename T>
+struct std::tuple_element<N, com::saxbophone::arby::Interval<T>> {
+    using type = T;
+};
 
 #endif // include guard
