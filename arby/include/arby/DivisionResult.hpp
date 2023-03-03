@@ -20,10 +20,12 @@
 #define COM_SAXBOPHONE_ARBY_DIVISION_HPP
 
 #include <concepts> // convertible_to
+#include <tuple> // tuple
 #include <type_traits>
-#include <utility> // pair
 
 #include <cstddef> // size_t
+
+#include <arby/Interval.hpp>
 
 
 namespace com::saxbophone::arby {
@@ -77,6 +79,10 @@ namespace com::saxbophone::arby {
 
         constexpr T ceil() const {
             return quotient + (remainder > 0); // ceil is one more than quotient if we have a non-zero remainder
+        }
+
+        constexpr operator Interval<T>() const {
+            return {floor(), ceil()};
         }
 
         T quotient = {}; /**< quotient, i.e. the main "result" part of the division */

@@ -56,4 +56,20 @@ TEMPLATE_TEST_CASE("Get ceiling and floor of DivisionResult", "[division-result]
     CHECK(whole.ceil() == 123);
 }
 
+TEMPLATE_TEST_CASE("Convert DivisionResult to Interval", "[division-result]", int, unsigned long, arby::Nat) {
+    arby::DivisionResult<TestType> between(988, 66);
+
+    arby::Interval<TestType> between_interval = between;
+
+    CHECK(between_interval.floor == between.floor());
+    CHECK(between_interval.ceil == between.ceil());
+
+    arby::DivisionResult<TestType> whole(123, 0);
+
+    arby::Interval<TestType> whole_interval = whole;
+
+    CHECK(whole_interval.floor == whole.floor());
+    CHECK(whole_interval.ceil == whole.ceil());
+}
+
 // NOTE: at this stage there is no support guaranteed for binding references

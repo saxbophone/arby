@@ -20,8 +20,8 @@
 #define COM_SAXBOPHONE_ARBY_INTERVAL_HPP
 
 #include <concepts> // convertible_to
+#include <tuple> // tuple
 #include <type_traits>
-#include <utility> // pair
 
 #include <cstddef> // size_t
 
