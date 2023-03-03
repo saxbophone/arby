@@ -35,6 +35,8 @@
 
 #include <codlili/list.hpp>
 
+#include <arby/Interval.hpp>
+
 
 /**
  * @brief Main namespace
@@ -1043,25 +1045,23 @@ namespace com::saxbophone::arby {
     /**
      * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
      * @code
-     * auto [low, high] = ilog(b, x);
+     * auto [floor, ceil] = ilog(b, x);
      * @endcode
      * @param base base to use for \f$b\f$
      * @param x value to use for \f$x\f$
      * @pre \f$b\geq2\f$
      * @pre \f$x\geq1\f$
      * @throws std::domain_error when preconditions are violated
-     * @returns pair of \f$(low, high)\f$ where for \f$\mathbb{R}\ v = log_b(x)\f$:
-     * - \f$low = floor(v)\f$
-     * - \f$high = ceil(v)\f$
-     * @post \f$low \leq high\f$
-     * @remarks When \f$low = high\f$:
+     * @returns Interval of \f$[floor, ceil]\f$ for \f$log_b(x)\f$
+     * @post \f$floor \leq ceil\f$
+     * @remarks When \f$floor = ceil\f$:
      * - \f$log_b(x)\in\mathbb{N}\f$
      * @remarks Otherwise:
      * - \f$log_b(x)\in\mathbb{R}\f$
      * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
      * @relates com::saxbophone::arby::Nat
      */
-    constexpr std::pair<uintmax_t, uintmax_t> ilog(const Nat& base, const Nat& x) {
+    constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
             throw std::domain_error("ilog: base cannot be < 2");
         } else if (x < 1) {

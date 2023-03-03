@@ -19,7 +19,6 @@
 #include <limits>
 #include <sstream>
 #include <string>
-#include <tuple>         // tie
 
 #include <arby/Nat.hpp>
 
@@ -32,8 +31,7 @@ namespace com::saxbophone::arby {
 
     std::string Nat::_stringify_for_base(std::uint8_t base) const {
         // find out how many digits of the given base can be squeezed into uintmax_t
-        Nat max_possible;
-        std::tie(max_possible, std::ignore) = ilog(base, std::numeric_limits<uintmax_t>::max());
+        auto [max_possible, discard] = ilog(base, std::numeric_limits<uintmax_t>::max());
         // we will build up the string using digits of this base, for efficiency
         const Nat chunk = ipow(base, (uintmax_t)max_possible);
         Nat value = *this;
