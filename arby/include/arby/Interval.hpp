@@ -27,8 +27,7 @@
 
 namespace com::saxbophone::arby {
     template <typename T>
-    class Interval {
-    public:
+    struct Interval {
         constexpr Interval() {}
 
         constexpr Interval(T value) : Interval(value, value) {}
