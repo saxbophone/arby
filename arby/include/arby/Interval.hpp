@@ -19,6 +19,7 @@
 #ifndef COM_SAXBOPHONE_ARBY_INTERVAL_HPP
 #define COM_SAXBOPHONE_ARBY_INTERVAL_HPP
 
+#include <concepts> // convertible_to
 #include <type_traits>
 #include <utility> // pair
 
@@ -39,6 +40,12 @@ namespace com::saxbophone::arby {
         constexpr decltype(auto) get() const {
             if constexpr (N == 0) return floor;
             else if constexpr (N == 1) return ceil;
+        }
+
+        // cast to other template of self
+        template <typename U> requires std::convertible_to<T, U>
+        constexpr operator Interval<U>() const {
+            return {(U)floor, (U)ceil};
         }
 
         T floor = {};
