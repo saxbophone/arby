@@ -38,3 +38,12 @@ TEMPLATE_TEST_CASE("Convert Interval to pair", "[interval]", int, unsigned long,
     CHECK(output.first == 99);
     CHECK(output.second == 133);
 }
+
+TEMPLATE_TEST_CASE("Structured binding from Interval", "[interval]", int, unsigned long, arby::Nat) {
+    arby::Interval<TestType> input(99, 133);
+
+    auto [floor, ceil] = input;
+
+    CHECK(floor == 99);
+    CHECK(ceil == 133);
+}
