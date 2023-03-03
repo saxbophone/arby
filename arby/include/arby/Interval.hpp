@@ -31,13 +31,7 @@ namespace com::saxbophone::arby {
     public:
         constexpr Interval() {}
 
-        constexpr Interval(std::pair<T, T> p) : _bounds(p) {}
-
-        constexpr Interval(T ceil, T floor) : Interval(std::pair{ceil, floor}) {}
-
-        constexpr operator std::pair<T, T>() const {
-            return _bounds;
-        }
+        constexpr Interval(T floor, T ceil) : floor(floor), ceil(ceil) {}
 
         // for structured binding support
         template <std::size_t N>
@@ -46,10 +40,8 @@ namespace com::saxbophone::arby {
             else if constexpr (N == 1) return ceil;
         }
 
-        T& floor = _bounds.first;
-        T& ceil = _bounds.second;
-    private:
-        std::pair<T, T> _bounds;
+        T floor = {};
+        T ceil = {};
     };
 
     // TODO: provide floor()/ceil() free function overloads?
