@@ -73,14 +73,23 @@ namespace com::saxbophone::arby {
             return {(U)quotient, (U)remainder};
         }
 
+        /**
+         * @returns the Rational value of this division rounded down
+         */
         constexpr T floor() const {
             return quotient;
         }
 
+        /**
+         * @returns the Rational value of this division rounded up
+         */
         constexpr T ceil() const {
             return quotient + (remainder > 0); // ceil is one more than quotient if we have a non-zero remainder
         }
 
+        /**
+         * @returns this division converted to an Interval of its floor and ceiling
+         */
         constexpr operator Interval<T>() const {
             return {floor(), ceil()};
         }
