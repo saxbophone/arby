@@ -16,7 +16,7 @@ target_link_libraries(
 )
 
 # every sub-part of the test suite
-add_subdirectory(Division)
+add_subdirectory(DivisionResult)
 add_subdirectory(Interval)
 add_subdirectory(Nat)
 
@@ -25,7 +25,7 @@ add_executable(tests)
 target_sources(
     tests PRIVATE
         main.cpp
-        $<TARGET_OBJECTS:Division>
+        $<TARGET_OBJECTS:DivisionResult>
         $<TARGET_OBJECTS:Interval>
         $<TARGET_OBJECTS:Nat>
 )
