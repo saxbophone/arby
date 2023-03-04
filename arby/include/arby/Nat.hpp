@@ -1003,11 +1003,6 @@ namespace com::saxbophone::arby {
         codlili::list<StorageType> _digits;
     };
 
-    /**
-     * @addtogroup math-support Math Support Functions
-     * @{
-     */
-
     // lift scope of divmod() friend from ADL into arby's scope
     constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs);
 
@@ -1016,7 +1011,7 @@ namespace com::saxbophone::arby {
      * i.e. for base as \f$b\f$ and exponent as \f$x\f$: \f$b^x\f$
      * @param base,exponent parameters for the base and exponent
      * @todo Work out time-complexity
-     * @relates com::saxbophone::arby::Nat
+     * @relatedalso com::saxbophone::arby::Nat
      */
     constexpr Nat ipow(const Nat& base, uintmax_t exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers
@@ -1058,7 +1053,7 @@ namespace com::saxbophone::arby {
      * @remarks Otherwise:
      * - \f$log_b(x)\in\mathbb{R}\f$
      * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
-     * @relates com::saxbophone::arby::Nat
+     * @relatedalso com::saxbophone::arby::Nat
      */
     constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
@@ -1077,8 +1072,6 @@ namespace com::saxbophone::arby {
         // floor = ceil when power = x
         return {power == x ? exponent : floor, exponent};
     }
-
-    /** @} */
 
     /**
      * @brief Various custom user-defined-literals for creating arby objects
@@ -1099,7 +1092,7 @@ namespace com::saxbophone::arby {
          * @note we use a raw literal in this case because as the Nat type is
          * unbounded, we want to support a potentially infinite number of digits,
          * or certainly more than can be stored in unsigned long long...
-         * @relates com::saxbophone::arby::Nat
+         * @relatedalso com::saxbophone::arby::Nat
          */
         constexpr Nat operator "" _nat(const char* literal) {
             // detect number base
