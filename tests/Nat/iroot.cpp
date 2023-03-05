@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #include <limits>
+#include <stdexcept>
 
 #include <catch2/catch.hpp>
 
@@ -10,21 +11,18 @@
 
 using namespace com::saxbophone;
 
-// std::pow() is not accurate for large powers and we need exactness
-// TODO: put this in a helper function accessible to all tests
-static uintmax_t integer_pow(uintmax_t base, uintmax_t exponent) {
-    // 1 to the power of anything is always 1
-    if (base == 1) {
-        return 1;
-    }
-    uintmax_t power = 1;
-    for (uintmax_t i = 0; i < exponent; i++) {
-        power *= base;
-    }
-    return power;
+TEST_CASE("0th root of any arby::Nat value raises domain_error") {
+    uintmax_t base = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+
+    CHECK_THROWS_AS(arby::iroot(0, base), std::domain_error);
 }
 
-// TODO: test cases for any root of 0 or 1, always equalling 0 or 1
+TEST_CASE("Integer root of arby::Nat of value 0 or 1 always returns same value regardless of the root", "[math-support][iroot]") {
+    uintmax_t exponent = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+
+    CHECK(arby::iroot(exponent, 0) == arby::Interval<arby::Nat>(0));
+    CHECK(arby::iroot(exponent, 1) == arby::Interval<arby::Nat>(1));
+}
 
 TEST_CASE("Integer root of perfect square/cube/n-power arby::Nat", "[math-support][iroot]") {
     uintmax_t base = GENERATE(take(100, random((uintmax_t)2, (uintmax_t)100)));
