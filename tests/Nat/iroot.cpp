@@ -48,7 +48,7 @@ TEST_CASE("arby::Nat Integer root of arbitrary base and exponents gives floor an
     uintmax_t base = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
     uintmax_t exponent = GENERATE((uintmax_t)2, (uintmax_t)100);
     double real_root = std::pow(base, 1.0 / exponent);
-    arby::Interval<arby::Nat> expected(std::floor(real_root), std::ceil(real_root));
+    arby::Interval<arby::Nat> expected(arby::Nat::from_float(std::floor(real_root)), arby::Nat::from_float(std::ceil(real_root)));
 
     auto root = arby::iroot(exponent, base);
 

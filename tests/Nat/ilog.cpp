@@ -84,7 +84,7 @@ TEST_CASE("arby::ilog() with hardcoded values", "[math-support][ilog]") {
 TEST_CASE("arby::ilog(2, x) regression test", "[math-support][ilog]") {
     uintmax_t x = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
     auto real_log = std::log2(x);
-    arby::Interval<uintmax_t> expected(std::floor(real_log), std::ceil(real_log));
+    arby::Interval<uintmax_t> expected((uintmax_t)std::floor(real_log), (uintmax_t)std::ceil(real_log));
 
     auto result = arby::ilog(2, x);
 
