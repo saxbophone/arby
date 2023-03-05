@@ -35,3 +35,15 @@ TEST_CASE("Integer root of perfect square/cube/n-power arby::Nat", "[math-suppor
 
     CHECK(root == expected);
 }
+
+TEST_CASE("arby::Nat Integer root of arbitrary base and exponents gives floor and ceil of Real answer", "[math-support][iroot]") {
+    uintmax_t base = GENERATE(take(100, random((uintmax_t)1, std::numeric_limits<uintmax_t>::max())));
+    // calculate nax exponent based on number of bits in uintmax_t to make sure results aren't all [0, 1]
+    uintmax_t exponent = GENERATE((uintmax_t)1, (uintmax_t)std::numeric_limits<uintmax_t>::digits / 6);
+    double real_root = std::pow(base, 1.0 / exponent);
+    arby::Interval<arby::Nat> expected(std::floor(real_root), std::ceil(real_root));
+
+    auto root = arby::iroot(base, exponent);
+
+    CHECK(root == expected);
+}
