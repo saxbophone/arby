@@ -33,6 +33,8 @@ TEST_CASE("Integer root of perfect square/cube/n-power arby::Nat", "[math-suppor
 
     auto root = arby::iroot(exponent, perfect_power);
 
+    CAPTURE(base, exponent, root.floor, root.ceil, expected.floor, expected.ceil);
+
     CHECK(root == expected);
 }
 
@@ -43,7 +45,9 @@ TEST_CASE("arby::Nat Integer root of arbitrary base and exponents gives floor an
     double real_root = std::pow(base, 1.0 / exponent);
     arby::Interval<arby::Nat> expected(std::floor(real_root), std::ceil(real_root));
 
-    auto root = arby::iroot(base, exponent);
+    auto root = arby::iroot(exponent, base);
+
+    CAPTURE(base, exponent, root.floor, root.ceil, expected.floor, expected.ceil);
 
     CHECK(root == expected);
 }

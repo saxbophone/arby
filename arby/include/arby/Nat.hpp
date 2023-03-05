@@ -1078,10 +1078,17 @@ namespace com::saxbophone::arby {
         return {power == x ? exponent : floor, exponent};
     }
 
-    constexpr Interval<Nat> iroot(const Nat& n, const Nat& x) {
+    constexpr Interval<Nat> iroot(uintmax_t n, const Nat& x) {
         if (n == 0) { throw std::domain_error("0th root is undefined"); }
         if (x < 2) { return x; /* any root of 0 or 1 is always 0 or 1 */ }
-        return {};
+        // use the bit-length of x to derive an estimate for nth root magnitude
+        auto w = ilog(2, x);
+        // then derive floor and ceiling of w/n
+        auto floor = w.floor / n;
+        auto ceil = w.ceil / n + (w.ceil % n > 0);
+        // the answer lies somewhere between 2**floor and 2**ceil
+        // TODO: use binary search over that interval to home in on the real answer
+        return {ipow(2, floor), ipow(2, ceil)};
     }
 
     /** @} */
