@@ -1079,6 +1079,8 @@ namespace com::saxbophone::arby {
     }
 
     constexpr Interval<Nat> iroot(const Nat& n, const Nat& x) {
+        if (n == 0) { throw std::domain_error("0th root is undefined"); }
+        if (x < 2) { return x; /* any root of 0 or 1 is always 0 or 1 */ }
         return {};
     }
 
