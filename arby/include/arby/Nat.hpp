@@ -1066,6 +1066,16 @@ namespace com::saxbophone::arby {
         } else if (x < 1) {
             throw std::domain_error("ilog: x cannot be < 1");
         }
+        // if base is 2, count the bits instead
+        if (base == 2) {
+            auto count = x.bit_length();
+            // just determine if x fully uses all the bits or not
+            if ((Nat(1) << count - 1) == x) {
+                return {count - 1}; // 1 followed by count-1 many zeroes
+            } else {
+                return {count - 1, count};
+            }
+        }
         // find the smallest power of base that is just >= than x
         Nat power = 1;
         uintmax_t floor = 0;
