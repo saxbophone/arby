@@ -1041,6 +1041,7 @@ namespace com::saxbophone::arby {
         }
         return power;
     }
+
     /**
      * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
      * @code
@@ -1088,6 +1089,16 @@ namespace com::saxbophone::arby {
         return {power == x ? exponent : floor, exponent};
     }
 
+    /**
+     * @brief Calculates integer root \f$[floor, ceil] = \sqrt[n]{x}\f$
+     * @returns Interval of floor and ceiling of the given root
+     * @pre \f$n\neq0\f$
+     * @pre \f$floor\leqceil\f$ for returned Interval
+     * @remarks When \f$floor = ceil\f$:
+     * - \f$l\sqrt[n]{x}\in\mathbb{N}\f$
+     * @remarks Otherwise:
+     * - \f$\sqrt[n]{x}\in\mathbb{R}\f$
+     */
     constexpr Interval<Nat> iroot(uintmax_t n, const Nat& x) {
         if (n == 0) { throw std::domain_error("0th root is undefined"); }
         if (x < 2) { return x; /* any root of 0 or 1 is always 0 or 1 */ }
