@@ -1041,6 +1041,7 @@ namespace com::saxbophone::arby {
         }
         return power;
     }
+
     /**
      * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
      * @code
@@ -1066,6 +1067,16 @@ namespace com::saxbophone::arby {
         } else if (x < 1) {
             throw std::domain_error("ilog: x cannot be < 1");
         }
+        // if base is 2, count the bits instead
+        if (base == 2) {
+            auto count = x.bit_length();
+            // just determine if x fully uses all the bits or not
+            if ((Nat(1) << count - 1) == x) {
+                return {count - 1}; // 1 followed by count-1 many zeroes
+            } else {
+                return {count - 1, count};
+            }
+        }
         // find the smallest power of base that is just >= than x
         Nat power = 1;
         uintmax_t floor = 0;
@@ -1076,6 +1087,38 @@ namespace com::saxbophone::arby {
         }
         // floor = ceil when power = x
         return {power == x ? exponent : floor, exponent};
+    }
+
+    /**
+     * @brief Calculates integer root \f$[floor, ceil] = \sqrt[n]{x}\f$
+     * @returns Interval of floor and ceiling of the given root
+     * @pre \f$n\neq0\f$
+     * @pre \f$floor\leqceil\f$ for returned Interval
+     * @remarks When \f$floor = ceil\f$:
+     * - \f$l\sqrt[n]{x}\in\mathbb{N}\f$
+     * @remarks Otherwise:
+     * - \f$\sqrt[n]{x}\in\mathbb{R}\f$
+     */
+    constexpr Interval<Nat> iroot(uintmax_t n, const Nat& x) {
+        if (n == 0) { throw std::domain_error("0th root is undefined"); }
+        if (x < 2) { return x; /* any root of 0 or 1 is always 0 or 1 */ }
+        // 1th root of anything is itself
+        if (n == 1) { return x; }
+        // use the bit-length of x to derive an estimate for nth root magnitude
+        auto w = ilog(2, x);
+        // then derive floor and ceiling of 2**w/n
+        auto floor = ipow(2, w.floor / n);
+        auto ceil = ipow(2, w.ceil / n + (w.ceil % n > 0));
+        // the answer lies somewhere between 2**floor and 2**ceil
+        // use binary search over that interval to home in on the real answer
+        while (ceil - floor > 1) {
+            auto estimate = (floor + ceil) / 2;
+            auto trial = ipow(estimate, n);
+            if (trial == x) { return estimate; } // exact match
+            if (trial > x) { ceil = estimate; } // too high
+            if (trial < x) { floor = estimate; } // too low
+        }
+        return {floor, ceil};
     }
 
     /** @} */

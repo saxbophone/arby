@@ -8,6 +8,7 @@ add_library(
         divmod.cpp
         ilog.cpp
         ipow.cpp
+        iroot.cpp
         misc.cpp
         multiplication.cpp
         namespaces.cpp

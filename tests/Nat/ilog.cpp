@@ -7,6 +7,7 @@
 
 #include <catch2/catch.hpp>
 
+#include <arby/Interval.hpp>
 #include <arby/Nat.hpp>
 
 using namespace com::saxbophone;
@@ -77,4 +78,15 @@ TEST_CASE("arby::ilog() with hardcoded values", "[math-support][ilog]") {
     CAPTURE(base, x);
     CHECK(result_floor == expected_floor);
     CHECK(result_ceil == expected_ceil);
+}
+
+// regression tests for base-2 log, because this is special-cased for performance reasons
+TEST_CASE("arby::ilog(2, x) regression test", "[math-support][ilog]") {
+    uintmax_t x = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
+    auto real_log = std::log2(x);
+    arby::Interval<uintmax_t> expected((uintmax_t)std::floor(real_log), (uintmax_t)std::ceil(real_log));
+
+    auto result = arby::ilog(2, x);
+
+    CHECK(result == expected);
 }

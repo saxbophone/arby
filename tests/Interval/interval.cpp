@@ -49,4 +49,11 @@ TEST_CASE("Interval<T> can be cast to Interval<U> where (T)U is valid", "[interv
     CHECK(output.ceil == 232);
 }
 
+TEST_CASE("Interval can be compared to Interval", "[interval]") {
+    arby::Interval<int> a(64, -523);
+    arby::Interval<int> b = a;
+
+    CHECK(a == b);
+}
+
 // NOTE: at this stage there is no support guaranteed for binding references
