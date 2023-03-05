@@ -72,6 +72,11 @@ namespace com::saxbophone::arby {
             return {(U)floor, (U)ceil};
         }
 
+        /**
+         * @brief enables defaulted equality-comparison between Intervals
+         */
+        constexpr bool operator==(const Interval& other) const = default;
+
         T floor = {}; /**< The minimum bound of this Interval, inclusive */
         T ceil = {}; /**< The maximum bound of this Interval, inclusive */
     };

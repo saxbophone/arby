@@ -1078,6 +1078,10 @@ namespace com::saxbophone::arby {
         return {power == x ? exponent : floor, exponent};
     }
 
+    constexpr Interval<Nat> iroot(const Nat& n, const Nat& x) {
+        return {};
+    }
+
     /** @} */
 
     /**
