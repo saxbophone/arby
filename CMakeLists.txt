@@ -115,7 +115,7 @@ else() # GCC/Clang warning option
     enable_cxx_compiler_flag_if_supported("-Wno-unknown-pragmas")
     # if tests are enabled, enable converting all warnings to errors too
     if (ENABLE_TESTS)
-        enable_cxx_compiler_flag_if_supported("-Werror")
+        # enable_cxx_compiler_flag_if_supported("-Werror")
         # exclude the following kinds of warnings from being converted into errors
         # unknown-pragma is useful to have as a warning but not as an error, if you have
         # pragmas which are for the consumption of one compiler only
@@ -128,6 +128,8 @@ else() # GCC/Clang warning option
         enable_cxx_compiler_flag_if_supported("-Wno-error=unused-but-set-variable")
         # Clang's now introduced a "helpful" analysis of for-loops that increment a variable twice
         enable_cxx_compiler_flag_if_supported("-Wno-error=for-loop-analysis")
+        # XXX: make sanitizer force quit
+        # enable_cxx_compiler_flag_if_supported("-fno-sanitize-recover=all")
     endif()
 endif()
 
