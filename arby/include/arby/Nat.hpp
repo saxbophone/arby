@@ -197,16 +197,16 @@ namespace com::saxbophone::arby {
             // use size to indicate ordering if they differ
             if (_digits.size() != rhs._digits.size()) {
                 return _digits.size() <=> rhs._digits.size();
-            } else { // otherwise compare the elements until a mismatch is found
-                auto it = _digits.begin();
-                auto rhs_it = rhs._digits.begin();
-                for (; it != _digits.end(); it++, rhs_it++) {
-                    if (*it != *rhs_it) {
-                        return *it <=> *rhs_it;
-                    }
-                }
-                return std::strong_ordering::equal;
             }
+            // otherwise compare the elements until a mismatch is found
+            auto it = _digits.begin();
+            auto rhs_it = rhs._digits.begin();
+            for (; it != _digits.end(); it++, rhs_it++) {
+                if (*it != *rhs_it) {
+                    return *it <=> *rhs_it;
+                }
+            }
+            return std::strong_ordering::equal;
         }
         /**
          * @brief Default constructor, initialises to numeric value `0`
@@ -575,11 +575,8 @@ namespace com::saxbophone::arby {
                 return product;
             }
             // optimisation using bitshifting when multiplying by binary powers
-            if (rhs.is_power_of_2()) {
-                return lhs << (rhs.bit_length() - 1);
-            } else if (lhs.is_power_of_2()) {
-                return rhs * lhs;
-            }
+            if (rhs.is_power_of_2()) { return lhs << (rhs.bit_length() - 1); }
+            if (lhs.is_power_of_2()) { return rhs * lhs; }
             // multiply each digit from lhs with each digit from rhs
             std::size_t l = 0; // manual indices to track which digit we are on,
             std::size_t r = 0; // as codlili's iterators are not random-access
@@ -1042,15 +1039,11 @@ namespace com::saxbophone::arby {
     constexpr Nat ipow(const Nat& base, uintmax_t exponent) {
         // use divide-and-conquer recursion to break up huge powers into products of smaller powers
         // exponent = 0 is our base case to terminate the recursion
-        if (exponent == 0) {
-            return 1;
-        } else if (exponent == 1) {
-            // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
-            return base;
-        } else if (exponent == 2) {
-            // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
-            return base * base;
-        }
+        if (exponent == 0) { return 1; }
+        // exponent = 1 is an additional base case mainly to prevent a redundant level of recursion to 0
+        if (exponent == 1) { return base; }
+        // exponent = 2 is our final base case, as it seems a waste to leave it to the catch-all case below
+        if (exponent == 2) { return base * base; }
         auto quotient = exponent / 2;
         auto remainder = exponent % 2;
         // instead of calculating x^n, do x^(n/2)
@@ -1065,11 +1058,8 @@ namespace com::saxbophone::arby {
 
     // define and lift scope of ilog() friend from ADL into arby's scope
     constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x) {
-        if (base < 2) {
-            throw std::domain_error("ilog: base cannot be < 2");
-        } else if (x < 1) {
-            throw std::domain_error("ilog: x cannot be < 1");
-        }
+        if (base < 2) { throw std::domain_error("ilog: base cannot be < 2"); }
+        if (x < 1) { throw std::domain_error("ilog: x cannot be < 1"); }
         // if base is 2, count the bits instead
         if (base == 2) {
             auto count = x.bit_length();
@@ -1104,9 +1094,8 @@ namespace com::saxbophone::arby {
      */
     constexpr Interval<Nat> iroot(uintmax_t n, const Nat& x) {
         if (n == 0) { throw std::domain_error("0th root is undefined"); }
-        if (x < 2) { return x; /* any root of 0 or 1 is always 0 or 1 */ }
-        // 1th root of anything is itself
-        if (n == 1) { return x; }
+        if (x < 2) { return x; } // any root of 0 or 1 is always 0 or 1
+        if (n == 1) { return x; } // 1th root of anything is itself
         // use the bit-length of x to derive an estimate for nth root magnitude
         auto w = ilog(2, x);
         // then derive floor and ceiling of 2**w/n
