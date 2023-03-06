@@ -1071,8 +1071,9 @@ namespace com::saxbophone::arby {
         }
         // if base is a power of 2, we can count how many n-bit chunks there are
         if (base.is_power_of_2()) {
-            auto b = ilog(2, base).floor;
-            auto xl = ilog(2, x);
+            auto b = ilog(2, base).floor; // floor=ceil in this case, as base is binary power
+            auto xl = ilog(2, x); // log₂(x)
+            // floor-rounding the floor and ceil-rounding the ceil divided by b gives an accurate answer
             return {xl.floor / b, xl.ceil / b + (xl.ceil % b > 0)};
         }
         // find the smallest power of base that is just >= than x
