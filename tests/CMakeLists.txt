@@ -5,6 +5,11 @@ CPMFindPackage(
     EXCLUDE_FROM_ALL YES
 )
 
+set(SANITIZE_ADDRESS ON)
+set(SANITIZE_UNDEFINED ON)
+
+find_package(Sanitizers)
+
 # common option-propagating target to use for test suite sub-targets
 add_library(tests-config INTERFACE)
 target_link_libraries(
@@ -35,6 +40,7 @@ target_link_libraries(
         arby
         Catch2::Catch2  # unit testing framework
 )
+add_sanitizers(tests)
 
 enable_testing()
 
