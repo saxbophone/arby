@@ -1077,9 +1077,11 @@ namespace com::saxbophone::arby {
             return {xl.floor / b, xl.ceil / b + (xl.ceil % b > 0)};
         }
         // find the smallest power of base that is just >= than x
-        Nat power = 1;
-        uintmax_t floor = 0;
-        uintmax_t exponent = 0;
+        // a good starting estimate can be found using log₂ of both base and x
+        uintmax_t exponent = ilog(2, x).floor / ilog(2, base).ceil; // deliberate underestimate
+        // NOTE: if binary search is desired rather than linear search from minimum bound, calculate an exponent interval
+        Nat power = ipow(base, exponent);
+        uintmax_t floor = exponent;
         while (power < x) {
             power *= base;
             floor = exponent++; // increment and store old value in floor
