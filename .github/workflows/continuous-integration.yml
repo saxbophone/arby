@@ -43,7 +43,10 @@ jobs:
             memcheck: true # memory-testing on Linux only
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
 
       # when building on master branch and not a pull request, build and test in release mode (optimised build)
       - name: Set Build Mode to Release
