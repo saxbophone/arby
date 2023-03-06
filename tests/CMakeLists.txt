@@ -5,10 +5,12 @@ CPMFindPackage(
     EXCLUDE_FROM_ALL YES
 )
 
-set(SANITIZE_ADDRESS ON)
-set(SANITIZE_UNDEFINED ON)
+if (NOT MSVC) # Sanitizers package doesn't seem to work well with MSVC on CI...
+    set(SANITIZE_ADDRESS ON)
+    set(SANITIZE_UNDEFINED ON)
 
-find_package(Sanitizers)
+    find_package(Sanitizers)
+endif()
 
 # common option-propagating target to use for test suite sub-targets
 add_library(tests-config INTERFACE)
@@ -40,7 +42,9 @@ target_link_libraries(
         arby
         Catch2::Catch2  # unit testing framework
 )
-add_sanitizers(tests)
+if (NOT MSVC) # Sanitizers package doesn't seem to work well with MSVC on CI...
+    add_sanitizers(tests)
+endif()
 
 enable_testing()
 
