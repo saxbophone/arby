@@ -1060,7 +1060,7 @@ namespace com::saxbophone::arby {
     constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) { throw std::domain_error("ilog: base cannot be < 2"); }
         if (x < 1) { throw std::domain_error("ilog: x cannot be < 1"); }
-        // if base is 2, count the bits instead
+        // if base is 2, count the bits
         if (base == 2) {
             auto count = x.bit_length();
             if (x.is_power_of_2()) {
@@ -1069,17 +1069,16 @@ namespace com::saxbophone::arby {
                 return {count - 1, count};
             }
         }
-        // if base is a power of 2, we can count how many n-bit chunks there are
+        // if base is any other power of 2, we can count how many n-bit chunks there are
         if (base.is_power_of_2()) {
             auto b = ilog(2, base).floor; // floor=ceil in this case, as base is binary power
             auto xl = ilog(2, x); // log₂(x)
             // floor-rounding the floor and ceil-rounding the ceil divided by b gives an accurate answer
             return {xl.floor / b, xl.ceil / b + (xl.ceil % b > 0)};
         }
-        // find the smallest power of base that is just >= than x
+        // otherwise, find the smallest power of base that is just >= x
         // a good starting estimate can be found using log₂ of both base and x
-        uintmax_t exponent = ilog(2, x).floor / ilog(2, base).ceil; // deliberate underestimate
-        // NOTE: if binary search is desired rather than linear search from minimum bound, calculate an exponent interval
+        uintmax_t exponent = ilog(2, x).floor / ilog(2, base).ceil; // deliberate underestimate, but closer than 1
         Nat power = ipow(base, exponent);
         uintmax_t floor = exponent;
         while (power < x) {
