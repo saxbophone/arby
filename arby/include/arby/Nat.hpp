@@ -1063,12 +1063,17 @@ namespace com::saxbophone::arby {
         // if base is 2, count the bits instead
         if (base == 2) {
             auto count = x.bit_length();
-            // just determine if x fully uses all the bits or not
-            if ((Nat(1) << count - 1) == x) {
+            if (x.is_power_of_2()) {
                 return {count - 1}; // 1 followed by count-1 many zeroes
             } else {
                 return {count - 1, count};
             }
+        }
+        // if base is a power of 2, we can count how many n-bit chunks there are
+        if (base.is_power_of_2()) {
+            auto b = ilog(2, base).floor;
+            auto xl = ilog(2, x);
+            return {xl.floor / b, xl.ceil / b + (xl.ceil % b > 0)};
         }
         // find the smallest power of base that is just >= than x
         Nat power = 1;

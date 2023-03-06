@@ -83,12 +83,14 @@ TEST_CASE("arby::ilog() with hardcoded values", "[math-support][ilog]") {
 // regression tests for log with power of 2 base, because these is special-cased for performance reasons
 TEST_CASE("arby::ilog(2**i, x) regression test", "[math-support][ilog]") {
     uintmax_t x = GENERATE(take(100, random((uintmax_t)0, std::numeric_limits<uintmax_t>::max())));
-    uintmax_t i = GENERATE((uintmax_t)1, std::numeric_limits<uintmax_t>::digits / 2);
+    uintmax_t i = GENERATE((uintmax_t)1, std::numeric_limits<uintmax_t>::digits);
     auto power = std::pow(2, i);
     auto real_log = std::log(x) / std::log(power);
     arby::Interval<uintmax_t> expected((uintmax_t)std::floor(real_log), (uintmax_t)std::ceil(real_log));
 
     auto result = arby::ilog(arby::ipow(2, i), x);
+
+    CAPTURE(x, i, power, real_log, expected.floor, expected.ceil, result.floor, result.ceil);
 
     CHECK(result == expected);
 }
