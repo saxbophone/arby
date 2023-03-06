@@ -557,6 +557,7 @@ namespace com::saxbophone::arby {
         }
     private: // private helper methods for multiplication operator
         constexpr bool is_power_of_2() const {
+            // TODO: optimise this --check leading digit is power of 2 and trailing digits are all zero
             return *this == Nat(1) << (bit_length() - 1);
         }
     public:
@@ -604,7 +605,7 @@ namespace com::saxbophone::arby {
             product._validate_digits();
             return product;
         }
-    private: // private helper methods for divmod()
+    private: // private helper methods for divmod() TODO: move to anonymous namespace near definition of divmod()
         // function that shifts up rhs to be just big enough to be smaller than lhs
         // TODO: rewrite this to use bit-shifting for speed
         static constexpr Nat get_max_shift(const Nat& lhs, const Nat& rhs) {
@@ -649,53 +650,7 @@ namespace com::saxbophone::arby {
          * @throws std::domain_error when rhs is zero
          * @todo Work out time-complexity
          */
-        friend constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs) {
-            // division by zero is undefined
-            if (rhs._digits.front() == 0) {
-                throw std::domain_error("division by zero");
-            }
-            if (lhs._digits.front() == 0) { return {lhs, lhs}; } // zero shortcut
-            // optimisation using bitshifting when dividing by binary powers
-            if (rhs.is_power_of_2()) {
-                auto width = rhs.bit_length();
-                // the remainder is the digits that are shifted out, so bitmask for them
-                auto bitmask = (Nat(1) << (width - 1)) - 1;
-                Nat quotient = lhs >> (width - 1);
-                Nat remainder = lhs & bitmask;
-                quotient._validate_digits();
-                remainder._validate_digits();
-                return {quotient, remainder};
-            }
-            // this will gradually accumulate the calculated quotient
-            Nat quotient;
-            // this will gradually decrement with each subtraction
-            Nat remainder = lhs;
-            // while we have any chance in subtracting further from it
-            while (remainder >= rhs) {
-                // exponent denotes a raw value describing how many places we can shift rhs up by
-                Nat exponent = Nat::get_max_shift(remainder, rhs);
-                // estimate how many times it goes in and subtract this many of rhs
-                Nat estimate = Nat::estimate_division(remainder, rhs);
-                // we'll actually be subtracting rhs shifted by exponent
-                Nat shifted_rhs = rhs * exponent;
-                if (remainder >= (estimate * shifted_rhs)) {
-                    remainder -= estimate * shifted_rhs;
-                    quotient += estimate * exponent;
-                }
-                // our estimate deliberately underestimates how many times shifted rhs can go into remainder
-                // here we subtract further rounds of shifted_rhs if possible
-                if (remainder >= (shifted_rhs)) {
-                    remainder -= (shifted_rhs);
-                    quotient += exponent;
-                }
-                // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
-                // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
-                // terminate.
-            }
-            quotient._validate_digits();
-            remainder._validate_digits();
-            return {quotient, remainder};
-        }
+        friend constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs);
         /**
          * @brief division-assignment
          * @details Divides this Nat by other value and stores result to this
@@ -997,6 +952,26 @@ namespace com::saxbophone::arby {
         constexpr codlili::list<StorageType> digits() const {
             return _digits;
         }
+        /**
+         * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
+         * @code
+         * auto [floor, ceil] = ilog(b, x);
+         * @endcode
+         * @param base base to use for \f$b\f$
+         * @param x value to use for \f$x\f$
+         * @pre \f$b\geq2\f$
+         * @pre \f$x\geq1\f$
+         * @throws std::domain_error when preconditions are violated
+         * @returns Interval of \f$[floor, ceil]\f$ for \f$log_b(x)\f$
+         * @post \f$floor \leq ceil\f$
+         * @remarks When \f$floor = ceil\f$:
+         * - \f$log_b(x)\in\mathbb{N}\f$
+         * @remarks Otherwise:
+         * - \f$log_b(x)\in\mathbb{R}\f$
+         * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
+         * @relates com::saxbophone::arby::Nat
+         */
+        friend constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x);
     private:
         std::string _stringify_for_base(std::uint8_t base) const;
 
@@ -1008,8 +983,54 @@ namespace com::saxbophone::arby {
      * @{
      */
 
-    // lift scope of divmod() friend from ADL into arby's scope
-    constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs);
+    // define and lift scope of divmod() friend from ADL into arby's scope
+    constexpr DivisionResult<Nat> divmod(const Nat& lhs, const Nat& rhs) {
+        // division by zero is undefined
+        if (rhs._digits.front() == 0) {
+            throw std::domain_error("division by zero");
+        }
+        if (lhs._digits.front() == 0) { return {lhs, lhs}; } // zero shortcut
+        // optimisation using bitshifting when dividing by binary powers
+        if (rhs.is_power_of_2()) {
+            auto width = rhs.bit_length();
+            // the remainder is the digits that are shifted out, so bitmask for them
+            auto bitmask = (Nat(1) << (width - 1)) - 1;
+            Nat quotient = lhs >> (width - 1);
+            Nat remainder = lhs & bitmask;
+            quotient._validate_digits();
+            remainder._validate_digits();
+            return {quotient, remainder};
+        }
+        // this will gradually accumulate the calculated quotient
+        Nat quotient;
+        // this will gradually decrement with each subtraction
+        Nat remainder = lhs;
+        // while we have any chance in subtracting further from it
+        while (remainder >= rhs) {
+            // exponent denotes a raw value describing how many places we can shift rhs up by
+            Nat exponent = Nat::get_max_shift(remainder, rhs);
+            // estimate how many times it goes in and subtract this many of rhs
+            Nat estimate = Nat::estimate_division(remainder, rhs);
+            // we'll actually be subtracting rhs shifted by exponent
+            Nat shifted_rhs = rhs * exponent;
+            if (remainder >= (estimate * shifted_rhs)) {
+                remainder -= estimate * shifted_rhs;
+                quotient += estimate * exponent;
+            }
+            // our estimate deliberately underestimates how many times shifted rhs can go into remainder
+            // here we subtract further rounds of shifted_rhs if possible
+            if (remainder >= (shifted_rhs)) {
+                remainder -= (shifted_rhs);
+                quotient += exponent;
+            }
+            // NOTE: this is guaranteed to terminate eventually because the last value that shifted_rhs will take
+            // will be rhs without a shift, i.e. rhs * 1, subtraction of which from the remainder is guaranteed to
+            // terminate.
+        }
+        quotient._validate_digits();
+        remainder._validate_digits();
+        return {quotient, remainder};
+    }
 
     /**
      * @returns base raised to the power of exponent
@@ -1042,25 +1063,7 @@ namespace com::saxbophone::arby {
         return power;
     }
 
-    /**
-     * @brief Calculates integer log of `x` in `base` as bounds of \f$log_b(x)\f$
-     * @code
-     * auto [floor, ceil] = ilog(b, x);
-     * @endcode
-     * @param base base to use for \f$b\f$
-     * @param x value to use for \f$x\f$
-     * @pre \f$b\geq2\f$
-     * @pre \f$x\geq1\f$
-     * @throws std::domain_error when preconditions are violated
-     * @returns Interval of \f$[floor, ceil]\f$ for \f$log_b(x)\f$
-     * @post \f$floor \leq ceil\f$
-     * @remarks When \f$floor = ceil\f$:
-     * - \f$log_b(x)\in\mathbb{N}\f$
-     * @remarks Otherwise:
-     * - \f$log_b(x)\in\mathbb{R}\f$
-     * @note Complexity: @f$ \mathcal{O}(n^2log(n)) @f$
-     * @relates com::saxbophone::arby::Nat
-     */
+    // define and lift scope of ilog() friend from ADL into arby's scope
     constexpr Interval<uintmax_t> ilog(const Nat& base, const Nat& x) {
         if (base < 2) {
             throw std::domain_error("ilog: base cannot be < 2");
