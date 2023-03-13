@@ -25,7 +25,6 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         cxx: [g++-10, clang++]
-        memcheck: [false]
         include:
           # macos has two separate versions for the different compilers because
           # the new macos image needed for clang using a new version of XCode
@@ -38,24 +37,17 @@ jobs:
             cxx: clang++
           - os: windows-2019
             cxx: msvc
-          - os: ubuntu-20.04
-            cxx: g++-10
-            memcheck: true # memory-testing on Linux only
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
 
       # when building on master branch and not a pull request, build and test in release mode (optimised build)
       - name: Set Build Mode to Release
         shell: bash
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
         run: echo "BUILD_TYPE=Release" >> $GITHUB_ENV
-
-      - name: Install Valgrind
-        if: ${{ matrix.memcheck }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install valgrind
 
       - name: Configure CMake
         env:
@@ -76,21 +68,11 @@ jobs:
         run: cmake --build . --config $BUILD_TYPE
 
       - name: Test
-        if: ${{ !matrix.memcheck }}
         working-directory: ${{github.workspace}}/build
         shell: bash
         # Execute tests defined by the CMake configuration.  
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: ctest -C $BUILD_TYPE --no-tests=error
-
-      - name: Test with Valgrind
-        if: ${{ matrix.memcheck }}
-        working-directory: ${{github.workspace}}/build
-        shell: bash
-        # run ctest with memcheck mode to check for memory errors with Valgrind
-        # exclude the one test case for arby::Nat::from_float with NaN/Inf because it fails on Valgrind
-        # due to lack of long double support
-        run: ctest -C $BUILD_TYPE -T memcheck -j3 -E "with non-finite value throws" --no-tests=error
 
       - name: Test Install
         working-directory: ${{github.workspace}}/build

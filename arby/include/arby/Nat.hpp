@@ -213,6 +213,8 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat() : _digits{0} {
             _validate_digits();
+            int i = std::numeric_limits<int>::max();
+            ++i;
         }
         /**
          * @brief Integer-constructor, initialises with the given integer value
