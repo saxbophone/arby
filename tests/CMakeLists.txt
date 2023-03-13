@@ -21,6 +21,9 @@ target_link_libraries(
         arby
         Catch2::Catch2  # unit testing framework
 )
+if (NOT MSVC) # Sanitizers package doesn't seem to work well with MSVC on CI...
+    add_sanitizers(tests-config)
+endif()
 
 # every sub-part of the test suite
 add_subdirectory(DivisionResult)
@@ -42,9 +45,6 @@ target_link_libraries(
         arby
         Catch2::Catch2  # unit testing framework
 )
-if (NOT MSVC) # Sanitizers package doesn't seem to work well with MSVC on CI...
-    add_sanitizers(tests)
-endif()
 
 enable_testing()
 
