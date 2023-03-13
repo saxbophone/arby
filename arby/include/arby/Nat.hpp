@@ -213,8 +213,8 @@ namespace com::saxbophone::arby {
          */
         constexpr Nat() : _digits{0} {
             _validate_digits();
-            int k = 0x7fffffff;
-            k += 1; // cause integer overflow
+            int i = std::numeric_limits<int>::max();
+            ++i;
         }
         /**
          * @brief Integer-constructor, initialises with the given integer value
